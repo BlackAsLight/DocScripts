@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.6
+// @version      0.7
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -76,7 +76,7 @@ const resources = (() => {
                 aTag.href = `https://politicsandwar.com/nation/trade/create/resource=${resource}?p=${price}&q=${resources.money / price - quantity > 1000000 ? 1000000 : Math.floor(resources.money / price) - quantity}&t=b`;
             }
             else if (cells[2].childElementCount == 1) {
-                aTag.href = `https://politicsandwar.com/nation/trade/create/resource=${resource}?p=${price}&q=${resources[resource] - quantity > 1000000 ? 1000000 : Math.floor(resources[resource]) - quantity}`;
+                aTag.href = `https://politicsandwar.com/nation/trade/create/resource=${resource}?p=${price}&q=${resources[resource] - quantity > 1000000 ? 1000000 : Math.floor(resources[resource]) - quantity}&t=s`;
             }
             aTag.innerText = 'TopUp';
             cells[5].appendChild(aTag);
