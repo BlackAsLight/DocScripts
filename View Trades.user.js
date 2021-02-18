@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.5
+// @version      0.6
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -81,9 +81,5 @@ const resources = (() => {
             aTag.innerText = 'TopUp';
             cells[5].appendChild(aTag);
         }
-    }
-})();
-        cells[5].append(' | ');
-        cells[5].appendChild(aTags[1]);
     }
 })();
