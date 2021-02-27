@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.8
+// @version      0.9
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -42,12 +42,11 @@ const resources = (() => {
         const quantity = parseInt(cells[4].innerText.trim().replaceAll(',', ''));
         const price = parseInt(cells[5].innerText.trim().split(' ')[0].replaceAll(',', ''));
         if (cells[6].children[0].tagName == 'FORM') {
-            const type = cells[6].children[0].children[5].value.toLowerCase();
+            const isSelling = cells[6].children[0].children[5].value.toLowerCase() == 'sell';
             cells[5].appendChild(document.createElement('br'));
             let outbidQuantity = 0;
             let matchQuantity = 0;
-            let t = '';
-            if (type == 'sell') {
+            if (isSelling) {
                 cells[6].children[0].children[5].style.backgroundColor = sellColor;
                 if (quantity > resources[resource]) {
                     cells[6].children[0].children[3].value = Math.floor(resources[resource]);
@@ -55,7 +54,6 @@ const resources = (() => {
                 }
                 outbidQuantity = resources.money / (price + 1) > 1000000 ? 1000000 : Math.floor(resources.money / (price + 1));
                 matchQuantity = resources.money / price > 1000000 ? 1000000 : Math.floor(resources.money / price);
-                t = 'b';
             }
             else {
                 cells[6].children[0].children[5].style.backgroundColor = buyColor;
@@ -65,12 +63,11 @@ const resources = (() => {
                 }
                 outbidQuantity = resources[resource] > 1000000 ? 1000000 : Math.floor(resources[resource]);
                 matchQuantity = resources[resource] > 1000000 ? 1000000 : Math.floor(resources[resource]);
-                t = 's';
             }
             if (outbidQuantity > 0) {
                 let aTag = document.createElement('a');
                 aTag.innerText = 'Outbid';
-                aTag.href = `https://politicsandwar.com/nation/trade/create/resource=${resource}?p=${price + 1}&q=${outbidQuantity}&t=${t}`;
+                aTag.href = `https://politicsandwar.com/nation/trade/create/resource=${resource}?p=${price + (isSelling ? 1 : -1)}&q=${outbidQuantity}&t=${isSelling ? 'b' : 's'}`;
                 cells[5].appendChild(aTag);
             }
             if (outbidQuantity > 0 && matchQuantity > 0) {
@@ -79,26 +76,26 @@ const resources = (() => {
             if (matchQuantity > 0) {
                 let aTag = document.createElement('a');
                 aTag.innerText = 'Match';
-                aTag.href = `https://politicsandwar.com/nation/trade/create/resource=${resource}?p=${price}&q=${matchQuantity}&t=${t}`;
+                aTag.href = `https://politicsandwar.com/nation/trade/create/resource=${resource}?p=${price}&q=${matchQuantity}&t=${isSelling ? 'b' : 's'}`;
                 cells[5].appendChild(aTag);
             }
         }
         else if (cells[6].children[0].tagName == 'A') {
             cells[5].appendChild(document.createElement('br'));
             let topUpQuantity = 0;
-            let t = '';
+            let type = '';
             if (cells[1].childElementCount == 1) {
                 topUpQuantity = resources.money / price - quantity > 1000000 ? 1000000 : Math.floor(resources.money / price) - quantity;
-                t = 'b';
+                type = 'b';
             }
             else if (cells[2].childElementCount == 1) {
                 topUpQuantity = resources[resource] - quantity > 1000000 ? 1000000 : Math.floor(resources[resource]) - quantity;
-                t = 's';
+                type = 's';
             }
             if (topUpQuantity > 0) {
                 let aTag = document.createElement('a');
                 aTag.innerText = 'TopUp';
-                aTag.href = `https://politicsandwar.com/nation/trade/create/resource=${resource}?p=${price}&q=${topUpQuantity}&t=${t}`;
+                aTag.href = `https://politicsandwar.com/nation/trade/create/resource=${resource}?p=${price}&q=${topUpQuantity}&t=${type}`;
                 cells[5].appendChild(aTag);
             }
         }
