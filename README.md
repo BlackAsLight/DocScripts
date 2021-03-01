@@ -19,5 +19,6 @@ The Outbid, Match, and TopUp buttons only appear if the quantity is greater than
 ### Create Trade
  - Reads quantity and price in URL, provided by the View Trades Script's buttons, and fills out the form for you.
  - Hides the buy/sell button not specified in the URL, provided by the View Trades Script's buttons.
+ - Removes the Confirm Buy/Sell buttons **if** one of the Buy/Sell buttons disappear.
 
 This script requires the View Trades Script to be of actual any use.

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.2
+// @version      0.3
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -20,13 +20,23 @@ for (let i = 0; i < args.length; i++) {
         document.getElementById('amount').value = parseInt(args[i][1]);
     }
     else if (args[i][0] == 't') {
+        let sellButton = document.getElementsByClassName('nationtable')[0].children[0].children[9].children[0].children[0].children[0];
+        let buyButton = document.getElementsByClassName('nationtable')[0].children[0].children[9].children[0].children[0].children[1];
         if (args[i][1] == 's') {
-            document.getElementsByClassName('nationtable')[0].children[0].children[9].children[0].children[0].children[1].style.display = 'none';
-            document.getElementsByClassName('nationtable')[0].children[0].children[9].children[0].children[0].children[0].style.borderRadius = '6px';
+            buyButton.style.display = 'none';
+            sellButton.style.borderRadius = '6px';
+            sellButton.type = 'submit';
+            sellButton.name = 'submit';
+            sellButton.value = 'Sell';
+            sellButton.dataset.target = '';
         }
         else {
-            document.getElementsByClassName('nationtable')[0].children[0].children[9].children[0].children[0].children[0].style.display = 'none';
-            document.getElementsByClassName('nationtable')[0].children[0].children[9].children[0].children[0].children[1].style.borderRadius = '6px';
+            sellButton.style.display = 'none';
+            buyButton.style.borderRadius = '6px';
+            buyButton.type = 'submit';
+            buyButton.name = 'submit';
+            buyButton.value = 'Buy';
+            buyButton.dataset.target = '';
         }
     }
 }
