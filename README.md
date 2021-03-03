@@ -6,7 +6,7 @@ Please create an issue here on GitHub if you find any bugs or have suggestions a
 
 ## Installation
 
-Click on the `.user.js` script above that you'd like to have installed on TamperMonkey, then click the Raw button located somewhere on your screen. TampkerMonkey should take over from there prompting you with an install button.
+Click on the `.user.js` script above that you'd like to have installed on [TamperMonkey](https://www.tampermonkey.net/), then click the Raw button located somewhere on your screen. [TamperMonkey](https://www.tampermonkey.net/) should take over from there prompting you with an install button.
 
 ## Script Description
 
