@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.0
+// @version      1.1
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -33,12 +33,14 @@ const resources = (() => {
 	};
 })();
 
-(async () => {
+{
 	let trTags = document.getElementsByClassName('nationtable')[0].children[0].children;
 	for (let i = 1; i < trTags.length; i++) {
 		AffectRow(trTags[i].children);
 	}
+}
 
+(async () => {
 	const isNationDisplay = (() => {
 		if (window.location.pathname == '/nation/trade/') {
 			return true;
@@ -55,7 +57,24 @@ const resources = (() => {
 		}
 		return true;
 	})();
+
 	if (!isNationDisplay) {
+		let ulTag = document.createElement('ul');
+		ulTag.innerHTML = `Load All Offers: <input id ="loadOffers" type="checkbox" ${localStorage.Doc_LoadAllOffers == 'true' ? 'checked' : ''}>`;
+		document.getElementById('leftcolumn').appendChild(ulTag);
+		document.getElementById('loadOffers').onchange = () => {
+			console.log('potatocake');
+			let inputTag = document.getElementById('loadOffers');
+			if (inputTag.checked) {
+				localStorage.Doc_LoadAllOffers = true;
+			}
+			else {
+				localStorage.Doc_LoadAllOffers = false;
+			}
+		};
+	}
+
+	if (!isNationDisplay && localStorage.Doc_LoadAllOffers == 'true') {
 		const maximumOffers = (() => {
 			const args = window.location.search.split('&');
 			while (args.length) {
@@ -152,6 +171,7 @@ function AffectRow(cells) {
 	const quantity = parseInt(cells[4].innerText.trim().replaceAll(',', ''));
 	const price = parseInt(cells[5].innerText.trim().split(' ')[0].replaceAll(',', ''));
 	const isSellOffer = cells[1].childElementCount == 1;
+
 	if (cells[6].children[0].tagName == 'FORM') {
 		if (isSellOffer) {
 			cells[6].children[0].children[5].style.backgroundColor = sellColor;
@@ -166,6 +186,7 @@ function AffectRow(cells) {
 			}
 		}
 		cells[5].children[2].innerText = '$' + (parseInt(cells[6].children[0].children[3].value) * price).toLocaleString();
+
 		cells[5].appendChild(document.createElement('br'));
 		let outbidLink = createLink(resource, price + (isSellOffer ? 1 : -1), isSellOffer);
 		if (typeof outbidLink == 'string') {

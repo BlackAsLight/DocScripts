@@ -14,8 +14,9 @@ Click on the `.user.js` script above that you'd like to have installed on [Tampe
 
 - Changes colour of sell and buy buttons to match that of the create trade screen.
 - Changes amount listed in the boxes to the actual amount you are able to buy or sell if the offerer is asking for more than you have.
-- Makes it so all trade offers refined to said search results are displayed instead of whatever your default is.
-  - This excludes when viewing your own nation trades page to prevent the unnecessary loading of (on average) 10-50 pages.
+- Provides the ability to load all trade offers (refined to your search) instead of your default amount listed.
+  - A checkbox can be found on the left side of the screen to toggle on and off this feature.
+  - This feature and the checkbox will not show up when viewing your own trade screen.
 - Adds an Outbid button, which allows you to easily place a trade offer $1 less than said offer.
   - Requires the Create Trade Script to work properly.
 - Adds a Match button, which allows you to easily place a trade offer at the same price as said offer.
