@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.1
+// @version      1.2
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -225,6 +225,9 @@ function createLink(resource, price, isSellOffer, subQuantity = 0) {
 	}
 	else {
 		quantity = Math.floor(resources[resource] - subQuantity);
+		if (resource == 'food') {
+			quantity -= 5000;
+		}
 	}
 	if (quantity > 1000000) {
 		quantity = 1000000;
