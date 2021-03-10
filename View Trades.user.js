@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.3
+// @version      1.4
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -190,25 +190,7 @@ function AffectRow(cells) {
 			}
 		}
 		cells[5].children[2].innerText = '$' + (parseInt(cells[6].children[0].children[3].value) * price).toLocaleString();
-
-		cells[5].appendChild(document.createElement('br'));
-		let outbidLink = createLink(resource, price + (isSellOffer ? 1 : -1), isSellOffer);
-		if (typeof outbidLink == 'string') {
-			let aTag = document.createElement('a');
-			aTag.innerText = 'Outbid';
-			aTag.href = outbidLink;
-			cells[5].appendChild(aTag);
-		}
-		let matchLink = createLink(resource, price, isSellOffer);
-		if (typeof outbidLink == 'string' && typeof matchLink == 'string') {
-			cells[5].append(' | ');
-		}
-		if (typeof matchLink == 'string') {
-			let aTag = document.createElement('a');
-			aTag.innerText = 'Match';
-			aTag.href = matchLink;
-			cells[5].appendChild(aTag);
-		}
+		outbidAndMatch(cells[5], resource, price, isSellOffer);
 	}
 	else if (cells[6].children[0].tagName == 'A') {
 		let link = createLink(resource, price, isSellOffer, quantity);
@@ -219,6 +201,34 @@ function AffectRow(cells) {
 			aTag.href = link;
 			cells[5].appendChild(aTag);
 		}
+	}
+	else if (cells[6].children[0].tagName == 'IMG') {
+		const isBuyOffer = cells[2].childElementCount == 1;
+		if (!isSellOffer && !isBuyOffer) {
+			return;
+		}
+		outbidAndMatch(cells[5], resource, price, isSellOffer);
+	}
+}
+
+function outbidAndMatch(cell, resource, price, isSellOffer) {
+    cell.appendChild(document.createElement('br'));
+	let outbidLink = createLink(resource, price + (isSellOffer ? 1 : -1), isSellOffer);
+	if (typeof outbidLink == 'string') {
+		let aTag = document.createElement('a');
+		aTag.innerText = 'Outbid';
+		aTag.href = outbidLink;
+		cell.appendChild(aTag);
+	}
+	let matchLink = createLink(resource, price, isSellOffer);
+	if (typeof outbidLink == 'string' && typeof matchLink == 'string') {
+		cell.append(' | ');
+	}
+	if (typeof matchLink == 'string') {
+		let aTag = document.createElement('a');
+		aTag.innerText = 'Match';
+		aTag.href = matchLink;
+		cell.appendChild(aTag);
 	}
 }
 
