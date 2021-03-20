@@ -28,7 +28,7 @@ The Outbid, Match, and TopUp buttons only appear if the quantity is greater than
 
 ### Create Trade
 
-- Changes colour of 'Top Offers' Tables to match that of the buy/sell buttons.
+- Changes colour of 'Top Offers' Tables to match that of the buy/sell buttons and fixes the bad formatting of the tables.
 - Reads quantity and price in URL, provided by the View Trades Script's buttons, and fills out the form for you.
 - Hides the buy/sell button not specified in the URL, provided by the View Trades Script's buttons.
 - Removes the Confirm Buy/Sell buttons **if** one of the Buy/Sell buttons disappear.

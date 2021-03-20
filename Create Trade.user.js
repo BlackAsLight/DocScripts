@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.5
+// @version      0.6
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -56,9 +56,72 @@ else {
 				}
 				rows.shift();
 				for (let j = 0; j < rows.length; j++) {
-					if (j % 2) {
-						for (let k = 0; k < rows[j].childElementCount; k++) {
-							rows[j].children[k].style = 'background: ' + (i ? '#9cc2e3' : '#a6d8a6');
+					for (let k = 0; k < rows[j].childElementCount; k++) {
+						let background = '';
+						if (j % 2) {
+							background = 'background: ' + (i ? '#9cc2e3;' : '#a6d8a6;');
+						}
+						if (k == 0) {
+							rows[j].children[k].style = background + 'text-align: center;';
+							rows[j].children[k].textContent = (() => {
+								let date = new Date(rows[j].children[k].textContent);
+								let text = '';
+								if (date.getHours() < 10) {
+									text += '0';
+								}
+								text += date.getHours() + ':';
+								if (date.getMinutes() < 10) {
+									text += '0';
+								}
+								text += date.getMinutes() + ' ';
+								if (date.getDate() < 10) {
+									text += '0';
+								}
+								text += date.getDate() + '/';
+								switch (date.getMonth()) {
+									case 0:
+										text += 'Jan/';
+										break;
+									case 1:
+										text += 'Feb/';
+										break;
+									case 2:
+										text += 'Mar/';
+										break;
+									case 3:
+										text += 'Apr/';
+										break;
+									case 4:
+										text += 'May/';
+										break;
+									case 5:
+										text += 'Jun/';
+										break;
+									case 6:
+										text += 'Jul/';
+										break;
+									case 7:
+										text += 'Aug/';
+										break;
+									case 8:
+										text += 'Sep/';
+										break;
+									case 9:
+										text += 'Oct/';
+										break;
+									case 10:
+										text += 'Nov/';
+										break;
+									case 11:
+										text += 'Dec/';
+										break;
+								}
+								text += date.getFullYear();
+								return text;
+							})();
+						}
+						else {
+							rows[j].children[k].style = background + 'text-align: right;';
 						}
 					}
 				}
