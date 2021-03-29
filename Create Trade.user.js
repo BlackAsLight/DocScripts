@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.6
+// @version      0.7
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -11,7 +11,20 @@
 'use strict';
 
 if (document.getElementsByClassName('alert-success').length) {
-	window.location = document.getElementsByClassName('alert-success')[0].children[1].children[0].href;
+	if (localStorage.Doc_LoadAllOffers == 'true') {
+		let args = document.getElementsByClassName('alert-success')[0].children[1].children[0].href.split('&');
+		for (let i = 0; i < args.length; i++) {
+			args[i] = args[i].split('=');
+			if (args[i][0] == 'minimum') {
+				args[i][1] = 0;
+			}
+			args[i] = args[i].join('=');
+		}
+		window.location = args.join('&');
+	}
+	else {
+		window.location = document.getElementsByClassName('alert-success')[0].children[1].children[0].href;
+	}
 }
 else {
 	let args = window.location.search.slice(1).split('&');
