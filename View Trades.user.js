@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.4
+// @version      1.5
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -59,11 +59,10 @@ const resources = (() => {
 	})();
 
 	if (!isNationDisplay) {
-		let ulTag = document.createElement('ul');
-		ulTag.innerHTML = `Load All Offers: <input id ="loadOffers" type="checkbox" ${localStorage.Doc_LoadAllOffers == 'true' ? 'checked' : ''}>`;
-		document.getElementById('leftcolumn').appendChild(ulTag);
+		let codeTag = document.createElement('code');
+		codeTag.innerHTML = `Load All Offers: <input id ="loadOffers" type="checkbox" ${localStorage.Doc_LoadAllOffers == 'true' ? 'checked' : ''}>`;
+		document.getElementById('leftcolumn').appendChild(codeTag);
 		document.getElementById('loadOffers').onchange = () => {
-			console.log('potatocake');
 			let inputTag = document.getElementById('loadOffers');
 			if (inputTag.checked) {
 				localStorage.Doc_LoadAllOffers = true;
