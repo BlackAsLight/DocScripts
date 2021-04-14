@@ -2,7 +2,7 @@
 
 Use with care. :)
 
-Please create an issue here on GitHub if you find any bugs or have suggestions about improvements.
+Please create an issue here on GitHub if you find any bugs, have suggestions about improvements or other script ideas.
 
 ## Installation
 
