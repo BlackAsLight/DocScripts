@@ -50,3 +50,6 @@ This script requires the View Trades Script for the first three features to be o
 This script runs on the Nations page.
 
 - Adds a Load button, which displays the current military of said Nation as well as how long since they were active.
+
+Note: You need to provide your API Key, found at the bottom of the Accounts page, to the script. You'll find an Insert API Key botton at the bottom of the sidebar for you to insert it.
+You can easily remove it by making the prompt box blank and hitting the Okay or Submit button.
