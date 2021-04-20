@@ -6,7 +6,7 @@ Please create an issue here on GitHub if you find any bugs, have suggestions abo
 
 ## Installation
 
-Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be installed on your modern browser of choice to install and run these scripts. If you do not known how to install an extention on your browser of choice then [YouTube](https://www.youtube.com/) it.
+Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be installed on your modern browser of choice to install and run these scripts. If you do not known how to install an extension on your browser of choice then [YouTube](https://www.youtube.com/) it.
 1. Click on the `.user.js` script above that you'd like to have installed on [TamperMonkey](https://www.tampermonkey.net/).
 2. Click the Raw button located somewhere on your screen.
 3. [TamperMonkey](https://www.tampermonkey.net/) should take over from there prompting you with an install button.
@@ -16,6 +16,8 @@ Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be insta
 ## Script Description
 
 ### View Trades
+
+This script runs on the Trades Page.
 
 - Changes colour of sell and buy buttons to match that of the create trade screen.
 - Changes amount listed in the boxes to the actual amount you are able to buy or sell if the offerer is asking for more than you have.
@@ -33,6 +35,8 @@ The Outbid, Match, and TopUp buttons only appear if the quantity is greater than
 
 ### Create Trade
 
+This script runs on the Create Trade page.
+
 - Reads quantity and price in URL, provided by the View Trades Script's buttons, and fills out the form for you.
 - Hides the buy/sell button not specified in the URL, provided by the View Trades Script's buttons.
 - Removes the Confirm Buy/Sell buttons **if** one of the Buy/Sell buttons disappear.
@@ -40,3 +44,9 @@ The Outbid, Match, and TopUp buttons only appear if the quantity is greater than
 - Changes colour of 'Top Offers' Tables to match that of the buy/sell buttons and fixes the bad formatting of the tables.
 
 This script requires the View Trades Script for the first three features to be of any use.
+
+### Find War
+
+This script runs on the Nations page.
+
+- Adds a Load button, which displays the current military of said Nation as well as how long since they were active.
