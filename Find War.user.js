@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Find War
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.1
+// @version      0.2
 // @description  Assists in helping find a good nation to attack.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=15*
@@ -35,22 +35,53 @@ if (localStorage.Doc_APIKey != undefined && localStorage.Doc_APIKey != '') {
 		trTags.shift();
 
 		for (let i = 0; i < trTags.length; i++) {
-			let rowID = randomID();
+			const rowID = randomID();
 			trTags[i].id = rowID;
-			let button = document.createElement('button');
-			let buttonID = randomID();
-			button.id = buttonID;
-			button.onclick = async () => {
-				let buttonTag = document.getElementById(buttonID);
-				button.parentElement.removeChild(button);
+			let loadButton = document.createElement('button');
+			const loadButtonID = randomID();
+			loadButton.id = loadButtonID;
+			loadButton.onclick = async () => {
+				let loadButtonTag = document.getElementById(loadButtonID);
+				loadButton.parentElement.removeChild(loadButton);
 				let trTag = document.getElementById(rowID);
 				let api = (await (await fetch(`https://politicsandwar.com/api/nation/id=${trTag.children[1].children[0].href.split('=')[1]}&key=${localStorage.Doc_APIKey}`)).json());
 				let newTag = document.createElement('tr');
-				newTag.innerHTML = `<td colspan="7"><p>Last Active: ${formatDate(new Date(new Date() - api.minutessinceactive * 1000 * 60))}<br>Soldiers: ${api.soldiers} | Tanks: ${api.tanks} | Planes: ${api.aircraft} | Ships: ${api.ships} | Missiles: ${api.missiles} | Nukes: ${api.nukes}</p></td>`;
+				const loadMoreButtonID = randomID();
+				newTag.innerHTML = `<td colspan="7"><p>Last Active: ${formatDate(new Date(new Date() - api.minutessinceactive * 1000 * 60))} | GDP: $${parseInt(api.gdp).toLocaleString()}`
+					+ '<br><b>Military</b>'
+					+ `<br>Soldiers: ${parseInt(api.soldiers).toLocaleString()} | Tanks: ${parseInt(api.tanks).toLocaleString()} | Planes: ${parseInt(api.aircraft).toLocaleString()} | Ships: ${parseInt(api.ships).toLocaleString()} | Missiles: ${parseInt(api.missiles).toLocaleString()} | Nukes: ${parseInt(api.nukes).toLocaleString()}`
+					+ `<br><button id="${loadMoreButtonID}">Load More</button></p></td>`;
 				trTag.parentElement.insertBefore(newTag, trTag.nextSibling);
+				document.getElementById(loadMoreButtonID).onclick = async () => {
+					let loadMoreButtonTag = document.getElementById(loadMoreButtonID);
+					let pTag = loadMoreButtonTag.parentElement;
+					pTag.removeChild(loadMoreButtonTag);
+					let doc = new DOMParser().parseFromString(await (await fetch(`https://politicsandwar.com/index.php?id=62&n=${encodeURI(api.name)}`)).text(), 'text/html');
+					let rows = doc.getElementsByClassName('nationtable')[1].children[0];
+					pTag.innerHTML += '<b>Nation</b>'
+						+ `<br>Commerce: ${parseInt(rows.children[8].children[1].innerText) + '%'} | Cities Powered: ${(() => {
+							let cities = Array.from(rows.children[9].children);
+							cities.shift();
+							cities.shift();
+							let count = 0;
+							for (let j = 0; j < cities.length; j++) {
+								count += cities[j].innerText == 'Yes';
+							}
+							return count.toLocaleString();
+						})()} | Avg Infra: ${(() => {
+							let infra = Array.from(rows.children[2].children);
+							infra.shift();
+							infra.shift();
+							let total = 0;
+							for (let j = 0; j < infra.length; j++) {
+								total += parseFloat(infra[j].innerText.replaceAll(',', ''));
+							}
+							return Math.round(total / infra.length, 2).toLocaleString();
+						})()}`;
+				};
 			};
-			button.innerText = 'Load';
-			trTags[i].children[6].appendChild(button);
+			loadButton.innerText = 'Load';
+			trTags[i].children[6].appendChild(loadButton);
 		}
 	})();
 }
