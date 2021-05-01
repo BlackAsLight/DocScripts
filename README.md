@@ -6,7 +6,7 @@ Please create an issue here on GitHub if you find any bugs, have suggestions abo
 
 ## Installation
 
-Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be installed on your modern browser of choice to install and run these scripts. If you do not known how to install an extension on your browser of choice then [YouTube](https://www.youtube.com/) it.
+Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be installed on your modern browser of choice to install and run these scripts. If you do not know how to install an extension on your browser of choice then [YouTube](https://www.youtube.com/) it.
 1. Click on the `.user.js` script above that you'd like to have installed on [TamperMonkey](https://www.tampermonkey.net/).
 2. Click the Raw button located somewhere on your screen.
 3. [TamperMonkey](https://www.tampermonkey.net/) should take over from there prompting you with an install button.
