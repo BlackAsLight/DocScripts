@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.5
+// @version      1.6
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -70,6 +70,7 @@ const resources = (() => {
 			else {
 				localStorage.Doc_LoadAllOffers = false;
 			}
+			location.reload();
 		};
 	}
 
