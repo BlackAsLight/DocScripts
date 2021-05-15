@@ -13,6 +13,16 @@ Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be insta
 4. Click said install button.
 5. You're done. Go to the pages the respective scripts run on and watch the magic.
 
+## Installation for Safari
+
+Safari users can download [TamperMonkey](https://www.tampermonkey.net/) from the App Store, but it isn't free like it is for other browsers, so a free alternative for Safari users is [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12). Once [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) is installed:
+1. Click on the `.user.js` script above that you'd like to have installed on [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12).
+2. Right click the Raw button located somewhere on your screen and click Copy Link.
+3. On the top of the browser to the left of the address bar, click on the [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) icon then click Manage Scripts.
+4. Click Install from URL and paste the copied URL into the provided box and click Ok.
+5. Click Confirm Installation located at the top right of your screen.
+6. You're done. You can close all the tabs you want now and go to the pages the respective scripts run on and waacth the magic.
+
 ## Script Description
 
 ### View Trades
