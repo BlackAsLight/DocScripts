@@ -23,6 +23,8 @@ Safari users can download [TamperMonkey](https://www.tampermonkey.net/) from the
 5. Click Confirm Installation located at the top right of your screen.
 6. You're done. You can close all the tabs you want now and go to the pages the respective scripts run on and waacth the magic.
 
+Warning: Sadly some of the features don't work properly on Safari. Currently unsure if it's due to Safari or MeddleMonkey. Further investigation is required.
+
 ## Script Description
 
 ### View Trades
@@ -40,6 +42,7 @@ This script runs on the Trades Page.
   - Requires the Create Trade Script to work properly.
 - Adds a TopUp button, which allows you to easily increase your current offers on the market.
   - Requires the Create Trade Script to work properly.
+- Adds Links with Resource Icons to easily and quickly switch between different markets.
 
 The Outbid, Match, and TopUp buttons only appear if the quantity is greater than zero. So if you have zero of said resource to sell, then no button will appear offering for you to sell it.
 
