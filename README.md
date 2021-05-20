@@ -18,7 +18,7 @@ Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be insta
 Safari users can download [TamperMonkey](https://www.tampermonkey.net/) from the App Store, but it isn't free like it is for other browsers, so a free alternative for Safari users is [UserScript](https://apps.apple.com/au/app/userscripts/id1463298887?mt=12). Once [UserScript](https://apps.apple.com/au/app/userscripts/id1463298887?mt=12) is installed and activiated Safari:
 1. Click on the `.user.js` script above that you'd like to have installed on [UserScript](https://apps.apple.com/au/app/userscripts/id1463298887?mt=12).
 2. Right click the Raw button located somewhere on your screen and click Copy Link.
-3. On the top of the browser to the left of the address bar, click on the [[UserScript](https://apps.apple.com/au/app/userscripts/id1463298887?mt=12) icon then click Open.
+3. On the top of the browser to the left of the address bar, click on the [UserScript](https://apps.apple.com/au/app/userscripts/id1463298887?mt=12) icon then click Open.
 4. Click on the `+` Plus Icon at the top of the window followed by clicking New Remote.
 5. Paste the copied link into the provided box and then click Ok.
 6. Hit the Save button in the bottom right corner.
