@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.7
+// @version      1.8
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -15,7 +15,7 @@ const sellColor = '#5cb85c';
 const buyColor = '#337ab7';
 
 const resources = (() => {
-	const resources = document.getElementById('rssBar').children[0].children[0].children[0].innerText.trim().replaceAll('  ', ' ').replaceAll(',', '').split(' ');
+	const resources = replaceAll(document.getElementById('rssBar').children[0].children[0].children[0].innerText.trim(), '  ', ' ').replaceAll(',', '').split(' ');
 	return {
 		money: parseFloat(resources[13]),
 		oil: parseFloat(resources[2]),
@@ -270,4 +270,14 @@ function createLink(resource, price, isSellOffer, subQuantity = 0) {
 		return undefined;
 	}
 	return `https://politicsandwar.com/nation/trade/create/resource=${resource}?p=${price}&q=${quantity}&t=${isSellOffer ? 'b' : 's'}`;
+}
+
+function replaceAll(text, search, replace) {
+	if (search == replace) {
+		throw `Infinite Loop`;
+	}
+	while (text.indexOf(search) != -1) {
+		text = text.replace(search, replace);
+	}
+	return text;
 }
