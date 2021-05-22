@@ -61,14 +61,7 @@ This script requires the View Trades Script for the first three features to be o
 
 This script runs on the Nations page.
 
-- Adds a Load button, which displays:
-  - When they were last active. (In your timezone not the games)
-  - Their GDP.
-  - Their current Soldiers, Tanks, Planes, Ships, Missiles, and Nukes.
-  - and adds a Load More button which displays:
-    - Their Avg Commerce.
-    - Number of Cities Powered.
-    - and their average Infrastructure.
+- Majorly changes the UI of the Nation's Page when viewing Nation's in war range. A more detailed discription will be provided when I can think of a way to describe it. Click the Find Nations in War Range button on this page to see the magic. https://politicsandwar.com/nation/war/
 
 Note: You need to provide your API Key, found at the bottom of the Accounts page, to the script. You'll find an Insert API Key botton at the bottom of the sidebar for you to insert it.
 You can easily remove it by making the prompt box blank and hitting the Okay or Submit button.
