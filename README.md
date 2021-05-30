@@ -13,16 +13,40 @@ Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be insta
 4. Click said install button.
 5. You're done. Go to the pages the respective scripts run on and watch the magic.
 
+### Updates
+
+[TamperMonkey](https://www.tampermonkey.net/) can check and install updates published here automatically and is enabled by default. If you make any updates to the script in [TamperMonkey](https://www.tampermonkey.net/) yourself then it will stop checking for updates, until otherwised told to.
+
+If you'd like to check if it's checking for updates or want to either enable/disable it from doing so then: 
+1. Click on the TamperMonkey icon and go to it's dashboard. (Based off different browsers this could look slightly differently.)
+2. Click on the script you wish to check. A tab should open listed with thata script name.
+3. Click on the Settings button for said script. 
+4. Look for the Check for Updates checkbox.
+5. Either Enable or Disable it and Click that Save button.
+6. Close the tab and you're done.
+
+Again: Saving any changes to the script's code itself will untick that box.
+
 ## Installation for Safari
 
-Safari users can download [TamperMonkey](https://www.tampermonkey.net/) from the App Store, but it isn't free like it is for other browsers, so a free alternative for Safari users is [UserScript](https://apps.apple.com/au/app/userscripts/id1463298887?mt=12). Once [UserScript](https://apps.apple.com/au/app/userscripts/id1463298887?mt=12) is installed and activiated Safari:
-1. Click on the `.user.js` script above that you'd like to have installed on [UserScript](https://apps.apple.com/au/app/userscripts/id1463298887?mt=12).
+Safari users can download [TamperMonkey](https://www.tampermonkey.net/) from the App Store, but it isn't free like it is for other browsers, so a free alternative for Safari users is [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12). Once [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) is installed and **activiated** on Safari:
+1. Click on the `.user.js` script above that you'd like to have installed on [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12).
 2. Right click the Raw button located somewhere on your screen and click Copy Link.
-3. On the top of the browser to the left of the address bar, click on the [UserScript](https://apps.apple.com/au/app/userscripts/id1463298887?mt=12) icon then click Open.
-4. Click on the `+` Plus Icon at the top of the window followed by clicking New Remote.
-5. Paste the copied link into the provided box and then click Ok.
-6. Hit the Save button in the bottom right corner.
-7. You're done. You can close the tab and go to the pages the respective scripts run on and watch the magic.
+3. On the top of the browser to the left of the address bar, click on the [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) icon then click Manage Scripts.
+4. Click on the Install From URL button at the top of the window and you'll be prompted with a textbox.
+5. Paste the copied link into this provided textbox and then click Ok.
+6. A new window will have opened. Click the green Confirm Installation button at the top right of your window.
+7. You're done. You can close the tab/s and go to the pages the respective scripts run on and watch the magic.
+
+### Updates
+
+[MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) can check and install updates published here automatically and in enabled by default.
+Unlike [TamperMonkey](https://www.tampermonkey.net/), [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) only has the "Auto Update All or Nothing" Feature.
+
+If you'd like to check if it's checking for updates or want to either enable/disable it from doing so then:
+1. On the top of the browser to the left of the address bar, click on the [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) icon then click Manage Scripts.
+2. Click on the Settings button located on the sidebar.
+3. And make sure "Automatically check scripts for updates every day" checkbox is either ticked or unticked, based on your desire.
 
 ## Script Description
 
