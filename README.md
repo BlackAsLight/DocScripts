@@ -25,6 +25,18 @@ Safari users can download [TamperMonkey](https://www.tampermonkey.net/) from the
 6. A new window will have opened. Click the green Confirm Installation button at the top right of your window.
 7. You're done. You can close the tab/s and go to the pages the respective scripts run on and watch the magic.
 
+### For Android Users
+
+It has not been tested, but according to the Internet, there is an app called Kiwi Browser, downloadable off the Google Play Store, supports Chrome extentsions. Meaning you can install TamperMonkey, through the Chrome store, on said browser and theoretically use these scripts on your phone as well.
+
+Again, this has not been tested, and that is only due to the fact that I do not own an Android.
+
+### For iOS Users
+
+iOS users are pretty much screwed. In my search for answers, I have only found one app that would allow my scripts to run on said iOS device. It's called [Gear Browser](https://apps.apple.com/au/app/gear-browser/id1458962238), and while the app is free for download the add-on feature that would run my scripts is sadly not. The app wants you to pay for a subscription to gain access, which is also the reason the app has such a low rating.
+
+**BUT** things might not always look so doom and gloom for you iOS users. If all goes to plan, and if I'm smart enough to do it, I'll be releasing my own browser app, for free, that can run userscripts.
+
 ## Updates
 
 ### TamperMonkey
