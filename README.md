@@ -27,7 +27,7 @@ Safari users can download [TamperMonkey](https://www.tampermonkey.net/) from the
 
 ### For Android Users
 
-It has not been tested, but according to the Internet, there is an app called Kiwi Browser, downloadable off the Google Play Store, supports Chrome extentsions. Meaning you can install TamperMonkey, through the Chrome store, on said browser and theoretically use these scripts on your phone as well.
+It has not been tested, but according to the Internet, there is an app called Kiwi Browser, downloadable off the Google Play Store, which supports Chrome extensions. Meaning you can install TamperMonkey, through the Chrome store, on said browser and theoretically use these scripts on your phone as well.
 
 Again, this has not been tested, and that is only due to the fact that I do not own an Android.
 
