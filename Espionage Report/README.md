@@ -16,10 +16,10 @@ To set up the Server side you'll need a Google Account.
 1. To go [Google App Script](https://script.google.com/home).
 2. Click on New Project.
 3. Give the project a name. I suggest 'Espionage Report' or 'Doc: Espionage Report'.
-4. Delete the code already in their and copy-paste the contents of the Server.js file found here above.
+4. Delete the code already in there and copy-paste the contents of the Server.js file found here above.
 5. Open this Google Spreadsheet Template [Doc: Espionage Report - Template](https://docs.google.com/spreadsheets/d/1JJPxw8O3mt_fEy5lqC6OIFdfB29EPzmW5rWBOFUWEcE/edit?usp=sharing) and select Make a Copy found under the File dropdown button on the menu bar.
 6. In the spreadsheet URL you'll want to copy the string of text between `/d/` and `/edit#gid=0`.
-7. Once Copyed you'll want to go back to the Google App Script tab and paste in between the `''` single quotation marks for the variable `spreadsheetID` found on line 9.
+7. Once Copied you'll want to go back to the Google App Script tab and paste in between the `''` single quotation marks for the variable `spreadsheetID` found on line 9.
 8. Click Save. Very important that you click Save before proceeding onto the next bit.
 9. Click the blue Deploy button, followed by New Deployment.
 10. Click the Cog wheel for Select Type and select Web App from the dropdown list.
@@ -44,6 +44,6 @@ Once that is all complete and the provided URL is correct, whenever you do an es
 ### Identifier Key
 An Identifier Key is simply meant to be a way to check who is sending in these reports. It can be any number or string and meant to help with filtering out any bad reports from malicious users.
 
-If you're in the **Alliance** category then you're government will provide you with a unique Indentification Key. While the Identification Key can just be the member's nation ID or name, it is recommended that you, the government, create a random number or string up and save it in a table next to the members name. As using a member's nation ID or name, or any other publicly available information would allow for anyone to easily send in reports as somebody else. Granted that they have the URL.
+If you're in the **Alliance** category then your government will provide you with a unique Indentification Key. While the Identification Key can just be the member's nation ID or name, it is recommended that you, the government, create a random number or string up and save it in a table next to the member's name. As using a member's nation ID or name, or any other publicly available information would allow for anyone to easily send in reports as somebody else. Granted that they have the URL.
 
 If you're an **Individual** then you can create up any number or string to place into it, but it cannot be left empty otherwise no report will be sent.
