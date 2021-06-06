@@ -4,6 +4,11 @@ Use with care. :)
 
 Please create an issue here on GitHub if you find any bugs, have suggestions about improvements or other script ideas.
 
+For those of you who find yourselves here and don't know GitHub. All the code above is open source. Meaning you can check it all out for malicious code, or if you can't read JavaScript, someone you trust can check it out for malicious code. Answers to some commonly asked questions:
+1. No, none of these scripts breaks the game rules.
+2. I can't tell if you do or don't choose to install these scripts. I don't get a notification of any sorts if you decide to install or run any of it.
+3. Likewise, I cannot see any information it provides or collects for you. All I can do is provide you with simple step by step guides for set up and hope you did it right.
+
 ## Installation
 
 ### For Chrome, Microsoft Edge, Firefox, Opera Next, Dolphin Browser, and UC Browser users
