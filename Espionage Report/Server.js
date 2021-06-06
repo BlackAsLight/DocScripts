@@ -6,7 +6,7 @@
 // @author       BlackAsLight
 // ==/GoogleScriptApp==
 
-const spreadsheetID = '1JJPxw8O3mt_fEy5lqC6OIFdfB29EPzmW5rWBOFUWEcE';
+const spreadsheetID = '';
 const sheetName = 'Reports';
 let sheet = SpreadsheetApp.openById(spreadsheetID).getSheetByName(sheetName);
 
