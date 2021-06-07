@@ -181,7 +181,7 @@ const resources = (() => {
 		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=aluminum&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/aluminum.png"> Aluminum</a>'
 		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=munitions&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/munitions.png"> Munitions</a>'
 		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=credits&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/icons/16/point_gold.png"> Credits</a>'
-        + '<br><a href="https://politicsandwar.com/index.php?id=26&display=nation&resource1=&buysell=&ob=date&od=DESC&maximum=100&minimum=0&search=Go">Personal Trades</a>';
+		+ '<br><a href="https://politicsandwar.com/index.php?id=26&display=nation&resource1=&buysell=&ob=date&od=DESC&maximum=100&minimum=0&search=Go">Personal Trades</a>';
 	let referenceTag = document.getElementById('rightcolumn').children[7];
 	referenceTag.parentElement.insertBefore(pTag, referenceTag);
 	referenceTag.parentElement.insertBefore(document.createElement('hr'), referenceTag);
@@ -233,7 +233,7 @@ function AffectRow(cells) {
 }
 
 function outbidAndMatch(cell, resource, price, isSellOffer) {
-    cell.appendChild(document.createElement('br'));
+	cell.appendChild(document.createElement('br'));
 	let outbidLink = createLink(resource, price + (isSellOffer ? 1 : -1), isSellOffer);
 	if (typeof outbidLink == 'string') {
 		let aTag = document.createElement('a');
