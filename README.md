@@ -21,7 +21,7 @@ Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be insta
 
 ### For Safari Users
 
-Safari users can download [TamperMonkey](https://www.tampermonkey.net/) from the App Store, but it isn't free like it is for other browsers, so a free alternative for Safari users is [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12). Once [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) is installed and **activiated** on Safari:
+Safari users can download [TamperMonkey](https://www.tampermonkey.net/) from the App Store, but it isn't free like it is for other browsers, so a free alternative for Safari users is [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12). Once [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) is installed and **activated** on Safari:
 1. Click on the `.user.js` script above that you'd like to have installed on [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12).
 2. Right click the Raw button located somewhere on your screen and click Copy Link.
 3. On the top of the browser to the left of the address bar, click on the [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) icon then click Manage Scripts.
@@ -40,22 +40,22 @@ Again, this has not been tested, and that is only due to the fact that I do not 
 
 iOS users are pretty much screwed. In my search for answers, I have only found one app that would allow my scripts to run on said iOS device. It's called [Gear Browser](https://apps.apple.com/au/app/gear-browser/id1458962238), and while the app is free for download the add-on feature that would run my scripts is sadly not. The app wants you to pay for a subscription to gain access, which is also the reason the app has such a low rating.
 
-**BUT** things might not always look so doom and gloom for you iOS users. If all goes to plan, and if I'm smart enough to do it, I'll be releasing my own browser app, for free, that can run userscripts.
+**BUT** things might not always look so doom and gloom for you iOS users. If all goes to plan, and if I'm smart enough to do it, I'll be releasing my own browser app, for free, that can run UserScripts.
 
 ## Updates
 
 ### TamperMonkey
-[TamperMonkey](https://www.tampermonkey.net/) can check and install updates published here automatically and is enabled by default. If you make any updates to the script in [TamperMonkey](https://www.tampermonkey.net/) yourself then it will stop checking for updates, until otherwised told to.
+[TamperMonkey](https://www.tampermonkey.net/) can check and install updates published here automatically and is enabled by default. If you make any updates to the script in [TamperMonkey](https://www.tampermonkey.net/) yourself then it will stop checking for updates, until otherwise told to.
 
 If you'd like to check if it's checking for updates or want to either enable/disable it from doing so then: 
 1. Click on the TamperMonkey icon and go to it's dashboard. (Based off different browsers this could look slightly differently.)
-2. Click on the script you wish to check. A tab should open listed with thata script name.
+2. Click on the script you wish to check. A tab should open listed with that script name.
 3. Click on the Settings button for said script. 
 4. Look for the Check for Updates checkbox.
 5. Either Enable or Disable it and Click that Save button.
 6. Close the tab and you're done.
 
-Again: Saving any changes to the script's code itself will untick that box.
+Again: Saving any changes to the script's code itself will un-tick that box.
 
 ### MeddleMonkey
 
@@ -65,7 +65,28 @@ Unlike [TamperMonkey](https://www.tampermonkey.net/), [MeddleMonkey](https://app
 If you'd like to check if it's checking for updates or want to either enable/disable it from doing so then:
 1. On the top of the browser to the left of the address bar, click on the [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) icon then click Manage Scripts.
 2. Click on the Settings button located on the sidebar.
-3. And make sure "Automatically check scripts for updates every day" checkbox is either ticked or unticked, based on your desire.
+3. And make sure "Automatically check scripts for updates every day" checkbox is either ticked or un-ticked, based on your desire.
+
+## Server
+
+As you might have noticed some of these scripts have a Server.js file associated with them. Installation for these are not done the same way as the `.user.js` files, but instead require you to have a Google account so you can install them on [Google's App Script](https://script.google.com/home) and have it run on the cloud.
+
+Below is general instructions on how to install a `Server.js` file. You will be instructed part way through to return back to that scripts Server section to make any changes specific to that scripts needs, before returning here to finish the installation.
+
+1. To go [Google App Script](https://script.google.com/home).
+2. Click on New Project.
+3. Give the project a name. It can be whatever you want, but it's probably best to give it the same name as the Script.
+4. Delete the code already in there and copy-paste the contents of the `Server.js` file associated with the script you want.
+5. Return back to the Server section of the script that instructed you to come here, and follow those instructions to make the specific changes necessary for said `Server.js`.
+6. Now that you've done the specifics for that `Server.js`, either hit the Save icon or do `Ctrl + S` or `CMD + S`, so the Save icon grays out.
+   - It is very important that you click Save before proceeding onto the next bit.
+7. Click the blue Deploy button, followed by New Deployment.
+8. Click the Cog wheel icon for Select Type and select Web App from the dropdown list.
+9. Set the description to whatever you want. It would be best to include the version number in the description.
+10. Set Who Can Access to Anyone.
+11. Click Deploy.
+14. After a few seconds of it processing, it will display an Authorization button. You will need to go ahead and click it. You'll need to give the script the access it needs to work properly.
+15. After that, a URL will display on the screen. Click the Copy button and provide it how the specific script says to in the Client section.
 
 ## Script Description
 
@@ -99,12 +120,3 @@ This script runs on the Create Trade page.
 - Changes colour of 'Top Offers' Tables to match that of the buy/sell buttons and fixes the bad formatting of the tables.
 
 This script requires the View Trades Script for the first three features to be of any use.
-
-### Find War
-
-This script runs on the Nations page.
-
-- Majorly changes the UI of the Nation's Page when viewing Nation's in war range. A more detailed discription will be provided when I can think of a way to describe it. Click the Find Nations in War Range button on this page to see the magic. https://politicsandwar.com/nation/war/
-
-Note: You need to provide your API Key, found at the bottom of the Accounts page, to the script. You'll find an Insert API Key botton at the bottom of the sidebar for you to insert it.
-You can easily remove it by making the prompt box blank and hitting the Okay or Submit button.

@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Doc: Find War
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.4
-// @description  Assists in helping find a good nation to attack.
+// @version      0.5
+// @description  Consolidates information about potential raiding targets.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=15*
 // @match        https://politicsandwar.com/nations/
-// @grant        none
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 'use strict';
@@ -17,31 +17,30 @@ const char = [
 	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
 ];
 
-// Depreciation
-(() => {
-	let pTag = document.createElement('p');
-	pTag.innerHTML = '<b>Depreciated | Doc: Find War</b><br>This version of Doc: Find War is now depreciated.'
-		+ '<br>You should consider uninstalling this script and installing the new and improved script from the GitHub repository, '
-		+ '<b><a style="color:inherit;text-decoration:underline;"target="_blank" href="https://github.com/BlackAsLight/DocScripts">DocScript</a></b>.';
-	pTag.style.position = 'fixed';
-	pTag.style.bottom = '1em';
-	pTag.style.right = '1em';
-	pTag.style.backgroundColor = '#ff4d6a';
-	pTag.style.padding = '1em';
-	pTag.style.borderRadius = '0.5em';
-	pTag.style.color = '#f2f2f2'
-	pTag.style.fontSize = '12px';
-	document.body.appendChild(pTag);
-})();
+let cache = [];
+let log = [];
 
 // Handle obtaining, changing and saving API Key provided by user.
 (() => {
 	let codeTag = document.createElement('code');
 	codeTag.innerHTML = localStorage.Doc_APIKey == undefined || localStorage.Doc_APIKey == '' ? '<button>Insert API Key</button>' : '<button>Update API Key</button>';
 	codeTag.onclick = () => {
-		let response = prompt('API Key found at the bottom of Account Page', localStorage.Doc_APIKey);
+		let response = prompt('API Key found at the bottom of Account Page:', localStorage.Doc_APIKey);
 		if (response != undefined) {
 			localStorage.Doc_APIKey = response;
+			location.reload();
+		}
+	};
+	document.getElementById('leftcolumn').appendChild(codeTag);
+})();
+
+(() => {
+	let codeTag = document.createElement('code');
+	codeTag.innerHTML = localStorage.Doc_FindWarURL == undefined || localStorage.Doc_FindWarURL == '' ? '<button>Insert Auto Load URL</button>' : '<button>Update Auto Load URL</button>';
+	codeTag.onclick = () => {
+		let response = prompt('URL received from Google Scripts:', localStorage.Doc_FindWarURL);
+		if (response != undefined) {
+			localStorage.Doc_FindWarURL = response;
 			location.reload();
 		}
 	};
@@ -57,19 +56,21 @@ const char = [
 
 // Creates a boolean value about whether it should alter the page.
 const run = (() => {
-	let args = location.search.slice(1).split('&');
-	while (args.length) {
-		let arg = args.shift().split('=');
-		if (arg[0] == 'cat') {
-			if (arg[1] == 'war_range') {
-				return true;
+	if (localStorage.Doc_APIKey != undefined && localStorage.Doc_APIKey != '') {
+		let args = location.search.slice(1).split('&');
+		while (args.length) {
+			let arg = args.shift().split('=');
+			if (arg[0] == 'cat') {
+				if (arg[1] == 'war_range') {
+					return true;
+				}
 			}
 		}
 	}
 	return false;
 })();
 
-// Iterates threw every row in the table.
+// Iterates through every row in the table.
 if (run) {
 	let trTags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children);
 	{
@@ -83,6 +84,16 @@ if (run) {
 	}
 	while (trTags.length) {
 		AffectRow(trTags.shift());
+	}
+	if (localStorage.Doc_FindWarURL != undefined && localStorage.Doc_FindWarURL != '') {
+		let nationIDs = [];
+		for (let i = 1; i < cache.length; i++) {
+			nationIDs.push(cache[i].nationID);
+		}
+		SendPost({
+			job: 'request',
+			nationIDs: nationIDs
+		}, true);
 	}
 }
 
@@ -98,22 +109,22 @@ function AffectRow(trTag) {
 	tdTag.innerHTML = RowTemplate(tdTags, buttonID, militaryID, continentID, lastActiveID);
 	// Load Military OnClick Event
 	let nationID = tdTags[0].children[0].href.split('=')[1];
-	document.getElementById(buttonID).onclick = async () => {
-		let buttonTag = document.getElementById(buttonID);
-		buttonTag.parentElement.removeChild(buttonTag);
-		let api = (await (await fetch(`https://politicsandwar.com/api/nation/id=${nationID}&key=${localStorage.Doc_APIKey}`)).json());
-		{
-			let gridItemTags = Array.from(document.getElementById(militaryID).children);
-			gridItemTags[0].innerText = 'Solders: ' + parseInt(api.soldiers).toLocaleString();
-			gridItemTags[1].innerText = 'Tanks: ' + parseInt(api.tanks).toLocaleString();
-			gridItemTags[2].innerText = 'Planes: ' + parseInt(api.aircraft).toLocaleString();
-			gridItemTags[3].innerText = 'Ships: ' + parseInt(api.ships).toLocaleString();
-			gridItemTags[4].innerText = 'Missiles: ' + parseInt(api.missiles).toLocaleString();
-			gridItemTags[5].innerText = 'Nukes: ' + parseInt(api.nukes).toLocaleString();
-		}
-		document.getElementById(continentID).innerText = api.continent;
-		document.getElementById(lastActiveID).innerText = 'Last Active: ' + FormatDateTime(new Date(new Date() - api.minutessinceactive * 1000 * 60))
-	};
+	if (localStorage.Doc_FindWarURL != undefined && localStorage.Doc_FindWarURL != '') {
+		cache.push({
+			buttonID: buttonID,
+			militaryID: militaryID,
+			continentID: continentID,
+			lastActiveID: lastActiveID,
+			nationID: nationID
+		});
+	}
+	else {
+		document.getElementById(buttonID).onclick = () => {
+			let buttonTag = document.getElementById(buttonID);
+			buttonTag.parentElement.removeChild(buttonTag);
+			LoadMilitary(nationID, militaryID, continentID, lastActiveID);
+		};
+	}
 
 	while (tdTags.length) {
 		tdTag = tdTags.shift();
@@ -138,7 +149,9 @@ function RowTemplate(tdTags, buttonID, militaryID, continentID, lastActiveID) {
 	html += '</div>';
 	// Title
 	html += `<hr><h4 style="text-align:center;">${tdTags[5].children[2] == undefined ? '' : `<img src="${tdTags[5].children[2].src}"> `}Military${tdTags[5].children[1] == undefined ? (tdTags[5].children[0] != undefined && tdTags[5].children[0].title.endsWith('Spy Range') ? ` <img src="${tdTags[5].children[0].src}">` : '') : ` <img src="${tdTags[5].children[1].src}">`}</h4>`;
-	html += `<h5 style="text-align:center;"><button id=${buttonID}>Load Military</button></h5>`; // Military Loan Button
+	if (localStorage.Doc_FindWarURL == undefined || localStorage.Doc_FindWarURL == '') {
+		html += `<h5 style="text-align:center;"><button id=${buttonID}>Load Military</button></h5>`; // Military Loan Button
+	}
 	// Second Container
 	html += `<div id="${militaryID}" class="grid-container-six">`;
 	html += GridItem('<i>Soldiers</i>');
@@ -159,6 +172,95 @@ function GridItem(text, id) {
 		return '<div class="grid-item">' + text + '</div>';
 	}
 	return '<div id="' + id + '" class="grid-item">' + text + '</div>';
+}
+
+// Deal with the response of a Post Request.
+function ReceivePost(jsonData) {
+	while (cache.length) {
+		const object = cache.shift();
+
+		if (jsonData[object.nationID] == undefined) {
+			LoadMilitary(object.nationID, object.militaryID, object.continentID, object.lastActiveID);
+		}
+		else {
+			UpdateRow(JSON.parse(jsonData[object.nationID]), object.militaryID, object.continentID, object.lastActiveID);
+		}
+	}
+	let pTag = document.createElement('p');
+	pTag.innerHTML = '<b>10</b>';
+	pTag.style.position = 'fixed';
+	pTag.style.bottom = '1em';
+	pTag.style.right = '1em';
+	pTag.style.backgroundColor = '#282883';
+	pTag.style.padding = '1em';
+	pTag.style.borderRadius = '0.5em';
+	pTag.style.color = '#ffffff'
+	pTag.style.fontSize = '12px';
+	document.body.appendChild(pTag);
+	for (let i = 0; i < 10; i++) {
+		setTimeout(() => {
+			pTag.innerHTML = `<b>${i + 1}</b>`;
+		}, (9 - i) * 1000);
+	}
+	setTimeout(() => {
+		pTag.innerHTML = `<b>Sent!</b>`;
+		pTag.style.opacity = 1;
+		pTag.style.transition = 'opacity 1s ease-in-out';
+		pTag.style.opacity = 0;
+		setTimeout(() => {
+			pTag.parentElement.removeChild(pTag);
+		}, 1500);
+	}, 10000);
+	setTimeout(() => {
+		if (log.length) {
+			SendPost({
+				job: 'log',
+				nations: log
+			}, false);
+		}
+		log = [];
+	}, 10000);
+}
+
+// Calls Military info when User clicks Load Military button.
+async function LoadMilitary(nationID, militaryID, continentID, lastActiveID) {
+	const api = (await (await fetch(`https://politicsandwar.com/api/nation/id=${nationID}&key=${localStorage.Doc_APIKey}`)).json());
+	UpdateRow(api, militaryID, continentID, lastActiveID);
+	// Log Nation
+	if (localStorage.Doc_FindWarURL != undefined && localStorage.Doc_FindWarURL != '') {
+		log.push({
+			timeStamp: new Date(),
+			nationID: nationID,
+			api: JSON.stringify(api)
+		});
+	}
+}
+
+// Fills in Military info.
+function UpdateRow(api, militaryID, continentID, lastActiveID) {
+	let gridItemTags = Array.from(document.getElementById(militaryID).children);
+	gridItemTags[0].innerText = 'Solders: ' + parseInt(api.soldiers).toLocaleString();
+	gridItemTags[1].innerText = 'Tanks: ' + parseInt(api.tanks).toLocaleString();
+	gridItemTags[2].innerText = 'Planes: ' + parseInt(api.aircraft).toLocaleString();
+	gridItemTags[3].innerText = 'Ships: ' + parseInt(api.ships).toLocaleString();
+	gridItemTags[4].innerText = 'Missiles: ' + parseInt(api.missiles).toLocaleString();
+	gridItemTags[5].innerText = 'Nukes: ' + parseInt(api.nukes).toLocaleString();
+	document.getElementById(continentID).innerText = api.continent;
+	document.getElementById(lastActiveID).innerText = 'Last Active: ' + FormatDateTime(new Date(new Date() - api.minutessinceactive * 1000 * 60));
+}
+
+// Send a POST request.
+function SendPost(jsonData, processResponse) {
+	GM_xmlhttpRequest({
+		method: 'POST',
+		data: JSON.stringify(jsonData),
+		url: localStorage.Doc_FindWarURL,
+		onload: (e) => {
+			if (processResponse) {
+				ReceivePost(JSON.parse(e.response));
+			}
+		}
+	});
 }
 
 function RandomID() {
