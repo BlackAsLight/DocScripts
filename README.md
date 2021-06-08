@@ -23,12 +23,9 @@ Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be insta
 
 Safari users can download [TamperMonkey](https://www.tampermonkey.net/) from the App Store, but it isn't free like it is for other browsers, so a free alternative for Safari users is [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12). Once [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) is installed and **activated** on Safari:
 1. Click on the `.user.js` script above that you'd like to have installed on [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12).
-2. Right click the Raw button located somewhere on your screen and click Copy Link.
-3. On the top of the browser to the left of the address bar, click on the [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12) icon then click Manage Scripts.
-4. Click on the Install From URL button at the top of the window and you'll be prompted with a textbox.
-5. Paste the copied link into this provided textbox and then click Ok.
-6. A new window will have opened. Click the green Confirm Installation button at the top right of your window.
-7. You're done. You can close the tab/s and go to the pages the respective scripts run on and watch the magic.
+2. Click the Raw button located somewhere on your screen.
+3. A new window will have opened. Click the green Confirm Installation button at the top right of your window.
+4. You're done. You can close the tab/s and go to the pages the respective scripts run on and watch the magic.
 
 ### For Android Users
 
