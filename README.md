@@ -66,16 +66,16 @@ If you'd like to check if it's checking for updates or want to either enable/dis
 
 ## Server
 
-As you might have noticed some of these scripts have a Server.js file associated with them. Installation for these are not done the same way as the `.user.js` files, but instead require you to have a Google account so you can install them on [Google's App Script](https://script.google.com/home) and have it run on the cloud.
+As you might have noticed some of these Scripts have a `Server.js` file associated with them. Setup for these are not done the same way as the `.user.js` Scripts, but instead require you to have a Google account so you can install them on [Google's App Script](https://script.google.com/home) and have it run on Google's cloud.
 
-Below is general instructions on how to install a `Server.js` file. You will be instructed part way through to return back to that scripts Server section to make any changes specific to that scripts needs, before returning here to finish the installation.
+Below is general instructions on how to setup a `Server.js` file. You will be instructed part way through to return back to that Script's Server section to make any changes specific to that Script's needs, before returning here to finish the setup.
 
 1. To go [Google App Script](https://script.google.com/home).
 2. Click on New Project.
 3. Give the project a name. It can be whatever you want, but it's probably best to give it the same name as the Script.
-4. Delete the code already in there and copy-paste the contents of the `Server.js` file associated with the script you want.
-5. Return back to the Server section of the script that instructed you to come here, and follow those instructions to make the specific changes necessary for said `Server.js`.
-6. Now that you've done the specifics for that `Server.js`, either hit the Save icon or do `Ctrl + S` or `CMD + S`, so the Save icon grays out.
+4. Delete the code already in there and copy-paste the contents of the `Server.js` file associated with the Script you want.
+5. Return back to the Server section of the Script that instructed you to come here, and follow those instructions to make the specific changes necessary for said `Server.js`.
+6. Now that you've done the specifics for that `Server.js`, either hit the Save icon or do `Ctrl + S` (or `CMD + S` for Mac users), so the Save icon grays out.
    - It is very important that you click Save before proceeding onto the next bit.
 7. Click the blue Deploy button, followed by New Deployment.
 8. Click the Cog wheel icon for Select Type and select Web App from the dropdown list.
@@ -83,7 +83,7 @@ Below is general instructions on how to install a `Server.js` file. You will be 
 10. Set Who Can Access to Anyone.
 11. Click Deploy.
 14. After a few seconds of it processing, it will display an Authorization button. You will need to go ahead and click it. You'll need to give the script the access it needs to work properly.
-15. After that, a URL will display on the screen. Click the Copy button and provide it how the specific script says to in the Client section.
+15. After that, a URL will display on the screen. Click the Copy button and use it how the Script intended it to be used.
 
 ## Script Description
 
