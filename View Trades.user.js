@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.9
+// @version      2.0
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -270,7 +270,7 @@ function createLink(resource, price, isSellOffer, subQuantity = 0) {
 	if (quantity <= 0) {
 		return undefined;
 	}
-	return `https://politicsandwar.com/nation/trade/create/resource=${resource}?p=${price}&q=${quantity}&t=${isSellOffer ? 'b' : 's'}`;
+	return `https://politicsandwar.com/nation/trade/create/?resource=${resource}&p=${price}&q=${quantity}&t=${isSellOffer ? 'b' : 's'}`;
 }
 
 function replaceAll(text, search, replace) {

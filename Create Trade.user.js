@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.8
+// @version      0.9
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -56,30 +56,7 @@ else {
 				buyButton.dataset.target = '';
 			}
 		}
-
 	}
-	// Temp to fix Alex's bug.
-	try {
-		console.log('Temp Fix Running!');
-		let linkEnd = window.location.href.split('/');
-		let selectedResource = linkEnd[linkEnd.length - 1].split('?')[0].split('=')[1];
-		if (selectedResource != 'food') {
-			let options = Array.from(document.getElementById('resourceoption').children);
-			options.shift().removeAttribute('selected');
-			while (options.length) {
-				let option = options.shift();
-				if (option.value == selectedResource) {
-					option.selected = true;
-					break;
-				}
-			}
-		}
-		console.log('Temp Fix Finished!');
-	}
-	catch (e) {
-		console.log(e);
-	}
-	// End of Temp Fix
 
 	document.getElementById('showTopOffersBtn').onclick = () => {
 		setTimeout(() => {
