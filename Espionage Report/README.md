@@ -3,6 +3,12 @@ Automatically collect your, or your alliance members, reports of espionage opera
 
 If you want this script just for personal use then you need to do both parts. Client and Server. If you want this script for alliance use then the government, or someone with authority and trust needs to set up the Server Part, while everyone else installs the Client Script.
 
+## Version Compatibility
+
+The Versions of Client that are compatible with Server.
+ - Client | Server
+ - v0.1-0.2 | v0.1-0.2
+
 ## Description
 
 ### Client
