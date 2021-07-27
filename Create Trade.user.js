@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.9
+// @version      1.0
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
+// @icon         https://avatars.githubusercontent.com/u/44320105
 // @grant        none
 // ==/UserScript==
 

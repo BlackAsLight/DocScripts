@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Doc: Espionage Report
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.1
+// @version      0.2
 // @description  Send a Copy of the Espionage Report to a Google Spreadsheet
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/espionage/*
+// @icon         https://avatars.githubusercontent.com/u/44320105
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 

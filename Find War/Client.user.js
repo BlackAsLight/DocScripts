@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Doc: Find War
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.5
+// @version      0.6
 // @description  Consolidates information about potential raiding targets.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=15*
 // @match        https://politicsandwar.com/nations/
+// @icon         https://avatars.githubusercontent.com/u/44320105
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
