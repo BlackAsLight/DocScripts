@@ -127,6 +127,11 @@ This script runs on the Trades Page.
 - Adds a TopUp button, which allows you to easily increase your current offers on the market.
   - If the Load All Trade Offers Checkbox is ticked then the quantities for TopUp will take all your offers into account instead of just that offer preventing trade offers getting cancelled.
   - Requires the Create Trade Script to work properly.
+- Adds a Push button. Like the TopUp button, but lets you choose a different price to create the trade at.
+  - This button won't appear unless the Load All Trade Offers Checkbox is ticked.
+  - Requires the Create Trade Script to work properly.
+- When you click the Push button, all TopUp buttons are replaced with Outbid buttons, and all Outbid buttons, including the new ones, have their quantities adjusted so the offer being created takes into account what's already on the market.
+- When you click the Push button, all the Match and Push buttons turn into Cancel buttons, which in turn can be clicked to undo the effects of the Push Button.
 - Adds Links with Resource Icons to easily and quickly switch between different markets.
 
 The Outbid, Match, and TopUp buttons only appear if the quantity is greater than zero. So if you have zero of said resource to sell, then no button will appear offering for you to sell it.

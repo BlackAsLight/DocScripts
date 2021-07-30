@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.3
+// @version      2.4
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -17,7 +17,7 @@ const sellColor = '#5cb85c';
 const buyColor = '#337ab7';
 
 const resources = (() => {
-	const resources = replaceAll(document.getElementById('rssBar').children[0].children[0].children[0].innerText.trim(), '  ', ' ').replaceAll(',', '').split(' ');
+	const resources = replaceAll(document.getElementById('rssBar').children[0].children[0].children[0].innerText.trim().replaceAll('\n', ''), '  ', ' ').replaceAll(',', '').split(' ');
 	return {
 		money: parseFloat(resources[13]),
 		oil: parseFloat(resources[2]),
@@ -34,6 +34,7 @@ const resources = (() => {
 		credits: parseFloat(resources[0])
 	};
 })();
+console.log(resources);
 
 let globalBuyOffers = {};
 let globalSellOffers = {};
@@ -251,8 +252,8 @@ function AffectRow(cells) {
 				}
 				globalSellOffers[resource] += quantity;
 			}
-			cells[5].appendChild(document.createElement('br'));
-			cells[5].appendChild(aTag);
+			let divTag = CreateDivTags(cells[5], resource, isSellOffer, true);
+			divTag.appendChild(aTag);
 		}
 		else {
 			const link = createLink(resource, price, isSellOffer, quantity);
@@ -275,66 +276,118 @@ function AffectRow(cells) {
 
 // Add the Outbid and Match buttons for the given cell.
 function outbidAndMatch(cell, resource, price, isSellOffer) {
-	cell.appendChild(document.createElement('br'));
+	let divTag = CreateDivTags(cell, resource, isSellOffer, false);
 	const outbidLink = createLink(resource, price + (isSellOffer ? 1 : -1), isSellOffer);
 	if (typeof outbidLink == 'string') {
 		let aTag = document.createElement('a');
 		aTag.innerText = 'Outbid';
 		aTag.href = outbidLink;
-		cell.appendChild(aTag);
+		divTag.appendChild(aTag);
 	}
 	const matchLink = createLink(resource, price, isSellOffer);
 	if (typeof outbidLink == 'string' && typeof matchLink == 'string') {
-		cell.append(' | ');
+		divTag.append(' | ');
 	}
 	if (typeof matchLink == 'string') {
 		let aTag = document.createElement('a');
 		aTag.innerText = 'Match';
 		aTag.href = matchLink;
-		cell.appendChild(aTag);
+		divTag.appendChild(aTag);
 	}
 }
 
 // Gets all the TopUp buttons on the market and adds links to them. Only gets called if infinite scroll is on.
 function GlobalLinks() {
 	for (let resource in globalBuyOffers) {
-		let aTags = Array.from(document.getElementsByClassName('Doc_TopUp_B_' + resource));
-		while (aTags.length) {
-			let aTag = aTags.shift();
-			const price = parseInt(aTag.parentElement.textContent.split(' ')[1]);
-			const link = createLink(resource, price, true, 0, globalBuyOffers[resource]);
-			if (typeof link == 'string') {
-				aTag.href = link;
-			}
-			else {
-				aTag.remove();
-			}
-		}
+		AddLinks('Doc_TopUp_B_' + resource, resource, true, true);
+		AddLinks('Doc_Outbid_B_' + resource, resource, true);
 	}
-	globalBuyOffers = undefined;
 
 	for (let resource in globalSellOffers) {
-		let aTags = Array.from(document.getElementsByClassName('Doc_TopUp_S_' + resource));
-		while (aTags.length) {
-			let aTag = aTags.shift();
-			const price = parseInt(aTag.parentElement.textContent.split(' ')[1]);
-			const link = createLink(resource, price, false, globalSellOffers[resource]);
-			if (typeof link == 'string') {
-				aTag.href = link;
-			}
-			else {
-				aTag.remove();
+		AddLinks('Doc_TopUp_S_' + resource, resource, false, true);
+		AddLinks('Doc_Outbid_S_' + resource, resource, false);
+	}
+}
+
+function AddLinks(className, resource, isSellOffer, addPush = false) {
+	console.log(`${className} | ${resource} | ${isSellOffer} | ${addPush}`);
+	let aTags = Array.from(document.getElementsByClassName(className));
+	while (aTags.length) {
+		let aTag = aTags.shift();
+		const price = parseInt(aTag.parentElement.parentElement.textContent.split(' ')[1]) + (className.search('Outbid') == -1 ? 0 : (isSellOffer ? 1 : -1));
+		const link = createLink(resource, price, isSellOffer, isSellOffer ? 0 : globalSellOffers[resource], isSellOffer ? globalBuyOffers[resource] : 0);
+		if (typeof link == 'string') {
+			aTag.href = link;
+			if (addPush) {
+				AddPushButton(aTag.parentElement, isSellOffer);
 			}
 		}
+		else {
+			aTag.remove();
+		}
 	}
-	globalSellOffers = undefined;
+}
+
+function AddPushButton(cell, isSellOffer) {
+	cell.append(' | ');
+	let aTag = document.createElement('a');
+	aTag.innerText = 'Push';
+	aTag.onclick = () => {
+		let linkTags = Array.from(document.getElementsByClassName('Doc_Links_' + (isSellOffer ? 'B' : 'S')));
+		while (linkTags.length) {
+			linkTags.shift().style.display = 'none';
+		}
+
+		let connectTags = Array.from(document.getElementsByClassName('Doc_Connect_' + (isSellOffer ? 'B' : 'S')));
+		while (connectTags.length) {
+			connectTags.shift().style.display = 'inline-block';
+		}
+	};
+	cell.appendChild(aTag);
+}
+
+function CreateDivTags(cell, resource, isSellOffer) {
+	cell.appendChild(document.createElement('br'));
+	{
+		let divTag = document.createElement('div');
+		divTag.className = 'Doc_Connect_' + (isSellOffer ? 'B' : 'S');
+		divTag.style.display = 'none';
+		cell.appendChild(divTag);
+		let toTag = document.createElement('a');
+		toTag.innerText = 'Outbid';
+		toTag.className = 'Doc_Outbid_' + (isSellOffer ? 'B_' : 'S_') + resource;
+		divTag.appendChild(toTag);
+		divTag.append(' | ');
+		let cancelTag = document.createElement('a');
+		cancelTag.innerText = 'Cancel';
+		cancelTag.onclick = () => {
+			let linkTags = Array.from(document.getElementsByClassName('Doc_Links_' + (isSellOffer ? 'B' : 'S')));
+			while (linkTags.length) {
+				linkTags.shift().style.display = 'inline-block';
+			}
+
+			let connectTags = Array.from(document.getElementsByClassName('Doc_Connect_' + (isSellOffer ? 'B' : 'S')));
+			while (connectTags.length) {
+				connectTags.shift().style.display = 'none';
+			}
+		};
+		divTag.appendChild(cancelTag);
+	}
+	{
+		let divTag = document.createElement('div');
+		divTag.className = 'Doc_Links_' + (isSellOffer ? 'B' : 'S');
+		cell.appendChild(divTag);
+		return divTag;
+	}
 }
 
 // Create Link for Create Trade Script
 function createLink(resource, price, isSellOffer, subQuantity = 0, subWorth = 0) {
+	console.log(`${resource} | ${price} | ${isSellOffer} | ${subQuantity} | ${subWorth}`);
 	let quantity;
 	if (isSellOffer) {
 		quantity = Math.floor((resources.money - subWorth) / price - subQuantity);
+		console.log(quantity);
 	}
 	else {
 		quantity = Math.floor(resources[resource] - subQuantity);
