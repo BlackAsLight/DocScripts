@@ -125,6 +125,7 @@ This script runs on the Trades Page.
 - Adds a Match button, which allows you to easily place a trade offer at the same price as said offer.
   - Requires the Create Trade Script to work properly.
 - Adds a TopUp button, which allows you to easily increase your current offers on the market.
+  - If the Load All Trade Offers Checkbox is ticked then the quantities for TopUp will take all your offers into account instead of just that offer preventing trade offers getting cancelled.
   - Requires the Create Trade Script to work properly.
 - Adds Links with Resource Icons to easily and quickly switch between different markets.
 

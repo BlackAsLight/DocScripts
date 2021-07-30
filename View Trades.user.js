@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.2
+// @version      2.3
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -12,6 +12,7 @@
 // ==/UserScript==
 
 'use strict';
+// Global Variables.
 const sellColor = '#5cb85c';
 const buyColor = '#337ab7';
 
@@ -34,21 +35,28 @@ const resources = (() => {
 	};
 })();
 
+let globalBuyOffers = {};
+let globalSellOffers = {};
+
+// Affect the current rows being in the table.
 {
-	let trTags = document.getElementsByClassName('nationtable')[0].children[0].children;
-	for (let i = 1; i < trTags.length; i++) {
-		AffectRow(trTags[i].children);
+	let trTags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children);
+	trTags.shift();
+	while (trTags.length) {
+		AffectRow(trTags.shift().children);
 	}
 }
 
+
 (async () => {
+	// If displaying personal trade window or not.
 	const isNationDisplay = (() => {
 		if (window.location.pathname == '/nation/trade/') {
 			return true;
 		}
 		const args = window.location.search.split('&');
 		while (args.length) {
-			let arg = args.shift().split('=');
+			const arg = args.shift().split('=');
 			if (arg[0] == 'display') {
 				if (arg[1] == 'alliance' || arg[1] == 'world') {
 					return false;
@@ -59,9 +67,11 @@ const resources = (() => {
 		return true;
 	})();
 
+	// If not displaying person trade window then activate infinite scroll feature.
 	if (!isNationDisplay) {
+		// Add Checkbox to toggle infinite scroll feature.
 		let codeTag = document.createElement('code');
-		codeTag.innerHTML = `Load All Offers: <input id ="loadOffers" type="checkbox" ${localStorage.Doc_LoadAllOffers == 'true' ? 'checked' : ''}>`;
+		codeTag.innerHTML = `Load All Offers: <input id="loadOffers" type="checkbox" ${localStorage.Doc_LoadAllOffers == 'true' ? 'checked' : ''}>`;
 		document.getElementById('leftcolumn').appendChild(codeTag);
 		document.getElementById('loadOffers').onchange = () => {
 			let inputTag = document.getElementById('loadOffers');
@@ -73,100 +83,106 @@ const resources = (() => {
 			}
 			location.reload();
 		};
-	}
 
-	if (!isNationDisplay && localStorage.Doc_LoadAllOffers == 'true') {
-		const maximumOffers = (() => {
-			const args = window.location.search.split('&');
-			while (args.length) {
-				let arg = args.shift().split('=');
-				if (arg[0] == 'maximum') {
-					return parseInt(arg[1]);
-				}
-			}
-			return 50;
-		})();
-
-		const pagesToLoad = (() => {
-			const totalOffers = (() => {
-				let tags = document.getElementsByClassName('center');
-				let pTags = [];
-				for (let i = 0; i < tags.length; i++) {
-					if (tags[i].tagName == 'P') {
-						pTags.push(tags[i]);
+		// If infinite scroll feature is enabled then load the other pages in.
+		if (localStorage.Doc_LoadAllOffers == 'true') {
+			const maximumOffers = (() => {
+				const args = window.location.search.split('&');
+				while (args.length) {
+					const arg = args.shift().split('=');
+					if (arg[0] == 'maximum') {
+						return parseInt(arg[1]);
 					}
 				}
-
-				pTags[2].appendChild(pTags[3].children[4]);
-
-				let text = pTags[4].textContent.split(' ');
-				text.splice(1, 2);
-				pTags[4].innerText = text.join(' ');
-
-				pTags[5].parentElement.removeChild(pTags[5]);
-
-				if (maximumOffers < 50) {
-					pTags[3].innerHTML = `Note: The game just tried to only load ${maximumOffers} trade offers.`
-						+ '<br>We strongly recommend going to your <a target="_blank" href="https://politicsandwar.com/account/#4">Account</a> settings and changing the default search results to 50,'
-						+ '<br>or if this was a link provided by some bot, that you ask the maximum query in the link be set to at least 50, preferably 100.';
-				}
-				else {
-					pTags[3].parentElement.removeChild(pTags[3]);
-				}
-
-				return parseInt(text[1]);
+				return 50;
 			})();
-			if (totalOffers > maximumOffers) {
-				let pages = Math.ceil((totalOffers - maximumOffers) / 100);
-				if (pages > 0) {
-					return pages;
-				}
-			}
-			return 0;
-		})();
 
-		let tbodyTag = document.getElementsByClassName('nationtable')[0].children[0];
-		for (let i = 0; i < pagesToLoad; i++) {
-			let url = (() => {
-				let args = window.location.href.split('&');
-				let minFound = false;
-				let maxFound = false;
-				for (let j = 0; j < args.length; j++) {
-					let arg = args[j].split('=');
-					if (arg[0] == 'minimum') {
-						minFound = true;
-						arg[1] = 100 * i + maximumOffers;
-						args[j] = arg.join('=');
-					}
-					else if (arg[0] == 'maximum') {
-						maxFound = true;
-						if (arg[1] != '100') {
-							arg[1] = '100';
-							args[j] = arg.join('=');
+			const pagesToLoad = (() => {
+				const totalOffers = (() => {
+					let tags = document.getElementsByClassName('center');
+					let pTags = [];
+					for (let i = 0; i < tags.length; i++) {
+						if (tags[i].tagName == 'P') {
+							pTags.push(tags[i]);
 						}
 					}
+
+					pTags[2].appendChild(pTags[3].children[4]);
+
+					let text = pTags[4].textContent.split(' ');
+					text.splice(1, 2);
+					pTags[4].innerText = text.join(' ');
+
+					pTags[5].parentElement.removeChild(pTags[5]);
+
+					if (maximumOffers < 50) {
+						pTags[3].innerHTML = `Note: The game just tried to only load ${maximumOffers} trade offers.`
+							+ '<br>We strongly recommend going to your <a target="_blank" href="https://politicsandwar.com/account/#4">Account</a> settings and changing the default search results to 50,'
+							+ '<br>or if this was a link provided by some bot, that you ask the maximum query in the link be set to at least 50, preferably 100.';
+					}
+					else {
+						pTags[3].parentElement.removeChild(pTags[3]);
+					}
+
+					return parseInt(text[1]);
+				})();
+				if (totalOffers > maximumOffers) {
+					const pages = Math.ceil((totalOffers - maximumOffers) / 100);
+					if (pages > 0) {
+						return pages;
+					}
 				}
-				if (!maxFound) {
-					args.push(`maximum=100`);
-				}
-				if (!minFound) {
-					args.push(`minimum=${100 * i + maximumOffers}`);
-				}
-				return args.join('&');
+				return 0;
 			})();
 
-			let doc = new DOMParser().parseFromString(await (await fetch(url)).text(), 'text/html');
-			let rows = Array.from(doc.getElementsByClassName('nationtable')[0].children[0].children);
-			rows.shift();
-			while (rows.length) {
-				let row = rows.shift();
-				AffectRow(row.children);
-				tbodyTag.appendChild(row);
+			let tbodyTag = document.getElementsByClassName('nationtable')[0].children[0];
+			for (let i = 0; i < pagesToLoad; i++) {
+				let url = (() => {
+					let args = window.location.href.split('&');
+					let minFound = false;
+					let maxFound = false;
+					for (let j = 0; j < args.length; j++) {
+						let arg = args[j].split('=');
+						if (arg[0] == 'minimum') {
+							minFound = true;
+							arg[1] = 100 * i + maximumOffers;
+							args[j] = arg.join('=');
+						}
+						else if (arg[0] == 'maximum') {
+							maxFound = true;
+							if (arg[1] != '100') {
+								arg[1] = '100';
+								args[j] = arg.join('=');
+							}
+						}
+					}
+					if (!maxFound) {
+						args.push(`maximum=100`);
+					}
+					if (!minFound) {
+						args.push(`minimum=${100 * i + maximumOffers}`);
+					}
+					return args.join('&');
+				})();
+
+				let doc = new DOMParser().parseFromString(await (await fetch(url)).text(), 'text/html');
+				let rows = Array.from(doc.getElementsByClassName('nationtable')[0].children[0].children);
+				rows.shift();
+				while (rows.length) {
+					let row = rows.shift();
+					AffectRow(row.children);
+					tbodyTag.appendChild(row);
+				}
 			}
+			GlobalLinks();
 		}
+	}
+	else {
+		GlobalLinks();
 	}
 })();
 
+// Display Market Links at the top of the page.
 {
 	let pTag = document.createElement('p');
 	pTag.style.textAlign = 'center';
@@ -188,12 +204,14 @@ const resources = (() => {
 	referenceTag.parentElement.insertBefore(document.createElement('hr'), referenceTag);
 }
 
+// Affect the rows cells to make it look pretty.
 function AffectRow(cells) {
 	const resource = cells[4].children[0].getAttribute('title').toLowerCase();
 	const quantity = parseInt(cells[4].innerText.trim().replaceAll(',', ''));
 	const price = parseInt(cells[5].innerText.trim().split(' ')[0].replaceAll(',', ''));
 	const isSellOffer = cells[1].childElementCount == 1;
 
+	// Someone Elses Trade Offer.
 	if (cells[6].children[0].tagName == 'FORM') {
 		if (isSellOffer) {
 			cells[6].children[0].children[5].style.backgroundColor = sellColor;
@@ -214,16 +232,38 @@ function AffectRow(cells) {
 		cells[5].children[2].innerText = '$' + (parseInt(cells[6].children[0].children[3].value) * price).toLocaleString();
 		outbidAndMatch(cells[5], resource, price, isSellOffer);
 	}
+	// My Trade Offer.
 	else if (cells[6].children[0].tagName == 'A') {
-		let link = createLink(resource, price, isSellOffer, quantity);
-		if (typeof link == 'string') {
+		let aTag = document.createElement('a');
+		aTag.innerText = 'TopUp';
+		if (localStorage.Doc_LoadAllOffers == 'true') {
+			if (isSellOffer) {
+				aTag.className = 'Doc_TopUp_B_' + resource;
+				if (globalBuyOffers[resource] == undefined) {
+					globalBuyOffers[resource] = 0
+				}
+				globalBuyOffers[resource] += price * quantity;
+			}
+			else {
+				aTag.className = 'Doc_TopUp_S_' + resource;
+				if (globalSellOffers[resource] == undefined) {
+					globalSellOffers[resource] = 0;
+				}
+				globalSellOffers[resource] += quantity;
+			}
 			cells[5].appendChild(document.createElement('br'));
-			let aTag = document.createElement('a');
-			aTag.innerText = 'TopUp';
-			aTag.href = link;
 			cells[5].appendChild(aTag);
 		}
+		else {
+			const link = createLink(resource, price, isSellOffer, quantity);
+			if (typeof link == 'string') {
+				cells[5].appendChild(document.createElement('br'));
+				aTag.href = link;
+				cells[5].appendChild(aTag);
+			}
+		}
 	}
+	// A Trade Offer I can't accept.
 	else if (cells[6].children[0].tagName == 'IMG') {
 		const isBuyOffer = cells[2].childElementCount == 1;
 		if (!isSellOffer && !isBuyOffer) {
@@ -233,16 +273,17 @@ function AffectRow(cells) {
 	}
 }
 
+// Add the Outbid and Match buttons for the given cell.
 function outbidAndMatch(cell, resource, price, isSellOffer) {
 	cell.appendChild(document.createElement('br'));
-	let outbidLink = createLink(resource, price + (isSellOffer ? 1 : -1), isSellOffer);
+	const outbidLink = createLink(resource, price + (isSellOffer ? 1 : -1), isSellOffer);
 	if (typeof outbidLink == 'string') {
 		let aTag = document.createElement('a');
 		aTag.innerText = 'Outbid';
 		aTag.href = outbidLink;
 		cell.appendChild(aTag);
 	}
-	let matchLink = createLink(resource, price, isSellOffer);
+	const matchLink = createLink(resource, price, isSellOffer);
 	if (typeof outbidLink == 'string' && typeof matchLink == 'string') {
 		cell.append(' | ');
 	}
@@ -254,10 +295,46 @@ function outbidAndMatch(cell, resource, price, isSellOffer) {
 	}
 }
 
-function createLink(resource, price, isSellOffer, subQuantity = 0) {
+// Gets all the TopUp buttons on the market and adds links to them. Only gets called if infinite scroll is on.
+function GlobalLinks() {
+	for (let resource in globalBuyOffers) {
+		let aTags = Array.from(document.getElementsByClassName('Doc_TopUp_B_' + resource));
+		while (aTags.length) {
+			let aTag = aTags.shift();
+			const price = parseInt(aTag.parentElement.textContent.split(' ')[1]);
+			const link = createLink(resource, price, true, 0, globalBuyOffers[resource]);
+			if (typeof link == 'string') {
+				aTag.href = link;
+			}
+			else {
+				aTag.remove();
+			}
+		}
+	}
+	globalBuyOffers = undefined;
+
+	for (let resource in globalSellOffers) {
+		let aTags = Array.from(document.getElementsByClassName('Doc_TopUp_S_' + resource));
+		while (aTags.length) {
+			let aTag = aTags.shift();
+			const price = parseInt(aTag.parentElement.textContent.split(' ')[1]);
+			const link = createLink(resource, price, false, globalSellOffers[resource]);
+			if (typeof link == 'string') {
+				aTag.href = link;
+			}
+			else {
+				aTag.remove();
+			}
+		}
+	}
+	globalSellOffers = undefined;
+}
+
+// Create Link for Create Trade Script
+function createLink(resource, price, isSellOffer, subQuantity = 0, subWorth = 0) {
 	let quantity;
 	if (isSellOffer) {
-		quantity = Math.floor(resources.money / price - subQuantity);
+		quantity = Math.floor((resources.money - subWorth) / price - subQuantity);
 	}
 	else {
 		quantity = Math.floor(resources[resource] - subQuantity);
@@ -276,6 +353,9 @@ function createLink(resource, price, isSellOffer, subQuantity = 0) {
 
 function replaceAll(text, search, replace) {
 	if (search == replace) {
+		throw `Infinite Loop`;
+	}
+	if (replace.search(search) != -1) {
 		throw `Infinite Loop`;
 	}
 	while (text.indexOf(search) != -1) {
