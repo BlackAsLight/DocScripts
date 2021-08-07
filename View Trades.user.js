@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.5
+// @version      2.6
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -335,7 +335,8 @@ function AddLinks(className, resource, isSellOffer, addPush = false) {
 	let aTags = Array.from(document.getElementsByClassName(className));
 	while (aTags.length) {
 		let aTag = aTags.shift();
-		const price = parseInt(aTag.parentElement.parentElement.textContent.split(' ')[1]) + (className.search('Outbid') == -1 ? 0 : (isSellOffer ? 1 : -1));
+		const price = parseInt(aTag.parentElement.parentElement.textContent.split(' ')[1].replaceAll(',', '')) + (className.search('Outbid') == -1 ? 0 : (isSellOffer ? 1 : -1));
+		console.log(price);
 		const link = createLink(resource, price, isSellOffer, isSellOffer ? 0 : globalSellOffers[resource], isSellOffer ? globalBuyOffers[resource] : 0);
 		if (typeof link == 'string') {
 			aTag.href = link;
