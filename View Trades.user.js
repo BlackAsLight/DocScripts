@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.4
+// @version      2.5
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -34,7 +34,6 @@ const resources = (() => {
 		credits: parseFloat(resources[0])
 	};
 })();
-console.log(resources);
 
 let globalBuyOffers = {};
 let globalSellOffers = {};
@@ -44,7 +43,13 @@ let globalSellOffers = {};
 	let trTags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children);
 	trTags.shift();
 	while (trTags.length) {
-		AffectRow(trTags.shift().children);
+		const row = trTags.shift().children;
+		try {
+			AffectRow(row);
+		}
+		catch {
+			console.log(row);
+		}
 	}
 }
 
@@ -171,7 +176,12 @@ let globalSellOffers = {};
 				rows.shift();
 				while (rows.length) {
 					let row = rows.shift();
-					AffectRow(row.children);
+					try {
+						AffectRow(row.children);
+					}
+					catch {
+						console.log(row);
+					}
 					tbodyTag.appendChild(row);
 				}
 			}
@@ -184,7 +194,7 @@ let globalSellOffers = {};
 })();
 
 // Display Market Links at the top of the page.
-{
+try {
 	let pTag = document.createElement('p');
 	pTag.style.textAlign = 'center';
 	pTag.innerHTML = '<a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=oil&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/oil.png"> Oil</a>'
@@ -200,9 +210,21 @@ let globalSellOffers = {};
 		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=munitions&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/munitions.png"> Munitions</a>'
 		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=credits&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/icons/16/point_gold.png"> Credits</a>'
 		+ '<br><a href="https://politicsandwar.com/index.php?id=26&display=nation&resource1=&buysell=&ob=date&od=DESC&maximum=100&minimum=0&search=Go">Personal Trades</a>';
-	let referenceTag = document.getElementById('rightcolumn').children[7];
+	let referenceTag = (() => {
+		let tags = Array.from(document.getElementById('rightcolumn').children);
+		while (tags.length) {
+			let tag = tags.shift();
+			if (tag.tagName == 'FORM') {
+				return tag;
+			}
+		}
+	})();[7];
 	referenceTag.parentElement.insertBefore(pTag, referenceTag);
 	referenceTag.parentElement.insertBefore(document.createElement('hr'), referenceTag);
+}
+catch (e) {
+	console.log('Injecting Market Links Failed.');
+	console.log(e);
 }
 
 // Affect the rows cells to make it look pretty.
@@ -310,7 +332,6 @@ function GlobalLinks() {
 }
 
 function AddLinks(className, resource, isSellOffer, addPush = false) {
-	console.log(`${className} | ${resource} | ${isSellOffer} | ${addPush}`);
 	let aTags = Array.from(document.getElementsByClassName(className));
 	while (aTags.length) {
 		let aTag = aTags.shift();
@@ -383,11 +404,9 @@ function CreateDivTags(cell, resource, isSellOffer) {
 
 // Create Link for Create Trade Script
 function createLink(resource, price, isSellOffer, subQuantity = 0, subWorth = 0) {
-	console.log(`${resource} | ${price} | ${isSellOffer} | ${subQuantity} | ${subWorth}`);
 	let quantity;
 	if (isSellOffer) {
 		quantity = Math.floor((resources.money - subWorth) / price - subQuantity);
-		console.log(quantity);
 	}
 	else {
 		quantity = Math.floor(resources[resource] - subQuantity);
