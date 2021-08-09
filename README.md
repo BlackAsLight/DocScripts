@@ -44,10 +44,10 @@ iOS users are pretty much screwed. In my search for answers, I have only found o
 ### TamperMonkey
 [TamperMonkey](https://www.tampermonkey.net/) can check and install updates published here automatically and is enabled by default. If you make any updates to the script in [TamperMonkey](https://www.tampermonkey.net/) yourself then it will stop checking for updates, until otherwise told to.
 
-If you'd like to check if it's checking for updates or want to either enable/disable it from doing so then: 
+If you'd like to check if it's checking for updates or want to either enable/disable it from doing so then:
 1. Click on the TamperMonkey icon and go to it's dashboard. (Based off different browsers this could look slightly differently.)
 2. Click on the script you wish to check. A tab should open listed with that script name.
-3. Click on the Settings button for said script. 
+3. Click on the Settings button for said script.
 4. Look for the Check for Updates checkbox.
 5. Either Enable or Disable it and Click that Save button.
 6. Close the tab and you're done.
@@ -147,3 +147,7 @@ This script runs on the Create Trade page.
 - Changes colour of 'Top Offers' Tables to match that of the buy/sell buttons and fixes the bad formatting of the tables.
 
 This script requires the View Trades Script for the first three features to be of any use.
+
+### Hide Nation Descriptions
+
+This script is very simple that it's just one line. It deletes nations custom descriptions. Installing this will mean you won't have to scroll anymore due to people's excessively long nation descriptions.
