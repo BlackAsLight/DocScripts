@@ -143,7 +143,10 @@ This script runs on the Create Trade page.
 - Reads quantity and price in URL, provided by the View Trades Script's buttons, and fills out the form for you.
 - Hides the buy/sell button not specified in the URL, provided by the View Trades Script's buttons.
 - Removes the Confirm Buy/Sell buttons **if** one of the Buy/Sell buttons disappear.
-- Auto returns back to market page if trade created successfully.
+- If the trade was successfully created then it will auto return back to the market page,
+- unless the quantity in the URL was greater than 1,000,000.00 and in that case it will return to the create create offer page.
+  - If this does happen then the sell/buy button will also be disabled for 5 seconds so you don't get the error message.
+  - this recessiveness allows for easily creating large trades well over 1,000,000.00 tons.
 - Changes colour of 'Top Offers' Tables to match that of the buy/sell buttons and fixes the bad formatting of the tables.
 
 This script requires the View Trades Script for the first three features to be of any use.
