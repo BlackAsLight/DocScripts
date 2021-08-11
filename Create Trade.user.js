@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.1
+// @version      1.2
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -13,20 +13,27 @@
 
 // If on Trade Successfully Made Page.
 if (document.getElementsByClassName('alert-success').length) {
-	let args = window.location.search.slice(1).split('&');
 	let recursive = false;
-	// Read Arguments to see if the Quantity listed is greater than 1,000,000.
-	for (let i = 0; i < args.length; ++i) {
-		args[i] = args[i].split('=');
-		if (args[i][0] == 'q') {
-			const quantity = parseInt(args[i][1]);
-			// If so subtract it and set recursive to true.
-			if (quantity > 1000000) {
-				args[i][1] = quantity - 1000000;
-				recursive = true;
+	let args = window.location.search.slice(1).split('&');
+	if (localStorage.Doc_IgnoreRecursive != 'true') {
+		// Read Arguments to...
+		for (let i = 0; i < args.length; ++i) {
+			args[i] = args[i].split('=');
+			// Update the Price in the URL.
+			if (args[i][0] == 'p') {
+				args[i][1] = localStorage.Doc_LastPrice;
 			}
+			// See if the Quantity listed is greater than 1,000,000.
+			else if (args[i][0] == 'q') {
+				const quantity = parseInt(args[i][1]);
+				// If so subtract it and set recursive to true.
+				if (quantity > 1000000) {
+					args[i][1] = quantity - 1000000;
+					recursive = true;
+				}
+			}
+			args[i] = args[i].join('=');
 		}
-		args[i] = args[i].join('=');
 	}
 	localStorage.Doc_Recursive = `${recursive}`;
 	// If resursive is true then return to Create Trade Page.
@@ -56,16 +63,25 @@ if (document.getElementsByClassName('alert-success').length) {
 }
 // If of Create Trade Page.
 else {
+	localStorage.Doc_IgnoreRecursive = 'false';
 	let args = window.location.search.slice(1).split('&');
+	let quantity;
 	for (let i = 0; i < args.length; ++i) {
 		args[i] = args[i].split('=');
 		// Getting Price from URL to fill in.
 		if (args[i][0] == 'p') {
-			document.getElementById('priceper').value = parseInt(args[i][1]);
+			const price = parseInt(args[i][1]);
+			let priceTag = document.getElementById('priceper');
+			priceTag.value = price;
+			// Logging Price in case Recursive gets activated.
+			localStorage.Doc_LastPrice = `${price}`;
+			priceTag.onchange = () => {
+				localStorage.Doc_LastPrice = document.getElementById('priceper').value;
+			};
 		}
 		// Getting Quantity from URL to fill in.
 		else if (args[i][0] == 'q') {
-			const quantity = parseInt(args[i][1]);
+			quantity = parseInt(args[i][1]);
 			document.getElementById('amount').value = quantity > 1000000 ? 1000000 : quantity;
 		}
 		// Getting Type from URL to figure out which button to hide.
@@ -80,6 +96,7 @@ else {
 				sellButton.value = 'Sell';
 				sellButton.dataset.target = '';
 				DisableButton(sellButton);
+				ButtonClicked(sellButton, quantity);
 			}
 			else {
 				sellButton.style.display = 'none';
@@ -89,6 +106,7 @@ else {
 				buyButton.value = 'Buy';
 				buyButton.dataset.target = '';
 				DisableButton(buyButton);
+				ButtonClicked(buyButton, quantity);
 			}
 		}
 	}
@@ -180,9 +198,20 @@ else {
 	};
 }
 
+// Disables Button for 5 seconds if Recursive Feature is active.
 function DisableButton(tag) {
 	if (localStorage.Doc_Recursive == 'true') {
 		tag.disabled = true;
 		setTimeout(() => { tag.disabled = false; }, 5000);
+		localStorage.Doc_Recursive = 'false';
 	}
+}
+
+// Ignores Checking for Recursive if amount isn't what was prefilled.
+function ButtonClicked(tag, quantity) {
+	tag.onclick = () => {
+		if ((quantity > 1000000 ? 1000000 : quantity) != parseInt(document.getElementById('amount').value)) {
+			localStorage.Doc_IgnoreRecursive = 'true';
+		}
+	};
 }
