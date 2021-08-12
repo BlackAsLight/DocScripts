@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Find War
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.0
+// @version      1.1
 // @description  Consolidates information about potential raiding targets.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=15*
@@ -167,9 +167,13 @@ function SendPost(data) {
 		onload: (e) => {
 			try {
 				ReceivePost(JSON.parse(e.response).data.nations.data);
+				localStorage.Doc_RefreshCount = 0;
 			}
 			catch {
-				window.location.reload();
+				if (localStorage.Doc_RefreshCount < '5') {
+					window.location.reload();
+					localStorage.Doc_RefreshCount = ++parseInt(localStorage.Doc_RefreshCount);
+				}
 			}
 		}
 	});
