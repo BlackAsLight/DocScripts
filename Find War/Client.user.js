@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Find War
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.7
+// @version      0.8
 // @description  Consolidates information about potential raiding targets.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=15*
@@ -244,9 +244,9 @@ function UpdateTargetInfo(api, militaryID, continentID, lastActiveID, warHistory
 		wars = wars.sort((x, y) => x.date < y.date);
 		let count = 0;
 		while (wars.length && count < 3) {
-			count++;
 			let war = wars.shift();
 			if (war.winner != '0') {
+				count++;
 				const opponentLost = war.winner == api.id;
 				const isAttacker = war.attacker.id == api.id;
 				const victory = war.attacks.filter(x => x.type == 'VICTORY').shift().loot_info.replaceAll('\r\n', '').split('won the war and looted')[1].split('Food.')[0].trim().split(' ').filter(x => x.length);
