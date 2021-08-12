@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Find War
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.9
+// @version      1.0
 // @description  Consolidates information about potential raiding targets.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=15*
@@ -21,14 +21,14 @@ const char = [
 let idCache = [];
 
 // Delete API Key from memory if present from previous versions.
-if (localStorage.Doc_APIKey != undefined) {
-	localStorage.removeItem('Doc_FindWarURL');
+if (localStorage.Doc_APIKey != 'undefined') {
+	localStorage.removeItem('Doc_APIKey');
 }
 
 // Handle obtaining, changing and saving the URL to the Google App Script provided by user.
 (() => {
 	let codeTag = document.createElement('code');
-	codeTag.innerHTML = localStorage.Doc_FindWarURL == undefined || localStorage.Doc_FindWarURL == '' ? '<button>Insert URL</button>' : '<button>Update URL</button>';
+	codeTag.innerHTML = localStorage.Doc_FindWarURL == 'undefined' || localStorage.Doc_FindWarURL == '' ? '<button>Insert URL</button>' : '<button>Update URL</button>';
 	codeTag.onclick = () => {
 		let response = prompt('URL received from Google Scripts:', localStorage.Doc_FindWarURL);
 		if (response != undefined) {
@@ -48,7 +48,7 @@ if (localStorage.Doc_APIKey != undefined) {
 
 // Creates a boolean value about whether it should alter the page.
 const run = (() => {
-	if (localStorage.Doc_FindWarURL != undefined && localStorage.Doc_FindWarURL != '') {
+	if (localStorage.Doc_FindWarURL != 'undefined' && localStorage.Doc_FindWarURL != '') {
 		let args = location.search.slice(1).split('&');
 		while (args.length) {
 			let arg = args.shift().split('=');
@@ -163,7 +163,7 @@ function SendPost(data) {
 	GM_xmlhttpRequest({
 		method: 'POST',
 		data: JSON.stringify(data),
-		url: 'https://script.google.com/macros/s/AKfycbyrpZdgVSDYvYvL0_4ZXatmaNdSuhNTaQXdTPzB6Hgy6IV0zLUNOmp2CLDYw2-rK9-Ynw/exec',
+		url: localStorage.Doc_FindWarURL,
 		onload: (e) => {
 			try {
 				ReceivePost(JSON.parse(e.response).data.nations.data);
