@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Find War
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.8
+// @version      0.9
 // @description  Consolidates information about potential raiding targets.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=15*
@@ -22,7 +22,7 @@ let idCache = [];
 
 // Delete API Key from memory if present from previous versions.
 if (localStorage.Doc_APIKey != undefined) {
-	localStorage.Doc_APIKey = undefined;
+	localStorage.removeItem('Doc_FindWarURL');
 }
 
 // Handle obtaining, changing and saving the URL to the Google App Script provided by user.
