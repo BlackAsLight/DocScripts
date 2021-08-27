@@ -1,7 +1,7 @@
 // ==GoogleScriptApp==
 // @name         Doc: Espionage Report
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.3
+// @version      0.4
 // @description  Receives a Copy of Espionage Reports and saves to a Google Spreadsheet
 // @author       BlackAsLight
 // ==/GoogleScriptApp==
@@ -42,7 +42,7 @@ function triggerUpdate() {
 	// Get list of approved identifiers.
 	const identifiers = (() => {
 		const sheet = spreadsheet.getSheetByName(identifier);
-		return sheet.getRange(2, 1, sheet.getMaxRows() - 1, 2).getValues();
+		return sheet.getRange(2, 1, sheet.getMaxRows() - 1, 2).getValues().filter(x => x[0].length && x[1].length);
 	})();
 
 	// Get folder and files in folder of all the reports.
