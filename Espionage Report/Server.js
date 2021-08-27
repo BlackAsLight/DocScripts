@@ -1,45 +1,68 @@
 // ==GoogleScriptApp==
 // @name         Doc: Espionage Report
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.2
+// @version      0.3
 // @description  Receives a Copy of Espionage Reports and saves to a Google Spreadsheet
 // @author       BlackAsLight
 // ==/GoogleScriptApp==
 
 const spreadsheetID = '';
-const sheetName = 'Reports';
-const sheet = SpreadsheetApp.openById(spreadsheetID).getSheetByName(sheetName);
+const report = 'Reports';
+const identifier = 'Identifiers';
 const folderPath = './Espionage/';
 
+// Receives Espionage Report from Client Script
 function doPost(e) {
 	const data = JSON.parse(e.postData.contents);
 	const folder = getFolderByPath(folderPath);
-	let fileName = `ER-${randomText(15)}.json`;
-	let check = true;
-	while (check) {
+
+	// Get a filename that isn't in use.
+	let fileName;
+	while (true) {
+		fileName = `ER-${randomText(15)}.json`;
 		try {
-			// Checks whether file name exists or not.
+			// Checks whether file name is already in use.
+			// If it does then no error will be thrown and the while loop will run again.
 			getFileByFolderFileName(folder, fileName);
-			// If it does exist then no error will be thrown and file name will be changed to try again.
-			fileName = `ER-${randomText(15)}.json`;
 		}
 		catch {
-			// If an error is thrown then the file doesn't exist.
-			check = false;
+			// If it doesn't then an error will be thrown, breaking out of the while loop.
+			break;
 		}
 	}
+	// Creates File in Google Drive for triggerUpdate()
 	folder.createFile(fileName, JSON.stringify(data));
 }
 
+// Reads all reports saved in Google Drive and moves them to the Spreadsheet.
 function triggerUpdate() {
+	const spreadsheet = SpreadsheetApp.openById(spreadsheetID);
+	const reportSheet = spreadsheet.getSheetByName(report);
+
+	// Get list of approved identifiers.
+	const identifiers = (() => {
+		const sheet = spreadsheet.getSheetByName(identifier);
+		return sheet.getRange(2, 1, sheet.getMaxRows() - 1, 2).getValues();
+	})();
+
+	// Get folder and files in folder of all the reports.
 	const folder = getFolderByPath(folderPath);
 	let files = folder.getFiles();
+	// Iterate through each file.
 	while (files.hasNext()) {
 		const file = files.next();
+		// If file is a report then...
 		if (file.getName().startsWith('ER-')) {
+			// Parse it's data.
 			const data = JSON.parse(file.getBlob().getDataAsString());
-			const row = findRow(sheet);
-			sheet.getRange(row, 1, 1, 3).setValues([[data.timeStamp, data.report, data.identifierKey]]);
+			// Check whether it has a valid identifierKey.
+			const key = identifiers.filter(x => x[1] == data.identifierKey);
+			if (key.length) {
+				// If so it logged it into the Spreadsheet.
+				const row = findRow(reportSheet, 3);
+				reportSheet.getRange(row, 1, 1, 3).setValues([[data.timeStamp, data.report, key[0]]]);
+			}
+			// Move File from Drive to Trash.
 			if (!file.isTrashed()) {
 				file.setTrashed(true);
 			}
@@ -65,13 +88,15 @@ function randomText(length) {
 
 /* Google Spreadsheets Functions
 -------------------------*/
-
 /**
  * @param {SpreadsheetApp.Sheet} sheet
  */
-function findRow(sheet) {
+function findRow(sheet, columns = undefined) {
+	if (columns == undefined) {
+		columns = sheet.getMaxColumns();
+	}
 	for (let i = 0; i < 2; ++i) {
-		if (!sheet.getRange(sheet.getMaxRows() - 1, 1, 1, sheet.getMaxColumns()).isBlank()) {
+		if (!sheet.getRange(sheet.getMaxRows() - 1, 1, 1, columns).isBlank()) {
 			sheet.insertRowAfter(sheet.getMaxRows());
 		}
 	}
@@ -79,10 +104,10 @@ function findRow(sheet) {
 	let position = min;
 	let max = sheet.getMaxRows();
 	while (true) {
-		if (sheet.getRange(position, 1, 1, sheet.getMaxColumns()).isBlank()) {
-			if (sheet.getRange(position - 1, 1, 1, sheet.getMaxColumns()).isBlank()) {
+		if (sheet.getRange(position, 1, 1, columns).isBlank()) {
+			if (sheet.getRange(position - 1, 1, 1, columns).isBlank()) {
 				max = position;
-				position = Math.floor((min + position) / 2);
+				position = Math.floor((min + max) / 2);
 			}
 			else {
 				return position;
@@ -90,14 +115,13 @@ function findRow(sheet) {
 		}
 		else {
 			min = position;
-			position = Math.floor((position + max) / 2);
+			position = Math.floor((min + max) / 2);
 		}
 	}
 }
 
 /* Google Drive Functions
 -------------------------*/
-
 /**
  * @param {String} path
  */

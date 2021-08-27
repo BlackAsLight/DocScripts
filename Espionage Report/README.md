@@ -7,7 +7,7 @@ If you want this script just for personal use then you need to do both parts. Cl
 
 The Versions of Client that are compatible with Server.
  - Client | Server
- - v0.1-0.2 | v0.1-0.2
+ - v0.1-0.2 | v0.1-0.3
 
 ## Description
 
@@ -35,7 +35,7 @@ Simply install the `Client.user.js` Script, found here above, like any of the ot
 
 1. Once installed you'll need a URL provided by the Server Part, and an Identifier Key.
 2. Simply go to any [Espionage](https://politicsandwar.com/nation/espionage/eid=6) page in game. Your own will even work.
-3. On the left sidebar at the bottom you'll find two buttons. Insert Report URL and Insert Identifier Key. 
+3. On the left sidebar at the bottom you'll find two buttons. Insert Report URL and Insert Identifier Key.
    - These buttons will change to Update Report URL and Update Identifier Key when they have been provided with something and upon refresh.
 4. Click on each button and provide the desired info into the prompted box that appears on screen.
 
@@ -57,4 +57,4 @@ As of v0.2 for `Server.js`, this Script does have one Trigger that needs to be s
 
 Go to the [main page](https://github.com/BlackAsLight/DocScripts#server) and scroll down to the Triggers heading under the Server section for instructions on how to add a trigger.
 
-That's everything you need to do to set up the Server Part. Granted that you've done it all correct it will work. You can share the spreadsheet you made a copy of with anyone you want to view the reports and also customise the other bits around it to suit your business more. 
+That's everything you need to do to set up the Server Part. Granted that you've done it all correct it will work. You can share the spreadsheet you made a copy of with anyone you want to view the reports and also customise the other bits around it to suit your business more.
