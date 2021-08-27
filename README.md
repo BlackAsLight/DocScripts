@@ -11,6 +11,8 @@ For those of you who find yourselves here and don't know GitHub. All the code ab
 
 ## Installation
 
+Please note that these scripts might have settings or require additional information from you the user upon setup. To provide the script with this info or configure it's available settings, go to the respective page the scripts run on and scroll down to the bottom of the left sidebar. That is where you'll find, if any, the scripts configurable settings or additional information needs.
+
 ### For Chrome, Microsoft Edge, Firefox, Opera Next, Dolphin Browser, and UC Browser users
 Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be installed on your modern browser of choice to install and run these scripts. If you do not know how to install an extension on your browser of choice then [YouTube](https://www.youtube.com/) it.
 1. Click on the `.user.js` script above that you'd like to have installed on [TamperMonkey](https://www.tampermonkey.net/).

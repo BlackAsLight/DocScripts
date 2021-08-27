@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Find War
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.2
+// @version      1.3
 // @description  Consolidates information about potential raiding targets.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=15*
@@ -20,19 +20,24 @@ const char = [
 
 let idCache = [];
 
-// Delete API Key from memory if present from previous versions.
-if (localStorage.Doc_APIKey != 'undefined') {
-	localStorage.removeItem('Doc_APIKey');
+// Delete Google URL from memory if present from previous versions.
+if (localStorage.Doc_FindWarURL != 'undefined') {
+	localStorage.removeItem('Doc_FindWarURL');
 }
 
-// Handle obtaining, changing and saving the URL to the Google App Script provided by user.
+// Handle obtaining, changing and saving the API Key, provided by user, to access the game's APIs.
 (() => {
 	let codeTag = document.createElement('code');
-	codeTag.innerHTML = localStorage.Doc_FindWarURL == 'undefined' || localStorage.Doc_FindWarURL == '' ? '<button>Insert URL</button>' : '<button>Update URL</button>';
+	codeTag.innerHTML = localStorage.Doc_APIKey == 'undefined' || localStorage.Doc_APIKey == '' ? '<button>Insert API Key</button>' : '<button>Update API Key</button>';
 	codeTag.onclick = () => {
-		let response = prompt('URL received from Google Scripts:', localStorage.Doc_FindWarURL);
+		const response = prompt('Insert API Key which can be found at the bottom of Accounts Page:', localStorage.Doc_APIKey);
 		if (response != undefined) {
-			localStorage.Doc_FindWarURL = response;
+			if (response.length) {
+				localStorage.Doc_APIKey = response;
+			}
+			else {
+				localStorage.removeItem('Doc_APIKey');
+			}
 			location.reload();
 		}
 	};
@@ -48,7 +53,7 @@ if (localStorage.Doc_APIKey != 'undefined') {
 
 // Creates a boolean value about whether it should alter the page.
 const run = (() => {
-	if (localStorage.Doc_FindWarURL != 'undefined' && localStorage.Doc_FindWarURL != '') {
+	if (localStorage.Doc_APIKey != undefined) {
 		let args = location.search.slice(1).split('&');
 		while (args.length) {
 			let arg = args.shift().split('=');
@@ -163,7 +168,7 @@ function SendPost(data) {
 	GM_xmlhttpRequest({
 		method: 'POST',
 		data: JSON.stringify(data),
-		url: localStorage.Doc_FindWarURL,
+		url: `https://api.politicsandwar.com/graphql?api_key=${localStorage.Doc_APIKey}&query={ nations(first: 50, id: [${data.join(', ')}]) { data { id leader_name continent last_active soldiers tanks aircraft ships missiles nukes treasures { name color continent bonus spawndate } offensive_wars { id date war_type winner attacker { id nation_name leader_name alliance { id name }} defender { id nation_name leader_name alliance { id name }} attacks { type loot_info }} defensive_wars { id date war_type winner attacker { id nation_name leader_name alliance { id name }} defender { id nation_name leader_name alliance { id name } } attacks { type loot_info }}}}}`,
 		onload: (e) => {
 			try {
 				ReceivePost(JSON.parse(e.response).data.nations.data);
