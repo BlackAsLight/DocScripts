@@ -155,4 +155,5 @@ This script requires the View Trades Script for the first three features to be o
 
 ### Hide Nation Descriptions
 
+**Depreciated**
 This script is very simple that it's just one line. It deletes nations custom descriptions. Installing this will mean you won't have to scroll anymore due to people's excessively long nation descriptions.
