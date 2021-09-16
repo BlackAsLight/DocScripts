@@ -115,6 +115,8 @@ Once you've done that:
 
 ### View Trades
 
+**Depreciated**
+
 This script runs on the Trades Page.
 
 - Changes colour of sell and buy buttons to match that of the create trade screen.
@@ -140,6 +142,8 @@ The Outbid, Match, and TopUp buttons only appear if the quantity is greater than
 
 ### Create Trade
 
+**Depreciated**
+
 This script runs on the Create Trade page.
 
 - Reads quantity and price in URL, provided by the View Trades Script's buttons, and fills out the form for you.
@@ -156,4 +160,5 @@ This script requires the View Trades Script for the first three features to be o
 ### Hide Nation Descriptions
 
 **Depreciated**
+
 This script is very simple that it's just one line. It deletes nations custom descriptions. Installing this will mean you won't have to scroll anymore due to people's excessively long nation descriptions.
