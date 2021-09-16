@@ -1,25 +1,22 @@
 # DocScripts
 
-Use with care. :)
+This is a GitHub respository of a bunch of scripts made by Doctor for a game called Politics and War. 
 
-Please create an issue here on GitHub if you find any bugs, have suggestions about improvements or other script ideas.
+**Please** scroll down and read how to [install](https://github.com/BlackAsLight/DocScripts#installation) these scripts and look in the individual folders for descriptions of said scripts.
 
-For those of you who find yourselves here and don't know GitHub. All the code above is open source. Meaning you can check it all out for malicious code, or if you can't read JavaScript, someone you trust can check it out for malicious code. Answers to some commonly asked questions:
-1. No, none of these scripts breaks the game rules.
-2. I can't tell if you do or don't choose to install these scripts. I don't get a notification of any sorts if you decide to install or run any of it.
-3. Likewise, I cannot see any information it provides or collects for you. All I can do is provide you with simple step by step guides for set up and hope you did it right.
+**DO NOT** ask me how to do this or that unless you have read, followed, and _failed_ the [installation](https://github.com/BlackAsLight/DocScripts#installation) instructions.
 
 ## Installation
 
-Please note that these scripts might have settings or require additional information from you the user upon setup. To provide the script with this info or configure it's available settings, go to the respective page the scripts run on and scroll down to the bottom of the left sidebar. That is where you'll find, if any, the scripts configurable settings or additional information needs.
+Please note that these scripts might have settings or require additional information from you the user upon setup. To provide the script with this info or configure it's available settings, go to the respective page the scripts run on and scroll down to the bottom of the left sidebar. That is where you'll find, if any, the scripts configurable settings or additional information needs. At no time will a script meant for the client side require you to edit the code.
 
 ### For Chrome, Microsoft Edge, Firefox, Opera Next, Dolphin Browser, and UC Browser users
 Note: [TamperMonkey](https://www.tampermonkey.net/), or alike, needs to be installed on your modern browser of choice to install and run these scripts. If you do not know how to install an extension on your browser of choice then [YouTube](https://www.youtube.com/) it. Once [TamperMonkey](https://www.tampermonkey.net/), or alike, is installed on your browser of choice:
-1. Click on the `.user.js` script above that you'd like to have installed on [TamperMonkey](https://www.tampermonkey.net/).
+1. Click on the `.user.js` script above that you'd like to have installed on [TamperMonkey](https://www.tampermonkey.net/), or alike.
 2. Click the Raw button located somewhere on your screen.
-3. [TamperMonkey](https://www.tampermonkey.net/) should take over from there prompting you with an install button.
+3. [TamperMonkey](https://www.tampermonkey.net/), or alike, should take over from there prompting you with an install button.
 4. Click said install button.
-5. You're done. Go to the pages the respective scripts run on and watch the magic.
+5. Go to the page the script runs on and check at the bottom of the left sidebar if it has any settings that might need to be configured/ additional information need to be provided.
 
 ### For Safari Users
 
@@ -27,13 +24,13 @@ Safari users can download [TamperMonkey](https://www.tampermonkey.net/) from the
 1. Click on the `.user.js` script above that you'd like to have installed on [MeddleMonkey](https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12).
 2. Click the Raw button located somewhere on your screen.
 3. A new window will have opened. Click the green Confirm Installation button at the top right of your window.
-4. You're done. You can close the tab/s and go to the pages the respective scripts run on and watch the magic.
+4. Go to the page the script runs on and check at the bottom of the left sidebar if it has any settings that might need to be configured/ additional information need to be provided.
 
 ### For Android Users
 
-It has not been tested, but according to the Internet, there is an app called Kiwi Browser, downloadable off the Google Play Store, which supports Chrome extensions. Meaning you can install TamperMonkey, through the Chrome store, on said browser and theoretically use these scripts on your phone as well.
+It has not been tested, but according to the Internet, there is an app called Kiwi Browser, downloadable off the Google Play Store, which supports Chrome extensions. Meaning you can install [TamperMonkey](https://www.tampermonkey.net/), through the Chrome store, on said browser and theoretically use these scripts on your phone as well.
 
-Again, this has not been tested, and that is only due to the fact that I do not own an Android.
+Again, this has not been tested, and that is only due to the fact that I do not own an Android. Since it has not been tested, I am unable to provide a step by step guide on how to install these scripts.
 
 ### For iOS Users
 
