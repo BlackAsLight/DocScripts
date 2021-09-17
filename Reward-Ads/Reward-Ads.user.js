@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Reward-Ads
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.2
+// @version      0.3
 // @description  Autoplay Reward Ads
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/rewarded-ads/
@@ -32,13 +32,40 @@ const observer = new MutationObserver((list) => {
 				}
 			}
 		}
+		// If "countdown" text shows up.
+		else if (mutation.target.id == 'countdown') {
+			console.log('Timer Set To Reload Page!');
+			// Reload the page in 3 mins.
+			setTimeout(() => {
+				console.log('Reloading Page!');
+				window.location.reload();
+			}, 1000 * 60 * 3); // Milliseconds * Seconds * Minutes
+		}
 	}
 });
 
-// Starts observing attribute changes for the "btnAds" button.
-observer.observe(document.getElementById('btnAds'), { attributes: true, childList: false, subtree: false });
+{
+	// Get User input on whether or not to set Aggressive Mode on.
+	const codeTag = document.createElement('code');
+	codeTag.innerHTML = `Aggressive Mode: <input id="aggressiveMode" type="checkbox" ${localStorage.Doc_RewardAds == 'true' ? 'checked' : ''}>`;
+	document.getElementById('leftcolumn').appendChild(codeTag);
+	document.getElementById('aggressiveMode').onchange = () => {
+		const inputTag = document.getElementById('aggressiveMode');
+		if (inputTag.checked) {
+			localStorage.Doc_RewardAds = true;
+			setTimeout(() => {
+				console.log('Reloading Page!');
+				window.location.reload();
+			}, 1000 * parseInt(document.getElementById('countdown').textContent.split(' ')[5])); // Milliseconds * Seconds
+		}
+		else {
+			localStorage.removeItem('Doc_RewardAds');
+			console.log('Reloading Page!');
+			window.location.reload();
+		}
+	};
+}
 
-// Three second delay to give page time to decide if the button can be clicked or should be hidden.
 setTimeout(() => {
 	// Check if we've hit the max for today...
 	if (document.getElementById('rewarded_ads_watched_today').textContent == '25') {
@@ -52,6 +79,17 @@ setTimeout(() => {
 			// Click button.
 			adTag.click();
 			console.log('Clicked!');
+		}
+		else {
+			// If Aggressive Mode is on...
+			if (localStorage.Doc_RewardAds == 'true') {
+				// Start observing attribute changes for the countdown display.
+				observer.observe(document.getElementById('countdown'), { attributes: true, childList: false, subtree: false });
+			}
+			else {
+				// Else Start observing attribute changes for the "btnAds" button.
+				observer.observe(document.getElementById('btnAds'), { attributes: true, childList: false, subtree: false });
+			}
 		}
 	}
 }, 3000);
