@@ -11,7 +11,7 @@ The Versions of Client that are compatible with Server.
  - v0.1-0.4 | Nil
  - v0.5-0.6 | v0.1
  - v0.7-1.2 | v0.2
- - v1.3 | Nil
+ - v1.3+ | Nil
 
 ## Description
 
