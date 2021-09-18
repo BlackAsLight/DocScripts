@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Reward-Ads
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.3
+// @version      0.4
 // @description  Autoplay Reward Ads
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/rewarded-ads/
@@ -44,6 +44,9 @@ const observer = new MutationObserver((list) => {
 	}
 });
 
+// Start observing attribute changes for the "btnAds" button.
+observer.observe(document.getElementById('btnAds'), { attributes: true, childList: false, subtree: false });
+
 {
 	// Get User input on whether or not to set Aggressive Mode on.
 	const codeTag = document.createElement('code');
@@ -85,10 +88,6 @@ setTimeout(() => {
 			if (localStorage.Doc_RewardAds == 'true') {
 				// Start observing attribute changes for the countdown display.
 				observer.observe(document.getElementById('countdown'), { attributes: true, childList: false, subtree: false });
-			}
-			else {
-				// Else Start observing attribute changes for the "btnAds" button.
-				observer.observe(document.getElementById('btnAds'), { attributes: true, childList: false, subtree: false });
 			}
 		}
 	}
