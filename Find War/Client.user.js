@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Find War
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.3
+// @version      1.4
 // @description  Consolidates information about potential raiding targets.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=15*
@@ -257,7 +257,7 @@ function UpdateTargetInfo(api, militaryID, continentID, lastActiveID, warHistory
 			if (war.winner != '0') {
 				count++;
 				const opponentLost = war.winner == api.id;
-				const isAttacker = war.attacker.id == api.id;
+				const opponentIsDefender = war.attacker.id == api.id;
 				const victory = war.attacks.filter(x => x.type == 'VICTORY').shift().loot_info.replaceAll('\r\n', '').split('won the war and looted')[1].split('Food.')[0].trim().split(' ').filter(x => x.length);
 				//console.log(victory);
 				html += `<p${count == 1 ? ' style="background: #85E085;"' : ''}>`
@@ -265,9 +265,9 @@ function UpdateTargetInfo(api, militaryID, continentID, lastActiveID, warHistory
 					+ ` | <img src="${opponentLost ? 'https://politicsandwar.com/img/icons/16/medal_award_gold.png' : 'https://politicsandwar.com/img/icons/16/emotion_dead.png'}">`
 					+ ` ${api.leader_name}`
 					+ ` ${opponentLost ? 'Won' : 'Lost'}`
-					+ ` against ${opponentLost ? war.defender.leader_name : war.attacker.leader_name}`
-					+ ` of <a target="_blank" href="https://politicsandwar.com/nation/id=${opponentLost ? war.defender.id : war.attacker.id}">${opponentLost ? war.defender.nation_name : war.attacker.nation_name}</a>`
-					+ ` from <a target="_blank" href="https://politicsandwar.com/alliance/id=${opponentLost ? war.defender.alliance.id : war.attacker.alliance.id}">${opponentLost ? war.defender.alliance.name : war.attacker.alliance.name}</a>`
+					+ ` against ${opponentIsDefender ? war.defender.leader_name : war.attacker.leader_name}`
+					+ ` of <a target="_blank" href="https://politicsandwar.com/nation/id=${opponentIsDefender ? war.defender.id : war.attacker.id}">${opponentIsDefender ? war.defender.nation_name : war.attacker.nation_name}</a>`
+					+ ` from <a target="_blank" href="https://politicsandwar.com/alliance/id=${opponentIsDefender ? war.defender.alliance.id : war.attacker.alliance.id}">${opponentIsDefender ? war.defender.alliance.name : war.attacker.alliance.name}</a>`
 					+ ` | <i><a target="_blank" href="https://politicsandwar.com/nation/war/timeline/war=${war.id}">War Timeline</a></i> | ${FormatDate(new Date(war.date.replace(' ', 'T') + 'Z'))}`
 					+ `<br><b>Loot</b>: ${victory[0].slice(0, victory[0].length - 1)}`
 					+ ` <img src="https://politicsandwar.com/img/resources/oil.png"> ${victory[3]}`
