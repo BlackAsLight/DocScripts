@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Away Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.1
+// @version      0.2
 // @description  Make Playing Away Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/play/
@@ -23,8 +23,8 @@ window.onload = () => {
 	if (document.getElementsByClassName('nationtable').length > 2) {
 		// Hide game details so page looks normal.
 		let children = Array.from(document.getElementById('rightcolumn').children);
-		for (let i = 0; i < 9; ++i) {
-			children[3 + i].style.display = 'none';
+		for (let i = 0; i < 10; ++i) {
+			children[4 + i].style.display = 'none';
 		}
 	}
 }
