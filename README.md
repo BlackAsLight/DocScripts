@@ -1,6 +1,6 @@
 # DocScripts
 
-This is a GitHub respository of a bunch of scripts made by Doctor for a game called Politics and War. 
+This is a GitHub respository of a bunch of scripts made by Doctor for a game called Politics and War.
 
 **Please** scroll down and read how to [install](https://github.com/BlackAsLight/DocScripts#installation) these scripts and look in the individual folders for descriptions of said scripts.
 
@@ -107,23 +107,3 @@ Once you've done that:
 6. Click Deploy.
 7. If the update needs new authorization then an Authorization button will appear. You'll need to go ahead and click it. You'll need to give the script the access it needs to work properly.
 8. The URL will appear for use. It is the exact same one as before so no need to update the Client side.
-
-## Script Description
-
-### View Trades
-
-**Depreciated**
-
-This script is depreciated, access the new version from the folder called Trading found above.
-
-### Create Trade
-
-**Depreciated**
-
-This script is depreciated, access the new version from the folder called Trading found above.
-
-### Hide Nation Descriptions
-
-**Depreciated**
-
-This script is very simple that it's just one line. It deletes nations custom descriptions. Installing this will mean you won't have to scroll anymore due to people's excessively long nation descriptions.
