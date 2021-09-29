@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      3.1
+// @version      3.2
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -12,12 +12,16 @@
 // ==/UserScript==
 
 'use strict';
-// Global Variables.
+/* Global Variables
+-------------------------*/
 const sellColor = '#5cb85c';
 const buyColor = '#337ab7';
 
+// Gets User's current Resources.
 const resources = (() => {
-	const resources = replaceAll(document.getElementById('rssBar').children[0].children[0].children[0].innerText.trim().replaceAll('\n', ''), '  ', ' ').replaceAll(',', '').split(' ');
+	const resources = ReplaceAll(document.getElementById('rssBar').children[0].children[0].children[0].innerText.trim().replaceAll('\n', ''), '  ', ' ')
+		.replaceAll(',', '')
+		.split(' ');
 	return {
 		money: parseFloat(resources[13]),
 		oil: parseFloat(resources[2]),
@@ -35,400 +39,369 @@ const resources = (() => {
 	};
 })();
 
-let globalBuyOffers = {};
-let globalSellOffers = {};
+let myBuyOffers = {};
+let mySellOffers = {};
 
-// Affect the current rows being in the table.
-{
-	let trTags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children);
-	trTags.shift();
+
+/* User Configuration Settings
+-------------------------*/
+document.getElementById('leftcolumn').appendChild((() => {
+	const codeTag = document.createElement('code');
+	codeTag.innerHTML = `Load All Offers: <input id="loadOffers" type="checkbox" ${localStorage.Doc_LoadAllOffers == 'true' ? 'checked' : ''}>`;
+	return codeTag;
+})());
+document.getElementById('loadOffers').onchange = () => {
+	const inputTag = document.getElementById('loadOffers');
+	if (inputTag.checked) {
+		localStorage.Doc_LoadAllOffers = true;
+	}
+	else {
+		localStorage.Doc_LoadAllOffers = false;
+	}
+	location.reload();
+};
+
+/* Modify Page
+-------------------------*/
+(() => {
+	// Modify existing Rows in the table.
+	let trTags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children).slice(1);
 	while (trTags.length) {
-		const row = trTags.shift().children;
+		const trTag = trTags.shift();
 		try {
-			AffectRow(row);
+			ModifyRow(Array.from(trTag.children));
 		}
-		catch {
-			console.log(row);
+		catch (e) {
+			console.log(trTag);
+			console.log(e);
 		}
 	}
-}
 
+	// Add Market Links at hte top of the page.
+	const formTag = Array.from(document.getElementById('rightcolumn').children).filter(tag => tag.tagName == 'FORM')[0];
+	formTag.parentElement.insertBefore((() => {
+		const pTag = document.createElement('p');
+		pTag.style.textAlign = 'center';
+		pTag.innerHTML = '<a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=oil&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/oil.png"> Oil</a>'
+			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=coal&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/coal.png"> Coal</a>'
+			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=iron&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/iron.png"> Iron</a>'
+			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=bauxite&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/bauxite.png"> Bauxite</a>'
+			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=lead&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/lead.png"> Lead</a>'
+			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=uranium&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/uranium.png"> Uranium</a>'
+			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=food&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/icons/16/steak_meat.png"> Food</a>'
+			+ '<br><a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=gasoline&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/gasoline.png"> Gasoline</a>'
+			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=steel&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/steel.png"> Steel</a>'
+			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=aluminum&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/aluminum.png"> Aluminum</a>'
+			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=munitions&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/munitions.png"> Munitions</a>'
+			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=credits&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/icons/16/point_gold.png"> Credits</a>'
+			+ '<br><a href="https://politicsandwar.com/index.php?id=26&display=nation&resource1=&buysell=&ob=date&od=DESC&maximum=100&minimum=0&search=Go">Personal Trades</a>';
+		return pTag;
+	})(), formTag);
+	formTag.parentElement.insertBefore(document.createElement('hr'), formTag);
+})();
 
 (async () => {
-	// If displaying personal trade window or not.
-	const isNationDisplay = (() => {
-		if (window.location.pathname == '/nation/trade/') {
-			return true;
+	// If page is not displaying User's trade history AND User has Load All Offers set to TRUE then...
+	if ((() => {
+		if (location.pathname.startsWith('/nation/trade/')) {
+			return false;
 		}
-		let args = window.location.search.split('&');
+		let args = location.search.slice(1).split('&');
 		while (args.length) {
 			const arg = args.shift().split('=');
 			if (arg[0] == 'display') {
 				if (arg[1] == 'alliance' || arg[1] == 'world') {
-					return false;
+					return true;
 				}
-				return true;
+				return false;
 			}
 		}
-		return true;
-	})();
-
-	// If not displaying person trade window then activate infinite scroll feature.
-	if (!isNationDisplay) {
-		// Add Checkbox to toggle infinite scroll feature.
-		let codeTag = document.createElement('code');
-		codeTag.innerHTML = `Load All Offers: <input id="loadOffers" type="checkbox" ${localStorage.Doc_LoadAllOffers == 'true' ? 'checked' : ''}>`;
-		document.getElementById('leftcolumn').appendChild(codeTag);
-		document.getElementById('loadOffers').onchange = () => {
-			let inputTag = document.getElementById('loadOffers');
-			if (inputTag.checked) {
-				localStorage.Doc_LoadAllOffers = true;
-			}
-			else {
-				localStorage.Doc_LoadAllOffers = false;
-			}
-			location.reload();
-		};
-
-		// If infinite scroll feature is enabled then load the other pages in.
-		if (localStorage.Doc_LoadAllOffers == 'true') {
-			const maximumOffers = (() => {
-				const args = window.location.search.split('&');
-				while (args.length) {
-					const arg = args.shift().split('=');
-					if (arg[0] == 'maximum') {
-						return parseInt(arg[1]);
-					}
+		return false;
+	})() && localStorage.Doc_LoadAllOffers == 'true') {
+		// Get max offers that can be displayed on the page.
+		const maxOffers = (() => {
+			let args = location.search.slice(1).split('&');
+			while (args.length) {
+				const arg = args.shift().split('=');
+				if (arg[0] == 'maximum') {
+					return parseInt(arg[1]);
 				}
-				return 50;
+			}
+			return 50;
+		})();
+
+		// Get number of pages that need to be loaded.
+		const pagesToLoad = (() => {
+			// Get total offers that exist with the this type of search.
+			// And while it's at it, make some edits to the filter options, located at the top of the page, and previous/next page buttons, located at the bottom.
+			const totalOffers = (() => {
+				const pTags = Array.from(document.getElementsByClassName('center')).filter(tag => tag.tagName == 'P');
+
+				// Move Go button to the above row on page.
+				pTags[2].appendChild(pTags[3].children[4]);
+
+				// Get the relevant text at the bottom of the page saying number of offers in existence.
+				const text = pTags[4].textContent.split(' ')
+				text.splice(1, 2);
+				pTags[4].innerText = text.join(' ');
+
+				// Remove previous/next page buttons located at the bottom of the page.
+				pTags[5].parentElement.removeChild(pTags[5]);
+
+				// If User had page set to display less than 50 offers, insert note to tell them DO BETTER!
+				if (maxOffers < 50) {
+					pTags[3].innerHTML = `Note: The game just tried to only load ${maxOffers} trade offers.`
+						+ '<br>We strongly recommend going to your <a target="_blank" href="https://politicsandwar.com/account/#4">Account</a> settings and changing the default search results to 50,'
+						+ '<br>or if this was a link provided by some bot, that you ask the maximum query in the link be set to at least 50, preferably 100.';
+				}
+				// Else remove second row of filter options, located at the top of the page.
+				else {
+					pTags[3].parentElement.removeChild(pTags[3]);
+				}
+
+				return parseInt(text[1]);
 			})();
 
-			const pagesToLoad = (() => {
-				const totalOffers = (() => {
-					let tags = document.getElementsByClassName('center');
-					let pTags = [];
-					for (let i = 0; i < tags.length; i++) {
-						if (tags[i].tagName == 'P') {
-							pTags.push(tags[i]);
-						}
+			if (totalOffers > maxOffers) {
+				return Math.ceil((totalOffers - maxOffers) / 100);
+			}
+			return 0;
+		})();
+
+		// Get tbody Tag for the table of offers.
+		const tbodyTag = document.getElementsByClassName('nationtable')[0].children[0];
+		for (let i = 0; i < pagesToLoad; ++i) {
+			// Get URL for page.
+			const url = (() => {
+				let args = location.search.slice(1).split('&');
+
+				// Find min and max values in URL.
+				let minFound = false;
+				let maxFound = false;
+				for (let j = 0; j < args.length; ++j) {
+					let arg = args[j].split('=');
+					// Update min if found.
+					if (arg[0] == 'minimum') {
+						minFound = true;
+						arg[1] = 100 * i + maxOffers;
+						args[j] = arg.join('=');
 					}
-
-					pTags[2].appendChild(pTags[3].children[4]);
-
-					let text = pTags[4].textContent.split(' ');
-					text.splice(1, 2);
-					pTags[4].innerText = text.join(' ');
-
-					pTags[5].parentElement.removeChild(pTags[5]);
-
-					if (maximumOffers < 50) {
-						pTags[3].innerHTML = `Note: The game just tried to only load ${maximumOffers} trade offers.`
-							+ '<br>We strongly recommend going to your <a target="_blank" href="https://politicsandwar.com/account/#4">Account</a> settings and changing the default search results to 50,'
-							+ '<br>or if this was a link provided by some bot, that you ask the maximum query in the link be set to at least 50, preferably 100.';
-					}
-					else {
-						pTags[3].parentElement.removeChild(pTags[3]);
-					}
-
-					return parseInt(text[1]);
-				})();
-				if (totalOffers > maximumOffers) {
-					const pages = Math.ceil((totalOffers - maximumOffers) / 100);
-					if (pages > 0) {
-						return pages;
-					}
-				}
-				return 0;
-			})();
-
-			let tbodyTag = document.getElementsByClassName('nationtable')[0].children[0];
-			for (let i = 0; i < pagesToLoad; i++) {
-				let url = (() => {
-					let args = window.location.href.split('&');
-					let minFound = false;
-					let maxFound = false;
-					for (let j = 0; j < args.length; j++) {
-						let arg = args[j].split('=');
-						if (arg[0] == 'minimum') {
-							minFound = true;
-							arg[1] = 100 * i + maximumOffers;
+					// Update max if found and isn't already set to 100.
+					else if (arg[0] == 'maximum') {
+						maxFound = true;
+						if (arg[1] != '100') {
+							arg[1] = '100';
 							args[j] = arg.join('=');
 						}
-						else if (arg[0] == 'maximum') {
-							maxFound = true;
-							if (arg[1] != '100') {
-								arg[1] = '100';
-								args[j] = arg.join('=');
-							}
-						}
 					}
-					if (!maxFound) {
-						args.push(`maximum=100`);
-					}
-					if (!minFound) {
-						args.push(`minimum=${100 * i + maximumOffers}`);
-					}
-					return args.join('&');
-				})();
-
-				let doc = new DOMParser().parseFromString(await (await fetch(url)).text(), 'text/html');
-				let rows = Array.from(doc.getElementsByClassName('nationtable')[0].children[0].children);
-				rows.shift();
-				while (rows.length) {
-					let row = rows.shift();
-					try {
-						AffectRow(row.children);
-					}
-					catch {
-						console.log(row);
-					}
-					tbodyTag.appendChild(row);
 				}
+
+				// If min not found in URL.
+				if (!minFound) {
+					args.push(`minimum=${100 * i + maxOffers}`);
+				}
+				// If max not found in URL.
+				if (!maxFound) {
+					args.push(`maximum=100`);
+				}
+
+				return location.origin + location.pathname + '?' + args.join('&');
+			})();
+
+			// Load Page.
+			const doc = new DOMParser().parseFromString(await (await fetch(url)).text(), 'text/html');
+			let trTags = Array.from(doc.getElementsByClassName('nationtable')[0].children[0].children).slice(1);
+			while (trTags.length) {
+				const trTag = trTags.shift();
+				try {
+					ModifyRow(Array.from(trTag.children));
+				}
+				catch (e) {
+					console.log(trTag);
+					console.log(e);
+				}
+				tbodyTag.appendChild(trTag);
 			}
-			GlobalLinks();
 		}
 	}
-	else {
-		GlobalLinks();
+
+	// Add links to all the buttons that were added.
+	for (const resource in myBuyOffers) {
+		UpdateLinks(resource, true);
+	}
+	for (const resource in mySellOffers) {
+		UpdateLinks(resource, false);
 	}
 })();
 
-// Display Market Links at the top of the page.
-try {
-	let pTag = document.createElement('p');
-	pTag.style.textAlign = 'center';
-	pTag.innerHTML = '<a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=oil&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/oil.png"> Oil</a>'
-		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=coal&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/coal.png"> Coal</a>'
-		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=iron&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/iron.png"> Iron</a>'
-		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=bauxite&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/bauxite.png"> Bauxite</a>'
-		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=lead&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/lead.png"> Lead</a>'
-		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=uranium&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/uranium.png"> Uranium</a>'
-		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=food&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/icons/16/steak_meat.png"> Food</a>'
-		+ '<br><a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=gasoline&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/gasoline.png"> Gasoline</a>'
-		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=steel&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/steel.png"> Steel</a>'
-		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=aluminum&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/aluminum.png"> Aluminum</a>'
-		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=munitions&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/munitions.png"> Munitions</a>'
-		+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=credits&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/icons/16/point_gold.png"> Credits</a>'
-		+ '<br><a href="https://politicsandwar.com/index.php?id=26&display=nation&resource1=&buysell=&ob=date&od=DESC&maximum=100&minimum=0&search=Go">Personal Trades</a>';
-	let referenceTag = (() => {
-		let tags = Array.from(document.getElementById('rightcolumn').children);
-		while (tags.length) {
-			let tag = tags.shift();
-			if (tag.tagName == 'FORM') {
-				return tag;
-			}
-		}
-	})();[7];
-	referenceTag.parentElement.insertBefore(pTag, referenceTag);
-	referenceTag.parentElement.insertBefore(document.createElement('hr'), referenceTag);
-}
-catch (e) {
-	console.log('Injecting Market Links Failed.');
-	console.log(e);
-}
-
-// Affect the rows cells to make it look pretty.
-function AffectRow(cells) {
-	const resource = cells[4].children[0].getAttribute('title').toLowerCase();
-	const quantity = parseInt(cells[4].innerText.trim().replaceAll(',', ''));
-	const price = parseInt(cells[5].innerText.trim().split(' ')[0].replaceAll(',', ''));
-	const isSellOffer = cells[1].childElementCount == 1;
-
-	// Someone Elses Trade Offer.
-	if (cells[6].children[0].tagName == 'FORM') {
-		if (isSellOffer) {
-			cells[6].children[0].children[5].style.backgroundColor = sellColor;
-			let baseline = 0;
-			if (resource == 'food') {
-				baseline = 5000;
-			}
-			if (quantity > resources[resource] - baseline) {
-				cells[6].children[0].children[3].value = resources[resource] - baseline < 0 ? 0 : Math.floor(resources[resource] - baseline);
-			}
+/* Functions
+-------------------------*/
+function UpdateLinks(resource, isSellOffer) {
+	let topUpTags = Array.from(document.getElementsByClassName(`Doc_TopUp_${isSellOffer ? 'S' : 'B'}_${resource}`))
+	while (topUpTags.length) {
+		const topUpTag = topUpTags.shift();
+		const link = CreateLink(resource, parseInt(topUpTag.parentElement.textContent.split(' ')[1].replaceAll(',', '')), isSellOffer, isSellOffer ? 0 : mySellOffers[resource], isSellOffer ? myBuyOffers[resource] : 0);
+		if (typeof link == 'string') {
+			topUpTag.href = link;
 		}
 		else {
-			cells[6].children[0].children[5].style.backgroundColor = buyColor;
-			if (quantity * price > resources.money) {
-				cells[6].children[0].children[3].value = Math.floor(resources.money / price);
+			topUpTag.remove();
+		}
+	}
+	let outbidMatchTags = Array.from(document.getElementsByClassName(`Doc_OutbidMatch_${isSellOffer ? 'S' : 'B'}_${resource}`));
+	while (outbidMatchTags.length) {
+		const outbidMatchTag = outbidMatchTags.shift();
+		FillOutbidMatch(outbidMatchTag, resource, parseInt(outbidMatchTag.parentElement.textContent.split(' ')[1].replaceAll(',', '')), isSellOffer, isSellOffer ? 0 : mySellOffers[resource], isSellOffer ? myBuyOffers[resource] : 0)
+	}
+}
+
+function ModifyRow(tdTags) {
+	const resource = tdTags[4].children[0].getAttribute('title').toLowerCase();
+	const quantity = parseInt(tdTags[4].innerText.trim().replaceAll(',', ''));
+	const price = parseInt(tdTags[5].innerText.trim().split(' ')[0].replaceAll(',', ''));
+	const isSellOffer = tdTags[1].childElementCount == 1;
+
+	if (myBuyOffers[resource] == undefined) {
+		myBuyOffers[resource] = 0;
+	}
+	if (mySellOffers[resource] == undefined) {
+		mySellOffers[resource] = 0;
+	}
+
+	// Is this somebody else's offer that you can accept?
+	if (tdTags[6].children[0].tagName == 'FORM') {
+		// Is offer looking to buy resources from you?
+		if (isSellOffer) {
+			// Set button color.
+			tdTags[6].children[0].children[5].style.backgroundColor = sellColor;
+
+			// Get the max amount we're able to sell.
+			const sellableQuantity = SellableQuantity(resource);
+
+			// Update quantity if offer wants to buy more than you're able to sell.
+			if (quantity > sellableQuantity) {
+				tdTags[6].children[0].children[3].value = Math.max(sellableQuantity, 0);
 			}
 		}
-		cells[5].children[2].innerText = '$' + (parseInt(cells[6].children[0].children[3].value) * price).toLocaleString();
-		outbidAndMatch(cells[5], resource, price, isSellOffer);
+		// No? Offer is looking to sell resources to you.
+		else {
+			// Set button color.
+			tdTags[6].children[0].children[5].style.backgroundColor = buyColor;
+
+			// Update quantity if offer wants to sell more than you're able to buy.
+			if (quantity * price > resources.money) {
+				tdTags[6].children[0].children[3].value = Math.floor(resources.money / price);
+			}
+		}
+		// Update total price since quantity might have been updated.
+		tdTags[5].children[2].innerText = '$' + (parseInt(tdTags[6].children[0].children[3].value) * price).toLocaleString();
+		AddOutbidMatchButtons(tdTags[5], resource, price, isSellOffer);
+
 	}
-	// My Trade Offer.
-	else if (cells[6].children[0].tagName == 'A') {
-		let aTag = document.createElement('a');
+	// No? Is this your offer?
+	else if (tdTags[6].children[0].tagName == 'A') {
+		// Add TopUp Button.
+		const aTag = document.createElement('a');
 		aTag.innerText = 'TopUp';
+
+		// If User has Load All Offers set to TRUE add required className for link to be added later.
 		if (localStorage.Doc_LoadAllOffers == 'true') {
 			if (isSellOffer) {
-				aTag.className = 'Doc_TopUp_B_' + resource;
-				if (globalBuyOffers[resource] == undefined) {
-					globalBuyOffers[resource] = 0
-				}
-				globalBuyOffers[resource] += price * quantity;
+				aTag.className = `Doc_TopUp_S_${resource}`;
+				myBuyOffers[resource] += price * quantity;
 			}
 			else {
-				aTag.className = 'Doc_TopUp_S_' + resource;
-				if (globalSellOffers[resource] == undefined) {
-					globalSellOffers[resource] = 0;
-				}
-				globalSellOffers[resource] += quantity;
+				aTag.className = `Doc_TopUp_B_${resource}`;
+				mySellOffers[resource] += quantity;
 			}
-			let divTag = CreateDivTags(cells[5], resource, isSellOffer, true);
-			divTag.appendChild(aTag);
+			tdTags[5].appendChild(document.createElement('br'));
+			tdTags[5].appendChild(aTag);
 		}
+		// Else add link now.
 		else {
-			const link = createLink(resource, price, isSellOffer, quantity);
+			const link = CreateLink(resource, price, isSellOffer, quantity);
 			if (typeof link == 'string') {
-				cells[5].appendChild(document.createElement('br'));
 				aTag.href = link;
-				cells[5].appendChild(aTag);
+				tdTags[5].appendChild(document.createElement('br'));
+				tdTags[5].appendChild(aTag);
 			}
 		}
 	}
-	// A Trade Offer I can't accept.
-	else if (cells[6].children[0].tagName == 'IMG') {
-		const isBuyOffer = cells[2].childElementCount == 1;
-		if (!isSellOffer && !isBuyOffer) {
+	// No? This is a trade offer by somebody who has embargoed you or one of your accepted trade offers.
+	else if (tdTags[6].children[0].tagName == 'IMG') {
+		const isBuyOffer = tdTags[2].childElementCount == 1;
+		if (!(isSellOffer || isBuyOffer)) {
 			return;
 		}
-		outbidAndMatch(cells[5], resource, price, isSellOffer);
+		AddOutbidMatchButtons(tdTags[5], resource, price, isSellOffer);
 	}
 }
 
-// Add the Outbid and Match buttons for the given cell.
-function outbidAndMatch(cell, resource, price, isSellOffer) {
-	let divTag = CreateDivTags(cell, resource, isSellOffer, false);
-	const outbidLink = createLink(resource, price + (isSellOffer ? 1 : -1), isSellOffer);
+// Calculate the amount that is sellable for the user.
+function SellableQuantity(resource) {
+	if (resource == 'food') {
+		return Math.max(Math.floor(resources[resource]) - 5000, 0);
+	}
+	return Math.floor(resources[resource]);
+}
+
+// Add area for Outbid and Match buttons to go.
+function AddOutbidMatchButtons(tdTag, resource, price, isSellOffer) {
+	tdTag.appendChild(document.createElement('br'));
+	tdTag.appendChild((() => {
+		const divTag = document.createElement('div');
+		if (localStorage.Doc_LoadAllOffers == 'true') {
+			divTag.className = `Doc_OutbidMatch_${isSellOffer ? 'S' : 'B'}_${resource}`;
+		}
+		else {
+			FillOutbidMatch(divTag, resource, price, isSellOffer);
+		}
+		return divTag;
+	})());
+}
+
+// Add Outbid and Match buttons to provided div.
+function FillOutbidMatch(divTag, resource, price, isSellOffer, subQuantity = 0, subMoney = 0) {
+	const outbidLink = CreateLink(resource, price + (isSellOffer ? 1 : -1), isSellOffer, subQuantity, subMoney);
+	const matchLink = CreateLink(resource, price, isSellOffer, subQuantity, subMoney);
 	if (typeof outbidLink == 'string') {
-		let aTag = document.createElement('a');
+		const aTag = document.createElement('a');
 		aTag.innerText = 'Outbid';
 		aTag.href = outbidLink;
 		divTag.appendChild(aTag);
 	}
-	const matchLink = createLink(resource, price, isSellOffer);
 	if (typeof outbidLink == 'string' && typeof matchLink == 'string') {
 		divTag.append(' | ');
 	}
 	if (typeof matchLink == 'string') {
-		let aTag = document.createElement('a');
+		const aTag = document.createElement('a');
 		aTag.innerText = 'Match';
 		aTag.href = matchLink;
 		divTag.appendChild(aTag);
 	}
 }
 
-// Gets all the TopUp buttons on the market and adds links to them. Only gets called if infinite scroll is on.
-function GlobalLinks() {
-	for (let resource in globalBuyOffers) {
-		AddLinks('Doc_TopUp_B_' + resource, resource, true, true);
-		AddLinks('Doc_Outbid_B_' + resource, resource, true);
+// Create link for Create Offer page.
+function CreateLink(resource, price, isSellOffer, subQuantity = 0, subMoney = 0) {
+	const quantity = (() => {
+		if (isSellOffer) {
+			return Math.floor((resources.money - subMoney) / price);
+		}
+		return Math.max(SellableQuantity(resource) - subQuantity, 0);
+	})();
+	if (quantity > 0) {
+		return `https://politicsandwar.com/nation/trade/create/?resource=${resource}&p=${price}&q=${quantity}&t=${isSellOffer ? 'b' : 's'}`;
 	}
-
-	for (let resource in globalSellOffers) {
-		AddLinks('Doc_TopUp_S_' + resource, resource, false, true);
-		AddLinks('Doc_Outbid_S_' + resource, resource, false);
-	}
+	return undefined;
 }
 
-function AddLinks(className, resource, isSellOffer, addPush = false) {
-	let aTags = Array.from(document.getElementsByClassName(className));
-	while (aTags.length) {
-		let aTag = aTags.shift();
-		const price = parseInt(aTag.parentElement.parentElement.textContent.split(' ')[1].replaceAll(',', '')) + (className.search('Outbid') == -1 ? 0 : (isSellOffer ? 1 : -1));
-		const link = createLink(resource, price, isSellOffer, isSellOffer ? 0 : globalSellOffers[resource], isSellOffer ? globalBuyOffers[resource] : 0);
-		if (typeof link == 'string') {
-			aTag.href = link;
-			if (addPush) {
-				AddPushButton(aTag.parentElement, isSellOffer);
-			}
-		}
-		else {
-			aTag.remove();
-		}
-	}
-}
-
-function AddPushButton(cell, isSellOffer) {
-	cell.append(' | ');
-	let aTag = document.createElement('a');
-	aTag.innerText = 'Push';
-	aTag.onclick = () => {
-		let linkTags = Array.from(document.getElementsByClassName('Doc_Links_' + (isSellOffer ? 'B' : 'S')));
-		while (linkTags.length) {
-			linkTags.shift().style.display = 'none';
-		}
-
-		let connectTags = Array.from(document.getElementsByClassName('Doc_Connect_' + (isSellOffer ? 'B' : 'S')));
-		while (connectTags.length) {
-			connectTags.shift().style.display = 'inline-block';
-		}
-	};
-	cell.appendChild(aTag);
-}
-
-function CreateDivTags(cell, resource, isSellOffer) {
-	cell.appendChild(document.createElement('br'));
-	{
-		let divTag = document.createElement('div');
-		divTag.className = 'Doc_Connect_' + (isSellOffer ? 'B' : 'S');
-		divTag.style.display = 'none';
-		cell.appendChild(divTag);
-		let toTag = document.createElement('a');
-		toTag.innerText = 'Outbid';
-		toTag.className = 'Doc_Outbid_' + (isSellOffer ? 'B_' : 'S_') + resource;
-		divTag.appendChild(toTag);
-		divTag.append(' | ');
-		let cancelTag = document.createElement('a');
-		cancelTag.innerText = 'Cancel';
-		cancelTag.onclick = () => {
-			let linkTags = Array.from(document.getElementsByClassName('Doc_Links_' + (isSellOffer ? 'B' : 'S')));
-			while (linkTags.length) {
-				linkTags.shift().style.display = 'inline-block';
-			}
-
-			let connectTags = Array.from(document.getElementsByClassName('Doc_Connect_' + (isSellOffer ? 'B' : 'S')));
-			while (connectTags.length) {
-				connectTags.shift().style.display = 'none';
-			}
-		};
-		divTag.appendChild(cancelTag);
-	}
-	{
-		let divTag = document.createElement('div');
-		divTag.className = 'Doc_Links_' + (isSellOffer ? 'B' : 'S');
-		cell.appendChild(divTag);
-		return divTag;
-	}
-}
-
-// Create Link for Create Trade Script
-function createLink(resource, price, isSellOffer, subQuantity = 0, subWorth = 0) {
-	let quantity;
-	if (isSellOffer) {
-		quantity = Math.floor((resources.money - subWorth) / price - subQuantity);
-	}
-	else {
-		quantity = Math.floor(resources[resource] - subQuantity);
-		if (resource == 'food') {
-			quantity -= 5000;
-		}
-	}
-	if (quantity <= 0) {
-		return undefined;
-	}
-	return `https://politicsandwar.com/nation/trade/create/?resource=${resource}&p=${price}&q=${quantity}&t=${isSellOffer ? 'b' : 's'}`;
-}
-
-function replaceAll(text, search, replace) {
-	if (search == replace) {
-		throw `Infinite Loop`;
-	}
-	if (replace.search(search) != -1) {
-		throw `Infinite Loop`;
+// Replace all instances of a string in some text with something else.
+function ReplaceAll(text, search, replace) {
+	if (search == replace || replace.search(search) != -1) {
+		throw 'Infinite Loop!';
 	}
 	while (text.indexOf(search) != -1) {
-		text = text.replace(search, replace);
+		text = text.replaceAll(search, replace);
 	}
 	return text;
 }

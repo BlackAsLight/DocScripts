@@ -21,23 +21,19 @@ This script requires the View Trades Script for the first three features to be o
 
 This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&display=world&resource1=food&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go) Page.
 
-- Changes colour of sell and buy buttons to match that of the create trade screen.
-- Changes amount listed in the boxes to the actual amount you are able to buy or sell if the offerer is asking for more than you have.
-- Provides the ability to load all trade offers (refined to your search) instead of your default amount listed.
-  - A checkbox can be found on the left side of the screen to toggle on and off this feature.
-  - This feature and the checkbox will not show up when viewing your own trade screen.
-- Adds an Outbid button, which allows you to easily place a trade offer $1 less than said offer.
+- Sets Sell/Buy button colours to match that on the [Create Trade](https://politicsandwar.com/nation/trade/create/) Page.
+- If the amount you're able to Sell/Buy is less than the Offer, the amount listed in the box will be changed to what you're actually able to Sell/Buy.
+- Can load all Offers that meet the specified filter results, instead of being limited to 100 offers.
+  - To activate, tick the `Load All Offers` checkbox, located at the bottom of the left sidebar.
+- Adds an Outbid button, to other people's offers, which allows you to easily create a trade offer at a better price of $1.
   - Requires the Create Trade Script to work properly.
-- Adds a Match button, which allows you to easily place a trade offer at the same price as said offer.
+  - If the `Load All Offers` checkbox is ticked then the quantities listed in the link will take into account exiting offers on the market.
+- Adds a Match button, to other people's offers, which allows you to easily create a trade offer at the same price.
   - Requires the Create Trade Script to work properly.
-- Adds a TopUp button, which allows you to easily increase your current offers on the market.
-  - If the Load All Trade Offers Checkbox is ticked then the quantities for TopUp will take all your offers into account instead of just that offer preventing trade offers getting cancelled.
+  - If the `Load All Offers` checkbox is ticked then the quantities listed in the link will take into account exiting offers on the market.
+- Adds a TopUp button, to your offers, which allows you to easily create a trade a trade offer at the same price. Due to how the game works, it will just end up increasing the quantity of the existing one and updating the created date
   - Requires the Create Trade Script to work properly.
-- Adds a Push button. Like the TopUp button, but lets you choose a different price to create the trade at.
-  - This button won't appear unless the Load All Trade Offers Checkbox is ticked.
-  - Requires the Create Trade Script to work properly.
-- When you click the Push button, all TopUp buttons are replaced with Outbid buttons, and all Outbid buttons, including the new ones, have their quantities adjusted so the offer being created takes into account what's already on the market.
-- When you click the Push button, all the Match and Push buttons turn into Cancel buttons, which in turn can be clicked to undo the effects of the Push Button.
-- Adds Links with Resource Icons to easily and quickly switch between different markets.
+  - If the `Load All Offers` checkbox is ticked then the quantities listed in the link will take into account exiting offers on the market.
+- Adds Market Links, with Resource Icons, at the top of the page, to easily and quickly switch between different markets.
 
-The Outbid, Match, and TopUp buttons only appear if the quantity is greater than zero. So if you have zero of said resource to sell, then no button will appear offering for you to sell it.
+The Outbid, Match, and TopUp buttons only appear if the calculated quantity is greater than zero. So if you have zero of said resource to sell, then no button will appear offering for you to sell it.
