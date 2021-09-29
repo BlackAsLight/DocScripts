@@ -37,3 +37,7 @@ This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&disp
 - Adds Market Links, with Resource Icons, at the top of the page, to easily and quickly switch between different markets.
 
 The Outbid, Match, and TopUp buttons only appear if the calculated quantity is greater than zero. So if you have zero of said resource to sell, then no button will appear offering for you to sell it.
+
+### Quick Scroll
+
+This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&display=world&resource1=food&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go) Page. It checks to see if the page has a mis-trade on it, and if so, scrolls down to it making it center-ish of your screen. Only checks on the global market, when looking at a specific resource (not all resources), and both buy/sell offers are displayed.
