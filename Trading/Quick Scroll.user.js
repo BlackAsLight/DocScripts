@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Quick Scroll
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.1
+// @version      0.2
 // @description  Quickly scroll down the page to the mis-trade on the screen if one exists.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -37,13 +37,11 @@ if ((() => {
 	return checkOne && checkTwo && checkThree;
 })()) {
 	let rows = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children).slice(1);
-	let count = 0;
 	let highestSell = 0;
 	let lowestBuy = 50000000;
 	while (rows.length) {
 		const row = rows.shift();
 		const cells = Array.from(row.children);
-		cells[0].id = 'Row' + ++count;
 		const price = parseInt(cells[5].textContent.trim().split(' ')[0].replaceAll(',', ''));
 		const offerIsSelling = cells[1].children.length == 1 ? true : false;
 		if (offerIsSelling) {
@@ -54,8 +52,9 @@ if ((() => {
 		}
 		if (lowestBuy < highestSell) {
 			// Jump!
-			document.getElementById('Row' + Math.max(1, count - 4)).scrollIntoView({
-				behavior: 'smooth'
+			row.scrollIntoView({
+				behavior: 'smooth',
+                block: 'center'
 			});
 			break;
 		}
