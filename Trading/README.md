@@ -27,6 +27,11 @@ This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&disp
   - To activate, tick the `Load All Offers` checkbox, located at the bottom of the left sidebar.
 - Adds a Min Resource button, under the `Load All Offers` checkbox, that lets you set a minimum amount of of that resource that you do not want to sell.
   - Set market to "Any Resource" to set a minimum cash amount.
+- A Re-sell/buy button appears when you accept a trade offer. Clicking it will update all the relevant amounts for the offers so you don't accidentally re-sell/buy for a loss, and only for a profit.
+  - When you refresh the page or any other time you load it, it will tell you how much you have left to sell and at what price to still make a profit.
+  - As you accept the opposing offers to re-sell/buy a running profit will be kept until either you click "Forget about it!" or you complete the re-sell/buy.
+  - When viewing "Any Resource" this Re-sell/buy button will appear after accepting a trade, but the amounts on the offers listed will not be updated to reflect any amounts remembered for re-sell/buy. However, accepting offers that would make a profit still reduce the re-sell/buy on this page.
+  - Clicking the Re-sell/buy button will overwrite any other one the script remembered for that resource.
 - Adds an Outbid button, to other people's offers, which allows you to easily create a trade offer at a better price of $1.
   - Requires the Create Trade Script to work properly.
   - If the `Load All Offers` checkbox is ticked then the quantities listed in the link will take into account exiting offers on the market.

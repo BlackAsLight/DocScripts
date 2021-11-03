@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      3.3
+// @version      3.4
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -113,12 +113,85 @@ document.getElementById('minResource').onclick = () => {
 		}
 	}
 
+	// Handle Re-sell/buy of resources for a profit.
+	const pTag = (() => {
+		const imgTag = Array.from(document.getElementsByTagName('img')).filter(x => x.alt == 'Success').shift();
+		if (imgTag) {
+			return imgTag.parentElement
+		}
+		return imgTag;
+	})();
+	if (pTag) {
+		pTag.style.textAlign = 'center';
+		const text = pTag.textContent.trim().replaceAll('  ', ' ').split(' ');
+		if (text[2] == 'accepted') {
+			const quantity = parseInt(text[8].replaceAll(',', ''));
+			const price = parseInt(text[14].slice(1, -1).replaceAll(',', '')) / quantity;
+			const bought = text[7] == 'bought';
+			const key = `Doc_ReturnToSender_${text[9][0].toUpperCase() + text[9].slice(1, -1)}`;
+			let data = JSON.parse(localStorage.getItem(key));
+			let profit = 0;
+			if (data) {
+				console.log(1);
+				if (data.bought != bought) {
+					console.log(2);
+					if ((!bought && price > data.price) || (bought && price < data.price)) {
+						console.log(3);
+						profit = Math.min(data.quantity, quantity) * Math.abs(data.price - price);
+						data.profit += profit;
+						data.quantity -= quantity;
+						if (data.quantity > 0) {
+							console.log(4);
+							localStorage.setItem(key, JSON.stringify(data));
+						}
+						else {
+							console.log(5);
+							profit = data.profit;
+							localStorage.removeItem(key);
+						}
+					}
+				}
+			}
+			pTag.innerHTML += ` $${price.toLocaleString()}/ton.<div><a id="ReturnToSender">Re${bought ? 'sell' : 'buy'} this for a profit?</a>${profit > 0 ? ` | ${localStorage.getItem(key) ? '' : 'In Total '}Made $${profit.toLocaleString()} Profit.` : ''}</div>`;
+			document.getElementById('ReturnToSender').onclick = () => {
+				localStorage.setItem(key, JSON.stringify({
+					'bought': bought,
+					'quantity': quantity,
+					'price': price,
+					'profit': 0
+				}));
+				if ((() => {
+					let args = location.search.slice(1).split('&');
+					while (args.length) {
+						const arg = args.shift().split('=');
+						if (arg[0] == 'resource1') {
+							if (arg[1].length) {
+								return true;
+							}
+							break;
+						}
+					}
+					return false;
+				})()) {
+					UpdateQuantities(quantity, price, bought);
+				}
+				const divTag = document.getElementById('ReturnToSender').parentElement;
+				if (profit > 0) {
+					divTag.innerHTML = `Made $${profit.toLocaleString()} Profit.`;
+				}
+				else {
+					divTag.remove();
+				}
+			};
+		}
+	}
+
 	// Add Market Links at hte top of the page.
 	const formTag = Array.from(document.getElementById('rightcolumn').children).filter(tag => tag.tagName == 'FORM')[0];
 	formTag.parentElement.insertBefore((() => {
-		const pTag = document.createElement('p');
-		pTag.style.textAlign = 'center';
-		pTag.innerHTML = '<a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=oil&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/oil.png"> Oil</a>'
+		const pTagSub = document.createElement('p');
+		pTagSub.style.textAlign = 'center';
+		pTagSub.innerHTML = '<a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=oil&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/oil.png"> Oil</a>'
 			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=coal&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/coal.png"> Coal</a>'
 			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=iron&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/iron.png"> Iron</a>'
 			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=bauxite&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/bauxite.png"> Bauxite</a>'
@@ -131,7 +204,41 @@ document.getElementById('minResource').onclick = () => {
 			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=munitions&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/resources/munitions.png"> Munitions</a>'
 			+ ' | <a href="https://politicsandwar.com/index.php?id=90&display=world&resource1=credits&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go"><img src="https://politicsandwar.com/img/icons/16/point_gold.png"> Credits</a>'
 			+ '<br><a href="https://politicsandwar.com/index.php?id=26&display=nation&resource1=&buysell=&ob=date&od=DESC&maximum=100&minimum=0&search=Go">Personal Trades</a>';
-		return pTag;
+		const resource = (() => {
+			let args = location.search.slice(1).split('&');
+			while (args.length) {
+				const arg = args.shift().split('=');
+				if (arg[0] == 'resource1') {
+					if (arg[1].length) {
+						return arg[1][0].toUpperCase() + arg[1].slice(1);
+					}
+					break;
+				}
+			}
+			return null;
+		})();
+		if (resource) {
+			const key = `Doc_ReturnToSender_${resource}`;
+			if (localStorage.getItem(key)) {
+				const data = JSON.parse(localStorage.getItem(key));
+				pTagSub.innerHTML += `<div id="Forgotten">Still have ${data.quantity} ${resource} to ${data.bought ? 'sell' : 'buy'} at no ${data.bought ? 'less' : 'more'} than $${(data.price + (data.bought ? 1 : -1)).toLocaleString()}/ton | <a>Forget about it!</a>${data.profit > 0 ? ` | In Total Made $${data.profit.toLocaleString()} Profit.` : ''}</div>`;
+				pTagSub.children[pTagSub.childElementCount - 1].onclick = () => {
+					localStorage.removeItem(key);
+					const divTag = document.getElementById('Forgotten');
+					divTag.innerText = 'Forgotten... | Refreshing in 3s';
+					setTimeout(() => {
+						divTag.innerText = 'Forgotten... | Refreshing in 2s';
+					}, 1000);
+					setTimeout(() => {
+						divTag.innerText = 'Forgotten... | Refreshing in 1s';
+					}, 2000);
+					setTimeout(() => {
+						location.reload();
+					}, 3000);
+				};
+			}
+		}
+		return pTagSub;
 	})(), formTag);
 	formTag.parentElement.insertBefore(document.createElement('hr'), formTag);
 })();
@@ -268,6 +375,26 @@ document.getElementById('minResource').onclick = () => {
 	for (const resource in mySellOffers) {
 		UpdateLinks(resource, false);
 	}
+
+	const resource = (() => {
+		let args = location.search.slice(1).split('&');
+		while (args.length) {
+			const arg = args.shift().split('=');
+			if (arg[0] == 'resource1') {
+				if (arg[1].length) {
+					return arg[1][0].toUpperCase() + arg[1].slice(1);
+				}
+				break;
+			}
+		}
+		return null;
+	})();
+	if (resource) {
+		const data = JSON.parse(localStorage.getItem(`Doc_ReturnToSender_${resource}`));
+		if (data) {
+			UpdateQuantities(data.quantity, data.price, data.bought);
+		}
+	}
 })();
 
 /* Functions
@@ -306,6 +433,8 @@ function ModifyRow(tdTags) {
 
 	// Is this somebody else's offer that you can accept?
 	if (tdTags[6].children[0].tagName == 'FORM') {
+		localStorage.getItem('Doc_')
+
 		// Is offer looking to buy resources from you?
 		if (isSellOffer) {
 			// Set button color.
@@ -368,6 +497,24 @@ function ModifyRow(tdTags) {
 			return;
 		}
 		AddOutbidMatchButtons(tdTags[5], resource, price, isSellOffer);
+	}
+}
+
+function UpdateQuantities(quantity, price, isSelling) {
+	let trTags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children).slice(1);
+	while (trTags.length) {
+		const tdTags = Array.from(trTags.shift().children);
+		if (tdTags[6].children[0].tagName == 'FORM') {
+			const offerPrice = parseInt(tdTags[5].innerText.trim().split(' ')[0].replaceAll(',', ''));
+			if (isSelling == (tdTags[1].childElementCount == 1)) {
+				if ((isSelling && offerPrice > price) || (!isSelling && offerPrice < price)) {
+					tdTags[6].children[0].children[3].value = Math.min(parseInt(tdTags[6].children[0].children[3].value), quantity);
+				}
+				else {
+					tdTags[6].children[0].children[3].value = 0;
+				}
+			}
+		}
 	}
 }
 
