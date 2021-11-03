@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      3.2
+// @version      3.3
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -23,19 +23,19 @@ const resources = (() => {
 		.replaceAll(',', '')
 		.split(' ');
 	return {
-		money: parseFloat(resources[13]),
-		oil: parseFloat(resources[2]),
-		coal: parseFloat(resources[1]),
-		iron: parseFloat(resources[5]),
-		bauxite: parseFloat(resources[6]),
-		lead: parseFloat(resources[4]),
-		uranium: parseFloat(resources[3]),
-		food: parseFloat(resources[11]),
-		gasoline: parseFloat(resources[7]),
-		steel: parseFloat(resources[9]),
-		aluminum: parseFloat(resources[10]),
-		munitions: parseFloat(resources[8]),
-		credits: parseFloat(resources[0])
+		money: parseFloat(resources[13]) - (localStorage.getItem('Doc_MinResource_Money') == null ? 0 : localStorage.getItem('Doc_MinResource_Money')),
+		oil: parseFloat(resources[2]) - (localStorage.getItem('Doc_MinResource_Oil') == null ? 0 : localStorage.getItem('Doc_MinResource_Oil')),
+		coal: parseFloat(resources[1]) - (localStorage.getItem('Doc_MinResource_Coal') == null ? 0 : localStorage.getItem('Doc_MinResource_Coal')),
+		iron: parseFloat(resources[5]) - (localStorage.getItem('Doc_MinResource_Iron') == null ? 0 : localStorage.getItem('Doc_MinResource_Iron')),
+		bauxite: parseFloat(resources[6]) - (localStorage.getItem('Doc_MinResource_Bauxite') == null ? 0 : localStorage.getItem('Doc_MinResource_Bauxite')),
+		lead: parseFloat(resources[4]) - (localStorage.getItem('Doc_MinResource_Lead') == null ? 0 : localStorage.getItem('Doc_MinResource_Lead')),
+		uranium: parseFloat(resources[3]) - (localStorage.getItem('Doc_MinResource_Uranium') == null ? 0 : localStorage.getItem('Doc_MinResource_Uranium')),
+		food: parseFloat(resources[11]) - (localStorage.getItem('Doc_MinResource_Food') == null ? 0 : localStorage.getItem('Doc_MinResource_Food')),
+		gasoline: parseFloat(resources[7]) - (localStorage.getItem('Doc_MinResource_Gasoline') == null ? 0 : localStorage.getItem('Doc_MinResource_Gasoline')),
+		steel: parseFloat(resources[9]) - (localStorage.getItem('Doc_MinResource_Steel') == null ? 0 : localStorage.getItem('Doc_MinResource_Steel')),
+		aluminum: parseFloat(resources[10]) - (localStorage.getItem('Doc_MinResource_Aluminum') == null ? 0 : localStorage.getItem('Doc_MinResource_Aluminum')),
+		munitions: parseFloat(resources[8]) - (localStorage.getItem('Doc_MinResource_Munitions') == null ? 0 : localStorage.getItem('Doc_MinResource_Munitions')),
+		credits: parseFloat(resources[0]) - (localStorage.getItem('Doc_MinResource_Credits') == null ? 0 : localStorage.getItem('Doc_MinResource_Credits'))
 	};
 })();
 
@@ -59,6 +59,42 @@ document.getElementById('loadOffers').onchange = () => {
 		localStorage.Doc_LoadAllOffers = false;
 	}
 	location.reload();
+};
+
+document.getElementById('leftcolumn').appendChild((() => {
+	const codeTag = document.createElement('code');
+	codeTag.innerHTML = `<button id="minResource">Min ${(() => {
+		let args = location.search.slice(1).split('&');
+		while (args.length) {
+			const arg = args.shift().split('=');
+			if (arg[0] == 'resource1') {
+				if (arg[1].length) {
+					return arg[1][0].toUpperCase() + arg[1].slice(1);
+				}
+				break;
+			}
+		}
+		return 'Money';
+	})()}</button>`;
+	return codeTag;
+})());
+document.getElementById('minResource').onclick = () => {
+	const resource = document.getElementById('minResource').textContent.split(' ')[1];
+	const key = `Doc_MinResource_${resource}`;
+	const currentMin = localStorage.getItem(key);
+	const minAmount = (Math.round(parseFloat(prompt(`Min Resource for ${resource}:`, currentMin == null ? 0 : currentMin)) * 100) / 100).toString();
+	if (minAmount != 'NaN') {
+		if (minAmount != currentMin) {
+			if (minAmount > 0) {
+				localStorage.setItem(key, minAmount);
+				location.reload();
+			}
+			else if (currentMin != null) {
+				localStorage.removeItem(key);
+				location.reload();
+			}
+		}
+	}
 };
 
 /* Modify Page
@@ -275,10 +311,8 @@ function ModifyRow(tdTags) {
 			// Set button color.
 			tdTags[6].children[0].children[5].style.backgroundColor = sellColor;
 
-			// Get the max amount we're able to sell.
-			const sellableQuantity = SellableQuantity(resource);
-
 			// Update quantity if offer wants to buy more than you're able to sell.
+			const sellableQuantity = Math.floor(resources[resource]);
 			if (quantity > sellableQuantity) {
 				tdTags[6].children[0].children[3].value = Math.max(sellableQuantity, 0);
 			}
@@ -337,14 +371,6 @@ function ModifyRow(tdTags) {
 	}
 }
 
-// Calculate the amount that is sellable for the user.
-function SellableQuantity(resource) {
-	if (resource == 'food') {
-		return Math.max(Math.floor(resources[resource]) - 5000, 0);
-	}
-	return Math.floor(resources[resource]);
-}
-
 // Add area for Outbid and Match buttons to go.
 function AddOutbidMatchButtons(tdTag, resource, price, isSellOffer) {
 	tdTag.appendChild(document.createElement('br'));
@@ -387,7 +413,7 @@ function CreateLink(resource, price, isSellOffer, subQuantity = 0, subMoney = 0)
 		if (isSellOffer) {
 			return Math.floor((resources.money - subMoney) / price);
 		}
-		return Math.max(SellableQuantity(resource) - subQuantity, 0);
+		return Math.max(Math.floor(resources[resource]) - subQuantity, 0);
 	})();
 	if (quantity > 0) {
 		return `https://politicsandwar.com/nation/trade/create/?resource=${resource}&p=${price}&q=${quantity}&t=${isSellOffer ? 'b' : 's'}`;

@@ -25,6 +25,8 @@ This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&disp
 - If the amount you're able to Sell/Buy is less than the Offer, the amount listed in the box will be changed to what you're actually able to Sell/Buy.
 - Can load all Offers that meet the specified filter results, instead of being limited to 100 offers.
   - To activate, tick the `Load All Offers` checkbox, located at the bottom of the left sidebar.
+- Adds a Min Resource button, under the `Load All Offers` checkbox, that lets you set a minimum amount of of that resource that you do not want to sell.
+  - Set market to "Any Resource" to set a minimum cash amount.
 - Adds an Outbid button, to other people's offers, which allows you to easily create a trade offer at a better price of $1.
   - Requires the Create Trade Script to work properly.
   - If the `Load All Offers` checkbox is ticked then the quantities listed in the link will take into account exiting offers on the market.
