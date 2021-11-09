@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.4
+// @version      1.5
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -36,7 +36,7 @@ if (document.getElementsByClassName('alert-success').length) {
 		}
 	}
 	localStorage.Doc_Recursive = `${recursive}`;
-	// If resursive is true then return to Create Trade Page.
+	// If recursive is true then return to Create Trade Page.
 	if (recursive) {
 		window.location = window.location.origin + window.location.pathname + '?' + args.join('&');
 	}
@@ -63,6 +63,10 @@ if (document.getElementsByClassName('alert-success').length) {
 }
 // If of Create Trade Page.
 else {
+	document.getElementById('priceper').parentElement.parentElement.parentElement.nextElementSibling.nextElementSibling.scrollIntoView({
+		behavior: 'smooth',
+		block: 'center'
+	});
 	localStorage.Doc_IgnoreRecursive = 'false';
 	let args = window.location.search.slice(1).split('&');
 	let quantity;
