@@ -47,4 +47,4 @@ The Outbid, Match, and TopUp buttons only appear if the calculated quantity is g
 
 ### Quick Scroll
 
-This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&display=world&resource1=food&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go) Page. It checks to see if the page has a mis-trade on it, and if so, scrolls down to it making it center-ish of your screen. Only checks on the global market, when looking at a specific resource (not all resources), and both buy/sell offers are displayed.
+This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&display=world&resource1=food&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go) Page. It checks to see if the page has a mis-trade on it, and if so, scrolls down to it making it center-ish of your screen. Only checks on the global market, when looking at a specific resource (not all resources), and both buy/sell offers are displayed. It will also flip you from light to dark or vise versa when it detects a mis-trade.

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Quick Scroll
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.2
+// @version      0.3
 // @description  Quickly scroll down the page to the mis-trade on the screen if one exists.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -54,8 +54,26 @@ if ((() => {
 			// Jump!
 			row.scrollIntoView({
 				behavior: 'smooth',
-                block: 'center'
+				block: 'center'
 			});
+			const linkTag = Array.from(document.getElementsByTagName('link')).filter(x => x.href == 'https://politicsandwar.com/css/dark-theme.css')[0];
+			if (linkTag) {
+				linkTag.remove();
+			}
+			else {
+				document.head.appendChild((() => {
+					const linkTag = document.createElement('link');
+					linkTag.rel = 'stylesheet';
+					linkTag.href = 'https://politicsandwar.com/css/dark-theme.css';
+					return linkTag;
+				})());
+			}
+			document.body.appendChild((() => {
+				const divTag = document.createElement('div');
+				divTag.style.display = 'none';
+				divTag.id = 'Doc_Scrolled';
+				return divTag;
+			})());
 			break;
 		}
 	}
