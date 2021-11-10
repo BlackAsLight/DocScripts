@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      3.5
+// @version      3.6
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -457,6 +457,7 @@ function ReGain() {
 							profit += Math.min(data.levels[i].quantity, quantity) * Math.abs(data.levels[i].price - price);
 							data.levels[i].quantity -= quantity;
 							if (data.levels[i].quantity >= 0) {
+								quantity = 0;
 								break;
 							}
 							quantity = data.levels[i].quantity * -1;
@@ -476,7 +477,7 @@ function ReGain() {
 			// Add Re-Sell/Buy for Profit Button.
 			pTag.appendChild(document.createElement('br'));
 			data = JSON.parse(localStorage.getItem(key));
-			if (!data || data.bought == bought) {
+			if ((!data || data.bought == bought) && quantity) {
 				pTag.appendChild((() => {
 					const aTag = document.createElement('a');
 					aTag.innerText = `Re${bought ? 'sell' : 'buy'} for Profit?`;
@@ -525,7 +526,7 @@ function ReGain() {
 					return aTag;
 				})());
 			}
-			if ((!data || data.bought == bought) && profit) {
+			if ((!data || data.bought == bought) && profit && quantity) {
 				pTag.append(' | ');
 			}
 			if (profit) {
@@ -718,7 +719,6 @@ function RemoveBadLinks() {
 /* Start
 -------------------------*/
 async function Main() {
-	console.time('View Trades');
 	let trTags = (() => {
 		let tags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children);
 		const tag = tags.shift();
@@ -743,7 +743,6 @@ async function Main() {
 	UpdateQuantities();
 	UpdateLinks();
 	RemoveBadLinks();
-	console.timeEnd('View Trades');
 }
 
 if (MarketType() > -1) {
