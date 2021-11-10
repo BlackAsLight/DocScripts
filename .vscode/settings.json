@@ -5,10 +5,12 @@
 		"leftcolumn",
 		"minutessinceactive",
 		"nationtable",
+		"nums",
 		"prefilled",
 		"priceper",
 		"rightcolumn",
 		"spawndate",
+		"topup",
 		"xmlhttp"
 	]
 }
