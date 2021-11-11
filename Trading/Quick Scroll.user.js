@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Quick Scroll
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.3
+// @version      0.4
 // @description  Quickly scroll down the page to the mis-trade on the screen if one exists.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -11,70 +11,18 @@
 // ==/UserScript==
 
 'use strict';
-if ((() => {
-	let args = window.location.search.slice(1).split('&');
-	let checkOne = false;
-	let checkTwo = false;
-	let checkThree = false;
-	while (args.length) {
-		const arg = args.shift().split('=');
-		if (arg[0] == 'display') {
-			if (arg[1] == 'world') {
-				checkOne = true;
-			}
-		}
-		else if (arg[0] == 'buysell') {
-			if (!arg[1].length) {
-				checkTwo = true;
-			}
-		}
-		else if (arg[0] == 'resource1') {
-			if (arg[1].length) {
-				checkThree = true;
-			}
-		}
-	}
-	return checkOne && checkTwo && checkThree;
-})()) {
-	let rows = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children).slice(1);
-	let highestSell = 0;
-	let lowestBuy = 50000000;
-	while (rows.length) {
-		const row = rows.shift();
-		const cells = Array.from(row.children);
-		const price = parseInt(cells[5].textContent.trim().split(' ')[0].replaceAll(',', ''));
-		const offerIsSelling = cells[1].children.length == 1 ? true : false;
-		if (offerIsSelling) {
-			highestSell = Math.max(highestSell, price);
-		}
-		else {
-			lowestBuy = Math.min(lowestBuy, price);
-		}
-		if (lowestBuy < highestSell) {
-			// Jump!
-			row.scrollIntoView({
-				behavior: 'smooth',
-				block: 'center'
-			});
-			const linkTag = Array.from(document.getElementsByTagName('link')).filter(x => x.href == 'https://politicsandwar.com/css/dark-theme.css')[0];
-			if (linkTag) {
-				linkTag.remove();
-			}
-			else {
-				document.head.appendChild((() => {
-					const linkTag = document.createElement('link');
-					linkTag.rel = 'stylesheet';
-					linkTag.href = 'https://politicsandwar.com/css/dark-theme.css';
-					return linkTag;
-				})());
-			}
-			document.body.appendChild((() => {
-				const divTag = document.createElement('div');
-				divTag.style.display = 'none';
-				divTag.id = 'Doc_Scrolled';
-				return divTag;
-			})());
-			break;
-		}
-	}
-}
+// Depreciation
+document.body.appendChild((() => {
+	const pTag = document.createElement('p');
+	pTag.innerHTML = '<b>Depreciated | Doc: Quick Scroll</b><br>This script is now depreciated as it\'s functionality has been merged with Doc: View Trades v3.7'
+		+ '<br>Delete this script to make this message disappear. Make sure you at least have v3.7 of Doc: View Trades for the functionality.</a>'
+	pTag.style.position = 'fixed';
+	pTag.style.bottom = '1em';
+	pTag.style.right = '1em';
+	pTag.style.backgroundColor = '#ff4d6a';
+	pTag.style.padding = '1em';
+	pTag.style.borderRadius = '0.5em';
+	pTag.style.color = '#f2f2f2'
+	pTag.style.fontSize = '12px';
+	return pTag;
+})());

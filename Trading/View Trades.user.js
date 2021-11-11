@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      3.6
+// @version      3.7
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -77,6 +77,8 @@ const currentResource = (() => {
 	}
 	return 'Money';
 })();
+
+const marketType = MarketType();
 
 let myOffers = {
 	'Money': 0
@@ -253,7 +255,7 @@ function GetURL(min) {
 }
 
 async function InfiniteScroll() {
-	if (MarketType() > 0 && localStorage.getItem('Doc_VT_InfiniteScroll')) {
+	if (marketType > 0 && localStorage.getItem('Doc_VT_InfiniteScroll')) {
 		const pTags = Array.from(document.getElementsByClassName('center')).filter(x => x.tagName == 'P');
 		const alreadyLoaded = (() => {
 			const nums = pTags[4].textContent.split(' ')[1].split('-');
@@ -431,6 +433,70 @@ function CreateOfferLink(resource, price, isSellOffer) {
 	}
 }
 
+function Mistrade(num = 0) {
+	if ((() => {
+		let args = location.search.slice(1).split('&');
+		let checkOne = false;
+		let checkTwo = false;
+		while (args.length) {
+			const arg = args.shift().split('=');
+			if (arg[0] == 'buysell') {
+				if (!arg[1].length) {
+					checkOne = true;
+				}
+			}
+			else if (arg[0] == 'resource1') {
+				if (arg[1].length) {
+					checkTwo = true;
+				}
+			}
+		}
+		return marketType == 2 && checkOne && checkTwo;
+	})()) {
+		let trTags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children).slice(1);
+		let highestSell = 0;
+		let lowestBuy = 50000000;
+		while (trTags.length) {
+			const trTag = trTags.shift();
+			const tdTags = Array.from(trTag.children);
+			const price = parseInt(tdTags[5 - num].textContent.trim().split(' ')[0].replaceAll(',', ''));
+			const offerIsSelling = tdTags[1 - num].childElementCount == 1;
+			if (offerIsSelling) {
+				highestSell = Math.max(highestSell, price);
+			}
+			else {
+				lowestBuy = Math.min(lowestBuy, price);
+			}
+			if (lowestBuy < highestSell) {
+				trTag.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center'
+				});
+				const linkTag = Array.from(document.getElementsByTagName('link')).filter(x => x.href == 'https://politicsandwar.com/css/dark-theme.css')[0];
+				if (linkTag) {
+					linkTag.remove();
+				}
+				else {
+					document.head.appendChild((() => {
+						const linkTag = document.createElement('link');
+						linkTag.rel = 'stylesheet';
+						linkTag.href = 'https://politicsandwar.com/css/dark-theme.css';
+						return linkTag;
+					})());
+				}
+				document.body.appendChild((() => {
+					const divTag = document.createElement('div');
+					divTag.style.display = 'none';
+					divTag.id = 'Doc_Scrolled';
+					return divTag;
+				})());
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 function ReGain() {
 	const pTag = (() => {
 		const imgTag = Array.from(document.getElementsByTagName('img')).filter(x => x.alt == 'Success').shift();
@@ -515,9 +581,7 @@ function ReGain() {
 							}));
 						}
 
-						if (currentResource != 'Money') {
-							UpdateQuantities();
-						}
+						UpdateQuantities();
 						pTag.removeChild(aTag);
 						if (profit) {
 							pTag.innerHTML = pTag.innerHTML.replaceAll(' | ', '');
@@ -592,7 +656,7 @@ function MarketLink(resource) {
 		}
 		return imgTag;
 	})());
-	aTag.append(` ${resource}`);
+	aTag.append(` ${resource}${localStorage.getItem(`Doc_VT_ReGain_${resource}`) ? '*' : ''}`);
 	return aTag;
 }
 
@@ -719,6 +783,8 @@ function RemoveBadLinks() {
 /* Start
 -------------------------*/
 async function Main() {
+	const exists = Mistrade();
+
 	let trTags = (() => {
 		let tags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children);
 		const tag = tags.shift();
@@ -740,11 +806,14 @@ async function Main() {
 	MarketLinks();
 	ReGainCurrentLevels();
 	await InfiniteScroll();
+	if (!exists) {
+		Mistrade(1);
+	}
 	UpdateQuantities();
 	UpdateLinks();
 	RemoveBadLinks();
 }
 
-if (MarketType() > -1) {
+if (marketType > -1) {
 	Main();
 }
