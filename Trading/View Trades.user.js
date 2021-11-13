@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      3.7
+// @version      3.8
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -597,7 +597,9 @@ function ReGain() {
 				pTag.append(`Made $${profit.toLocaleString()} Profit.`);
 			}
 		}
+		return true;
 	}
+	return false;
 }
 
 function MarketLinks() {
@@ -738,6 +740,49 @@ function ForgetAboutIt(price, i) {
 	UpdateQuantities();
 }
 
+function MiddleScroll() {
+	if ((() => {
+		let args = location.search.slice(1).split('&');
+		let checkOne = false;
+		let checkTwo = false;
+		while (args.length) {
+			const arg = args.shift().split('=');
+			if (arg[0] == 'buysell') {
+				if (!arg[1].length) {
+					checkOne = true;
+				}
+			}
+			else if (arg[0] == 'resource1') {
+				if (arg[1].length) {
+					checkTwo = true;
+				}
+			}
+		}
+		return marketType > 0 && checkOne && checkTwo;
+	})()) {
+		let trTags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children).slice(1);
+		let favouringSelling = trTags[0].children[0].childElementCount == 1;
+		let bestOffer = favouringSelling ? 0 : 50000000;
+		let midTag;
+		while (trTags.length) {
+			const trTag = trTags.shift();
+			const tdTags = Array.from(trTag.children);
+			const price = parseInt(tdTags[4].textContent.trim().split(' ')[0].replaceAll(',', ''));
+			const offerIsSelling = tdTags[0].childElementCount == 1;
+			if (offerIsSelling == favouringSelling && ((offerIsSelling && bestOffer <= price) || (!offerIsSelling && bestOffer >= price))) {
+				bestOffer = price;
+				midTag = trTag;
+			}
+		}
+		if (midTag) {
+			midTag.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center'
+			});
+		}
+	}
+}
+
 function UpdateLinks() {
 	for (let resource in myOffers) {
 		if (resource == 'Money') {
@@ -783,7 +828,7 @@ function RemoveBadLinks() {
 /* Start
 -------------------------*/
 async function Main() {
-	const exists = Mistrade();
+	let mistradeExists = Mistrade();
 
 	let trTags = (() => {
 		let tags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children);
@@ -802,12 +847,15 @@ async function Main() {
 		}
 	}
 
-	ReGain();
+	const acceptedOffer = ReGain();
 	MarketLinks();
 	ReGainCurrentLevels();
 	await InfiniteScroll();
-	if (!exists) {
-		Mistrade(1);
+	if (!mistradeExists) {
+		mistradeExists = Mistrade(1);
+		if (!(mistradeExists || acceptedOffer)) {
+			MiddleScroll();
+		}
 	}
 	UpdateQuantities();
 	UpdateLinks();
