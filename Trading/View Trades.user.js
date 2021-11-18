@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      3.8
+// @version      3.9
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -484,6 +484,10 @@ function Mistrade(num = 0) {
 						return linkTag;
 					})());
 				}
+				const aTag = document.getElementById('Doc_ReGain');
+				if (aTag) {
+					aTag.click();
+				}
 				document.body.appendChild((() => {
 					const divTag = document.createElement('div');
 					divTag.style.display = 'none';
@@ -546,6 +550,7 @@ function ReGain() {
 			if ((!data || data.bought == bought) && quantity) {
 				pTag.appendChild((() => {
 					const aTag = document.createElement('a');
+					aTag.id = 'Doc_ReGain';
 					aTag.innerText = `Re${bought ? 'sell' : 'buy'} for Profit?`;
 					aTag.onclick = () => {
 						if (data) {
@@ -586,6 +591,7 @@ function ReGain() {
 						if (profit) {
 							pTag.innerHTML = pTag.innerHTML.replaceAll(' | ', '');
 						}
+						MiddleScroll();
 					};
 					return aTag;
 				})());
@@ -596,8 +602,8 @@ function ReGain() {
 			if (profit) {
 				pTag.append(`Made $${profit.toLocaleString()} Profit.`);
 			}
+			return true;
 		}
-		return true;
 	}
 	return false;
 }
@@ -828,7 +834,7 @@ function RemoveBadLinks() {
 /* Start
 -------------------------*/
 async function Main() {
-	let mistradeExists = Mistrade();
+	const mistradeExists = Mistrade();
 
 	let trTags = (() => {
 		let tags = Array.from(document.getElementsByClassName('nationtable')[0].children[0].children);
@@ -852,8 +858,7 @@ async function Main() {
 	ReGainCurrentLevels();
 	await InfiniteScroll();
 	if (!mistradeExists) {
-		mistradeExists = Mistrade(1);
-		if (!(mistradeExists || acceptedOffer)) {
+		if (!(Mistrade(1) || acceptedOffer)) {
 			MiddleScroll();
 		}
 	}
