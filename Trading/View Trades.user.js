@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      3.9
+// @version      4.0
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -344,6 +344,20 @@ function ModifyRow(tdTags) {
 	// Is this your offer?
 	else if (tdTags[6].children[0].tagName == 'A') {
 		AddTopUpButton(tdTags[5], resource, quantity, price, isSellOffer);
+		tdTags[6].children[0].appendChild((() => {
+			const buttonTag = document.createElement('button');
+			buttonTag.appendChild(tdTags[6].children[0].children[0].children[0]);
+			buttonTag.append(' Delete');
+			buttonTag.className = tdTags[6].children[0].children[0].className;
+			const link = tdTags[6].children[0].href;
+			tdTags[6].children[0].removeAttribute('href');
+			buttonTag.onclick = () => {
+				buttonTag.disabled = true;
+				fetch(link);
+			};
+			return buttonTag;
+		})());
+		tdTags[6].children[0].removeChild(tdTags[6].children[0].children[0]);
 	}
 	// This is a an offer that you cannot accept due to an embargo or is one of your accepted offers.
 	else {

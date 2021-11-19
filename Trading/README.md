@@ -41,6 +41,7 @@ This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&disp
   - If the Quantity for these buttons is zero or less then these button's will not appear for that offer.
 - A TopUp button will appear on your own offers. This button is just like the Match button, but it's Quantity will subtract the offer's current Quantity.
   - Like the Match button, this button will not appear if it's calculated Quantity is zero or less.
+- Makes it so you can delete your own trades without the page refreshing.
 - When a mistrade is spotted upon loading a page, the script will auto scroll you down to it, making it the centre of your page for you to easily click on to accept. It will also toggle you from Light to Dark mode or Dark to Light mode whenever it detects a mistrade, **AND** click on the Re-Sell/Buy button if it exists.
 - When no mistrade is detected and you haven't accepted an offer, you will get scrolled down to the change between the two markets **if** you're viewing both sides of the market at once.
 
