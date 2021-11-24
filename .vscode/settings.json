@@ -1,6 +1,7 @@
 {
 	"cSpell.words": [
 		"buysell",
+		"cancelhomegame",
 		"customise",
 		"leftcolumn",
 		"minutessinceactive",
@@ -12,6 +13,7 @@
 		"priceper",
 		"rightcolumn",
 		"spawndate",
+		"submithomegame",
 		"topup",
 		"xmlhttp"
 	]
