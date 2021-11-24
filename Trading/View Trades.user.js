@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      4.0
+// @version      4.1
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -12,34 +12,6 @@
 // ==/UserScript==
 
 'use strict';
-/* Migration
--------------------------*/
-(() => {
-	const mig1 = localStorage.getItem('Doc_LoadAllOffers');
-	if (mig1) {
-		if (mig1 == 'true') {
-			localStorage.setItem('Doc_VT_InfiniteScroll', true);
-		}
-		localStorage.removeItem('Doc_LoadAllOffers');
-	}
-	for (let i = 0; i < localStorage.length; ++i) {
-		const key = localStorage.key(i);
-		if (key.startsWith('Doc_ReturnToSender')) {
-			const data = localStorage.getItem(key);
-			localStorage.setItem(`Doc_VT_ReGain_${key.split('_')[2]}`, JSON.stringify({
-				'bought': data.bought,
-				'levels': [
-					{
-						'quantity': data.quantity,
-						'price': data.price
-					}
-				]
-			}));
-			localStorage.removeItem(key);
-		}
-	}
-})();
-
 /* Global Variables
 -------------------------*/
 const sellColor = '#5cb85c';
@@ -351,9 +323,17 @@ function ModifyRow(tdTags) {
 			buttonTag.className = tdTags[6].children[0].children[0].className;
 			const link = tdTags[6].children[0].href;
 			tdTags[6].children[0].removeAttribute('href');
-			buttonTag.onclick = () => {
+			buttonTag.onclick = async () => {
 				buttonTag.disabled = true;
-				fetch(link);
+				await fetch(link);
+				tdTags[6].parentElement.remove();
+				if (isSellOffer) {
+					myOffers.Money -= price * quantity;
+				}
+				else {
+					myOffers[resource] -= quantity;
+				}
+				UpdateLinks();
 			};
 			return buttonTag;
 		})());
@@ -371,40 +351,27 @@ function ModifyRow(tdTags) {
 function AddOutbidMatchButtons(cell, resource, price, isSellOffer) {
 	cell.appendChild(document.createElement('br'));
 	cell.appendChild((() => {
-		const aTag = document.createElement('a');
-		aTag.innerText = 'Outbid';
-		if (localStorage.getItem('Doc_VT_InfiniteScroll')) {
-			aTag.className = `Doc_Outbid_${isSellOffer ? 'S' : 'B'}_${resource}`;
-		}
-		else {
-			const outbidLink = CreateOfferLink(resource, price + (isSellOffer ? 1 : -1), isSellOffer);
-			//const matchLink = CreateOfferLink(resource, price, isSellOffer);
-			if (outbidLink) {
-				aTag.href = outbidLink;
-			}
-			else {
-				aTag.className = 'Doc_RemoveLink';
-			}
-		}
-		return aTag;
-	})());
-	cell.append(' | ');
-	cell.appendChild((() => {
-		const aTag = document.createElement('a');
-		aTag.innerText = 'Match';
-		if (localStorage.getItem('Doc_VT_InfiniteScroll')) {
-			aTag.className = `Doc_Match_${isSellOffer ? 'S' : 'B'}_${resource}`;
-		}
-		else {
-			const matchLink = CreateOfferLink(resource, price, isSellOffer);
-			if (matchLink) {
-				aTag.href = matchLink;
-			}
-			else {
-				aTag.className = 'Doc_RemoveLink';
-			}
-		}
-		return aTag;
+		const divTag = document.createElement('div');
+		divTag.className = `Doc_OutbidMatch_${isSellOffer ? 'S' : 'B'}_${resource}`;
+		divTag.style.display = 'inline';
+		divTag.appendChild((() => {
+			const aTag = document.createElement('a');
+			aTag.innerText = 'Outbid';
+			return aTag;
+		})());
+		divTag.appendChild((() => {
+			const pTag = document.createElement('p');
+			pTag.innerText = ' | ';
+			pTag.style.display = 'inline';
+			pTag.style.margin = '0';
+			return pTag;
+		})());
+		divTag.appendChild((() => {
+			const aTag = document.createElement('a');
+			aTag.innerText = 'Match';
+			return aTag;
+		})());
+		return divTag;
 	})());
 }
 
@@ -413,28 +380,13 @@ function AddTopUpButton(cell, resource, quantity, price, isSellOffer) {
 	cell.appendChild((() => {
 		const aTag = document.createElement('a');
 		aTag.innerText = 'TopUp';
-		if (localStorage.getItem('Doc_VT_InfiniteScroll')) {
-			if (isSellOffer) {
-				aTag.className = `Doc_TopUp_S_${resource}`;
-				myOffers.Money += price * quantity;
-			}
-			else {
-				aTag.className = `Doc_TopUp_B_${resource}`;
-				myOffers[resource] += quantity;
-			}
+		if (isSellOffer) {
+			aTag.className = `Doc_TopUp_S_${resource}`;
+			myOffers.Money += price * quantity;
 		}
 		else {
-			myOffers.Money = price * quantity;
-			myOffers[resource] = quantity;
-			const topupLink = CreateOfferLink(resource, price, isSellOffer);
-			if (topupLink) {
-				aTag.href = topupLink;
-			}
-			else {
-				aTag.className = 'Doc_RemoveLink';
-			}
-			myOffers.Money = 0;
-			myOffers[resource] = 0;
+			aTag.className = `Doc_TopUp_B_${resource}`;
+			myOffers[resource] += quantity;
 		}
 		return aTag;
 	})());
@@ -808,38 +760,49 @@ function UpdateLinks() {
 		if (resource == 'Money') {
 			continue;
 		}
-		UpdateLinksFor(`Doc_Outbid_S_${resource}`, resource, true, 1);
-		UpdateLinksFor(`Doc_Outbid_B_${resource}`, resource, false, -1);
-		UpdateLinksFor(`Doc_Match_S_${resource}`, resource, true);
-		UpdateLinksFor(`Doc_Match_B_${resource}`, resource, false);
-		UpdateLinksFor(`Doc_TopUp_S_${resource}`, resource, true);
-		UpdateLinksFor(`Doc_TopUp_B_${resource}`, resource, false);
-	}
-}
-
-function UpdateLinksFor(className, resource, isSellOffer, modifyPrice = 0) {
-	let aTags = Array.from(document.getElementsByClassName(className));
-	while (aTags.length) {
-		const aTag = aTags.shift();
-		const link = CreateOfferLink(resource, parseInt(aTag.parentElement.textContent.split(' ')[1].replaceAll(',', '')) + modifyPrice, isSellOffer);
-		if (link) {
-			aTag.href = link;
-		}
-		else {
-			aTag.className = 'Doc_RemoveLink';
-		}
-	}
-}
-
-function RemoveBadLinks() {
-	for (let i = 0; i < 2; ++i) {
-		let aTags = Array.from(document.getElementsByClassName('Doc_RemoveLink'));
-		while (aTags.length) {
-			const aTag = aTags.shift();
-			const parentTag = aTag.parentElement;
-			if (parentTag) {
-				aTag.remove();
-				parentTag.innerHTML = parentTag.innerHTML.replaceAll(' | ', '');
+		for (let i = 0; i < 2; ++i) {
+			console.log(`Doc_${i % 2 ? 'S' : 'B'}_${resource}`);
+			let divTags = Array.from(document.getElementsByClassName(`Doc_OutbidMatch_${i % 2 ? 'S' : 'B'}_${resource}`));
+			while (divTags.length) {
+				const divTag = divTags.shift();
+				const price = parseInt(divTag.parentElement.textContent.split(' ')[1].replaceAll(',', ''));
+				let hidCount = 0;
+				const outbidLink = CreateOfferLink(resource, price + (i % 2 ? 1 : -1), i % 2);
+				if (outbidLink) {
+					divTag.children[0].href = outbidLink;
+					divTag.children[0].style.display = 'inline';
+				}
+				else {
+					divTag.children[0].style.display = 'none';
+					++hidCount;
+				}
+				const matchLink = CreateOfferLink(resource, price, i % 2);
+				if (matchLink) {
+					divTag.children[2].href = matchLink;
+					divTag.children[2].style.display = 'inline';
+				}
+				else {
+					divTag.children[2].style.display = 'none';
+					++hidCount;
+				}
+				if (hidCount) {
+					divTag.children[1].style.display = 'none';
+				}
+				else {
+					divTag.children[1].style.display = 'inline';
+				}
+			}
+			let aTags = Array.from(document.getElementsByClassName(`Doc_TopUp_${i % 2 ? 'S' : 'B'}_${resource}`));
+			while (aTags.length) {
+				const aTag = aTags.shift();
+				const topupLink = CreateOfferLink(resource, parseInt(aTag.parentElement.textContent.split(' ')[1].replaceAll(',', '')), i % 2);
+				if (topupLink) {
+					aTag.href = topupLink;
+					aTag.style.display = 'inline';
+				}
+				else {
+					aTag.style.display = 'none';
+				}
 			}
 		}
 	}
@@ -878,7 +841,6 @@ async function Main() {
 	}
 	UpdateQuantities();
 	UpdateLinks();
-	RemoveBadLinks();
 }
 
 if (marketType > -1) {

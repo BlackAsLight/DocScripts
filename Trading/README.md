@@ -9,8 +9,8 @@ This script runs on the [Create Offer](https://politicsandwar.com/nation/trade/c
 - Auto scrolls the form to the centre of your page.
 - Fills out the Quantity and Price of the form **if** it is provided in the URL.
 - Hides the Sell/Buy button that is not specified in the URL **if** one is provided in the URL.
-- When trades are successfully created, you get auto returned to the [Trades](https://politicsandwar.com/index.php?id=90&display=world&resource1=food&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go) Page that you were last on.
-- Unless the Quantity provided in the URL was greater than 1m tons. In that case it will return to the [Create Offer](https://politicsandwar.com/nation/trade/create/) Page.
+- When trades are successfully created, you get auto returned to the [Trades](https://politicsandwar.com/index.php?id=90&display=world&resource1=food&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go) Page that you were last on...
+- Unless the Quantity provided in the URL was greater than 1m tons. In which case it will return to the [Create Offer](https://politicsandwar.com/nation/trade/create/) Page, with an adjusted quantity.
   - When you do get return to the [Create Offer](https://politicsandwar.com/nation/trade/create/) Page, the Sell/Buy button that is still present will be disabled for 5s so you don't run into an error message.
 - Formats the 'Top Offers' Table to match tht of the Sell/Buy buttons and fixes the bad formatting of the tables.
 
@@ -36,12 +36,11 @@ This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&disp
   - Some other features change in their calculations based on if this feature is activated or not.
 - An Outbid and Match button will appear on other people's offers. These buttons will lead to the [Create Trade](https://politicsandwar.com/nation/trade/create/) Page with a unique URL defining the resource, quantity, price, and whether you're buying or selling.
   - The Outbid button's price will be $1 better than that current offer's price, while the Match button's price will be the same as their offer's price.
-  - The Quantity selected for these buttons will be calculated based off how much you're actually able to Sell/Buy. Taking into account any minimums you have set.
-  - **If** 'Infinite Scroll' is toggled on, then the Quantity will also take into account all your other offers on the page, so none on the page will be canceled due to insufficient funds.
+  - The Quantity selected for these buttons will be calculated based off how much you're actually able to Sell/Buy. Taking into account any minimums you have set as well as current offers loaded in on the page. It's recommended for 'Infinite Scroll' to be toggled on to avoid any errors.
   - If the Quantity for these buttons is zero or less then these button's will not appear for that offer.
-- A TopUp button will appear on your own offers. This button is just like the Match button, but it's Quantity will subtract the offer's current Quantity.
+- A TopUp button will appear on your own offers. This button is just like the Match button, but it's Quantity will subtract your offer's current Quantity.
   - Like the Match button, this button will not appear if it's calculated Quantity is zero or less.
-- Makes it so you can delete your own trades without the page refreshing.
+- When you delete your own trade, instead of refreshing the page, the delete button gets disabled for a moment as it gets deleted. When it is finished it will disappear off your screen and all the Outbid, Match, and TopUp buttons will have their quantities updated. Some may even appear as a result.
 - When a mistrade is spotted upon loading a page, the script will auto scroll you down to it, making it the centre of your page for you to easily click on to accept. It will also toggle you from Light to Dark mode or Dark to Light mode whenever it detects a mistrade, **AND** click on the Re-Sell/Buy button if it exists.
 - When no mistrade is detected and you haven't accepted an offer, you will get scrolled down to the change between the two markets **if** you're viewing both sides of the market at once.
 
