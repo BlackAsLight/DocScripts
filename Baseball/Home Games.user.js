@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Home Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.4
+// @version      0.5
 // @description  Make Hosting Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -95,6 +95,7 @@ async function ToggleHostingStatus(buttonTag) {
 			formData.append('token', token);
 			if (isHosting) {
 				formData.append('cancelhomegame', 'Cancel Home Game');
+				clicked = true;
 			}
 			else {
 				formData.append('submithomegame', 'Host Home Game');
@@ -103,7 +104,6 @@ async function ToggleHostingStatus(buttonTag) {
 		})()
 	});
 	toggling = false;
-	clicked = true;
 }
 
 async function CheckHostingStatus() {
@@ -132,8 +132,10 @@ async function CheckHostingStatus() {
 			}
 		}
 		document.getElementById('CHECKS').innerText = 0;
-		if (!clicked) {
+		if (clicked) {
 			clicked = false;
+		}
+		else {
 			Sound();
 			await CheckStats();
 		}
@@ -327,26 +329,26 @@ function CreateRow(book) {
 		divTag.appendChild((() => {
 			const aTag = document.createElement('a');
 			aTag.innerText = 'Adjust';
-            aTag.onclick = () => {
-                const response = Math.round(parseFloat(prompt(`Adjust Book Value:\nYou're Owed Money > 0 | You Owe Money < 0 | Zero will Remove. Blank or Invalid will Cancel`, book.debit / 100)) * 100);
-                if (`${response}` != 'NaN') {
-                    const books = JSON.parse(localStorage.getItem('Doc_SB_Books'));
-                    for (let i = 0; i < books.length; ++i) {
-                        if (books[i].id == book.id) {
-                            book.debit = response;
-                            if (book.debit) {
-                                books[i].debit = response;
-                            }
-                            else {
-                                books.splice(i, 1);
-                            }
-                            localStorage.setItem('Doc_SB_Books', JSON.stringify(books));
-                            UpdateTable(book);
-                            break;
-                        }
-                    }
-                }
-            };
+			aTag.onclick = () => {
+				const response = Math.round(parseFloat(prompt(`Adjust Book Value:\nYou're Owed Money > 0 | You Owe Money < 0 | Zero will Remove. Blank or Invalid will Cancel`, book.debit / 100)) * 100);
+				if (`${response}` != 'NaN') {
+					const books = JSON.parse(localStorage.getItem('Doc_SB_Books'));
+					for (let i = 0; i < books.length; ++i) {
+						if (books[i].id == book.id) {
+							book.debit = response;
+							if (book.debit) {
+								books[i].debit = response;
+							}
+							else {
+								books.splice(i, 1);
+							}
+							localStorage.setItem('Doc_SB_Books', JSON.stringify(books));
+							UpdateTable(book);
+							break;
+						}
+					}
+				}
+			};
 			return aTag;
 		})());
 		divTag.append(' | ');
