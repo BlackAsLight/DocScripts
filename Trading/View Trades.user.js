@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      4.1
+// @version      4.2
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -79,6 +79,30 @@ let myOffers = {
 					localStorage.removeItem('Doc_VT_InfiniteScroll');
 				}
 				location.reload();
+			};
+			return inputTag;
+		})());
+		return codeTag;
+	})());
+
+	// Toggle Zero Accountability
+	leftColumn.appendChild((() => {
+		const codeTag = document.createElement('code');
+		codeTag.innerText = 'Zero Accountability: ';
+		codeTag.appendChild((() => {
+			const inputTag = document.createElement('input');
+			inputTag.type = 'checkbox';
+			if (localStorage.getItem('Doc_VT_ZeroAccountability')) {
+				inputTag.checked = true;
+			}
+			inputTag.onchange = () => {
+				if (inputTag.checked) {
+					localStorage.setItem('Doc_VT_ZeroAccountability', true);
+				}
+				else {
+					localStorage.removeItem('Doc_VT_ZeroAccountability');
+				}
+				UpdateLinks();
 			};
 			return inputTag;
 		})());
@@ -333,7 +357,9 @@ function ModifyRow(tdTags) {
 				else {
 					myOffers[resource] -= quantity;
 				}
-				UpdateLinks();
+				if (!localStorage.getItem('Doc_VT_ZeroAccountability')) {
+					UpdateLinks();
+				}
 			};
 			return buttonTag;
 		})());
@@ -393,7 +419,12 @@ function AddTopUpButton(cell, resource, quantity, price, isSellOffer) {
 }
 
 function CreateOfferLink(resource, price, isSellOffer) {
-	const quantity = Math.max(Math.floor(isSellOffer ? (resources.Money - myOffers.Money) / price : resources[resource] - myOffers[resource]), 0);
+	const quantity = (() => {
+		if (localStorage.getItem('Doc_VT_ZeroAccountability')) {
+			return Math.max(Math.floor(isSellOffer ? (resources.Money + MinAmount('Money')) / price : resources[resource] + MinAmount(resource)), 0);
+		}
+		return Math.max(Math.floor(isSellOffer ? (resources.Money - myOffers.Money) / price : resources[resource] - myOffers[resource]), 0);
+	})();
 	if (quantity > 0) {
 		return `https://politicsandwar.com/nation/trade/create/?resource=${resource.toLowerCase()}&p=${price}&q=${quantity}&t=${isSellOffer ? 'b' : 's'}`;
 	}
@@ -761,7 +792,6 @@ function UpdateLinks() {
 			continue;
 		}
 		for (let i = 0; i < 2; ++i) {
-			console.log(`Doc_${i % 2 ? 'S' : 'B'}_${resource}`);
 			let divTags = Array.from(document.getElementsByClassName(`Doc_OutbidMatch_${i % 2 ? 'S' : 'B'}_${resource}`));
 			while (divTags.length) {
 				const divTag = divTags.shift();
