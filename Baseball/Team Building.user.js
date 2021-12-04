@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Team Building
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.1
+// @version      0.2
 // @description  Increase Player Stats with less Clicks.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/team/id=*
@@ -66,33 +66,38 @@ async function IncreasePlayer(id, type, playerID, verify) {
 	document.getElementById(`Stop_${id}`).style.display = 'inline';
 	upping = true;
 	let money = 0;
-	while (upping) {
-		const doc = new DOMParser().parseFromString(await (await fetch(location.href, {
-			method: 'POST',
-			body: (() => {
-				let formData = new FormData();
-				formData.append(type, '+');
-				formData.append('playerid', playerID);
-				formData.append('verify', verify);
-				return formData;
-			})()
-		})).text(), 'text/html');
-		const formTag = (() => {
-			let inputTags = Array.from(doc.getElementsByTagName('input')).filter(x => x.name == 'playerid' && x.value == playerID).slice(1);
-			while (inputTags) {
-				const formTag = inputTags.shift().parentElement;
-				if (formTag.children[1].name == type) {
-					return formTag;
+	try {
+		while (upping) {
+			const doc = new DOMParser().parseFromString(await (await fetch(location.href, {
+				method: 'POST',
+				body: (() => {
+					let formData = new FormData();
+					formData.append(type, '+');
+					formData.append('playerid', playerID);
+					formData.append('verify', verify);
+					return formData;
+				})()
+			})).text(), 'text/html');
+			const formTag = (() => {
+				let inputTags = Array.from(doc.getElementsByTagName('input')).filter(x => x.name == 'playerid' && x.value == playerID).slice(1);
+				while (inputTags) {
+					const formTag = inputTags.shift().parentElement;
+					if (formTag.children[1].name == type) {
+						return formTag;
+					}
 				}
+				throw Error();
+			})();
+			if (parseFloat(formTag.textContent.trim()) == 100) {
+				upping = false;
+				Sound();
 			}
-			throw Error();
-		})();
-		if (parseFloat(formTag.textContent.trim()) == 100) {
-			upping = false;
-			Sound();
+			document.getElementById(`Text_${id}`).innerText = formTag.textContent;
+			money += 2000;
 		}
-		document.getElementById(`Text_${id}`).innerText = formTag.textContent;
-		money += 2000;
+	}
+	catch {
+		location.reload();
 	}
 	for (let i = 0; i < buttonTags.length; ++i) {
 		buttonTags[i].disabled = false;
