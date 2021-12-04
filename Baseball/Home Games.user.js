@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Home Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.5
+// @version      0.6
 // @description  Make Hosting Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -191,7 +191,7 @@ async function GetGameStats(gameID) {
 	}
 	let exists = false;
 	const debt = Math.round(((game.hosting + game.winnings) * 0.3 - (game.isAwayGame != game.otherTeamWon ? game.winnings : 0)) * (game.isAwayGame ? 100 : -100));
-	console.log(game.otherTeam, debt);
+	console.info(game.otherTeam, MoneyFormat(debt/100));
 	for (let i = 0; i < books.length; ++i) {
 		if (books[i].id == game.otherID) {
 			exists = true;
@@ -398,7 +398,6 @@ async function Sleep(ms) {
 		}, ms);
 	});
 }
-
 
 async function Main() {
 	const divTag = SetUpButtons();
