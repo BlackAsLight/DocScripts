@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Away Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.3
+// @version      0.4
 // @description  Make Playing Away Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/play/
@@ -262,7 +262,7 @@ function UpdateTable(book) {
 	const divTag = document.getElementById(`Doc_Stats_${book.id}`);
 	if (divTag) {
 		if (book.debit) {
-			divTag.style.order = book.debit; // Update Order
+			divTag.style.order = book.debit * -1; // Update Order
 			divTag.children[1].innerText = MoneyFormat(Math.abs(book.debit / 100)); // Update Displayed Amount
 			divTag.children[1].style.color = book.debit > 0 ? '#5CB85C' : '#D9534F';
 			const link = CreateOfferLink(book.nation, book.debit / 100); // Update Send Offer Link
@@ -291,7 +291,7 @@ function CreateRow(book) {
 	divTag.style.gridGap = '0 0.5em';
 	divTag.style.gridTemplateColumns = '50% auto 50%';
 	divTag.style.justifyContent = 'center';
-	divTag.style.order = book.debit;
+	divTag.style.order = book.debit * -1;
 	divTag.appendChild((() => {
 		const pTag = document.createElement('p');
 		pTag.style.margin = '0';
