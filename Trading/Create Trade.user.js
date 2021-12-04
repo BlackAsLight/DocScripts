@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.5
+// @version      1.6
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -14,7 +14,7 @@
 // If on Trade Successfully Made Page.
 if (document.getElementsByClassName('alert-success').length) {
 	let recursive = false;
-	let args = window.location.search.slice(1).split('&');
+	let args = location.search.slice(1).split('&');
 	if (localStorage.Doc_IgnoreRecursive != 'true') {
 		// Read Arguments to...
 		for (let i = 0; i < args.length; ++i) {
@@ -38,7 +38,7 @@ if (document.getElementsByClassName('alert-success').length) {
 	localStorage.Doc_Recursive = `${recursive}`;
 	// If recursive is true then return to Create Trade Page.
 	if (recursive) {
-		window.location = window.location.origin + window.location.pathname + '?' + args.join('&');
+		location = location.origin + location.pathname + '?' + args.join('&');
 	}
 	// Otherwise Return to Market Page.
 	else {
@@ -53,11 +53,11 @@ if (document.getElementsByClassName('alert-success').length) {
 				}
 				args[i] = args[i].join('=');
 			}
-			window.location = args.join('&');
+			location = args.join('&');
 		}
 		// Otherwise just use whatever link the game suggested.
 		else {
-			window.location = document.getElementsByClassName('alert-success')[0].children[1].children[0].href;
+			location = document.getElementsByClassName('alert-success')[0].children[1].children[0].href;
 		}
 	}
 }
@@ -68,7 +68,7 @@ else {
 		block: 'center'
 	});
 	localStorage.Doc_IgnoreRecursive = 'false';
-	let args = window.location.search.slice(1).split('&');
+	let args = location.search.slice(1).split('&');
 	let quantity;
 	for (let i = 0; i < args.length; ++i) {
 		args[i] = args[i].split('=');
