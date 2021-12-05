@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Away Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.4
+// @version      0.5
 // @description  Make Playing Away Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/play/
@@ -10,6 +10,8 @@
 // ==/UserScript==
 
 'use strict';
+/* Global Variables
+-------------------------*/
 const nationID = Array.from(document.getElementsByTagName('a')).filter(x => x.textContent == 'View')[0].href.split('=')[1];
 const teamID = Array.from(document.getElementsByTagName('a')).filter(x => x.textContent == 'Baseball')[0].href.split('=')[1];
 let token = (() => {
@@ -19,6 +21,7 @@ let token = (() => {
 	}
 })();
 let isPlaying = false;
+let checkingStats = false;
 
 function SetUpButton() {
 	const divTag = (() => {
@@ -167,7 +170,21 @@ async function Played() {
 	location.reload();
 }
 
+async function Sleep(ms) {
+	await new Promise((resolve) => {
+		setTimeout(() => {
+			resolve(true);
+		}, ms);
+	});
+}
+
+/* Track Stats
+-------------------------*/
 async function CheckStats() {
+	if (checkingStats) {
+		return;
+	}
+	checkingStats = true;
 	const lastGameID = (() => {
 		const gameID = localStorage.getItem('Doc_SB_GameID');
 		if (gameID) {
@@ -190,6 +207,7 @@ async function CheckStats() {
 	}
 	localStorage.setItem('Doc_SB_GameID', latestGameID);
 	await Promise.all(promises);
+	checkingStats = false;
 }
 
 async function GetGameStats(gameID) {
@@ -218,6 +236,7 @@ async function GetGameStats(gameID) {
 		if (books[i].id == game.otherID) {
 			exists = true;
 			books[i].debit += debt;
+			books[i].date = new Date().getTime()
 			UpdateTable(books[i]);
 			break;
 		}
@@ -227,7 +246,8 @@ async function GetGameStats(gameID) {
 			id: game.otherID,
 			nation: game.otherNation,
 			team: game.otherTeam,
-			debit: debt
+			debit: debt,
+			date: new Date().getTime()
 		});
 		UpdateTable(books[books.length - 1]);
 	}
@@ -241,6 +261,8 @@ async function GetGameStats(gameID) {
 	}
 }
 
+/* Display Stats
+-------------------------*/
 function CreateTable() {
 	const divTag = document.createElement('div');
 	divTag.id = 'STATS';
@@ -251,8 +273,19 @@ function CreateTable() {
 	divTag.style.transitionDuration = '10s';
 	let books = JSON.parse(localStorage.getItem('Doc_SB_Books'));
 	if (books) {
-		while (books.length) {
-			divTag.appendChild(CreateRow(books.shift()));
+		let edited = false;
+		for (let i = 0; i < books.length; ++i) {
+			if (books[i].date < new Date().getTime() - 1000 * 60 * 60 * 24 * 7) {
+				console.info('Removing Book', books.splice(i, 1)[0]);
+				--i;
+				edited = true;
+			}
+			else {
+				divTag.appendChild(CreateRow(books[i]));
+			}
+		}
+		if (edited) {
+			localStorage.setItem('Doc_SB_Books', JSON.stringify(books));
 		}
 	}
 	return divTag;
@@ -291,7 +324,7 @@ function CreateRow(book) {
 	divTag.style.gridGap = '0 0.5em';
 	divTag.style.gridTemplateColumns = '50% auto 50%';
 	divTag.style.justifyContent = 'center';
-	divTag.style.order = book.debit * -1;
+	divTag.style.order = book.debit * -1; // Different for Home
 	divTag.appendChild((() => {
 		const pTag = document.createElement('p');
 		pTag.style.margin = '0';
@@ -413,14 +446,8 @@ function MoneyFormat(money) {
 	return `$${money.toLocaleString()}${decimals ? (decimals < 2 ? '0' : '') : '.00'}`;
 }
 
-async function Sleep(ms) {
-	await new Promise((resolve) => {
-		setTimeout(() => {
-			resolve(true);
-		}, ms);
-	});
-}
-
+/* Start
+-------------------------*/
 async function Main() {
 	const divTag = SetUpButton();
 	divTag.parentElement.insertBefore(CreateTable(), divTag.nextElementSibling);
