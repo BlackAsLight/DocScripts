@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Home Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.6
+// @version      0.7
 // @description  Make Hosting Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -10,6 +10,8 @@
 // ==/UserScript==
 
 'use strict';
+/* Global Variables
+-------------------------*/
 const nationID = Array.from(document.getElementsByTagName('a')).filter(x => x.textContent == 'View')[0].href.split('=')[1];
 const teamID = Array.from(document.getElementsByTagName('a')).filter(x => x.textContent == 'Baseball')[0].href.split('=')[1];
 let token = Array.from(document.getElementsByTagName('input')).filter(x => x.name == 'token')[0].value;
@@ -17,7 +19,10 @@ let isHosting = Array.from(document.getElementsByTagName('input')).filter(x => x
 let toggling = false;
 let checking = false;
 let clicked = false;
+let checkingStats = false;
 
+/* Home Specific
+-------------------------*/
 function SetUpButtons() {
 	const divTag = (() => {
 		const divTag = document.createElement('div');
@@ -145,7 +150,21 @@ async function CheckHostingStatus() {
 	}
 }
 
+async function Sleep(ms) {
+	await new Promise((resolve) => {
+		setTimeout(() => {
+			resolve(true);
+		}, ms);
+	});
+}
+
+/* Track Stats
+-------------------------*/
 async function CheckStats() {
+	if (checkingStats) {
+		return;
+	}
+	checkingStats = true;
 	const lastGameID = (() => {
 		const gameID = localStorage.getItem('Doc_SB_GameID');
 		if (gameID) {
@@ -168,6 +187,7 @@ async function CheckStats() {
 	}
 	localStorage.setItem('Doc_SB_GameID', latestGameID);
 	await Promise.all(promises);
+	checkingStats = false;
 }
 
 async function GetGameStats(gameID) {
@@ -191,7 +211,7 @@ async function GetGameStats(gameID) {
 	}
 	let exists = false;
 	const debt = Math.round(((game.hosting + game.winnings) * 0.3 - (game.isAwayGame != game.otherTeamWon ? game.winnings : 0)) * (game.isAwayGame ? 100 : -100));
-	console.info(game.otherTeam, MoneyFormat(debt/100));
+	console.info(game.otherTeam, MoneyFormat(debt / 100));
 	for (let i = 0; i < books.length; ++i) {
 		if (books[i].id == game.otherID) {
 			exists = true;
@@ -219,6 +239,8 @@ async function GetGameStats(gameID) {
 	}
 }
 
+/* Display Stats
+-------------------------*/
 function CreateTable() {
 	const divTag = document.createElement('div');
 	divTag.id = 'STATS';
@@ -229,8 +251,19 @@ function CreateTable() {
 	divTag.style.transitionDuration = '10s';
 	let books = JSON.parse(localStorage.getItem('Doc_SB_Books'));
 	if (books) {
-		while (books.length) {
-			divTag.appendChild(CreateRow(books.shift()));
+		let edited = false;
+		for (let i = 0; i < books.length; ++i) {
+			if (books[i].date < new Date().getTime() - 1000 * 60 * 60 * 24 * 7) {
+				console.info('Removing Book', books.splice(i, 1)[0]);
+				--i;
+				edited = true;
+			}
+			else {
+				divTag.appendChild(CreateRow(books[i]));
+			}
+		}
+		if (edited) {
+			localStorage.setItem('Doc_SB_Books', JSON.stringify(books));
 		}
 	}
 	return divTag;
@@ -269,7 +302,7 @@ function CreateRow(book) {
 	divTag.style.gridGap = '0 0.5em';
 	divTag.style.gridTemplateColumns = '50% auto 50%';
 	divTag.style.justifyContent = 'center';
-	divTag.style.order = book.debit;
+	divTag.style.order = book.debit; // Different for Away
 	divTag.appendChild((() => {
 		const pTag = document.createElement('p');
 		pTag.style.margin = '0';
@@ -391,14 +424,8 @@ function MoneyFormat(money) {
 	return `$${money.toLocaleString()}${decimals ? (decimals < 2 ? '0' : '') : '.00'}`;
 }
 
-async function Sleep(ms) {
-	await new Promise((resolve) => {
-		setTimeout(() => {
-			resolve(true);
-		}, ms);
-	});
-}
-
+/* Start
+-------------------------*/
 async function Main() {
 	const divTag = SetUpButtons();
 	if (isHosting) {
