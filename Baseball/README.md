@@ -23,6 +23,7 @@ This script runs on the [Baseball Home Game's](https://politicsandwar.com/obl/ho
   - Clicking the Send Offer button will open the Create Offer screen. It is recommended to also have [Create Trade](https://github.com/BlackAsLight/DocScripts/blob/main/Trading/Create%20Trade.user.js) script installed so it auto fills the price, and quantity for you, and hides the sell/buy button that you don't want to click, otherwise only the resource, food, and nation part will be filled out.
   - The Adjust button creates a prompt allowing you to change the value of the amount owed. Setting it to zero will cause it to be removed from the books, while setting it blank or invalid number will cause nothing to happen.
   - The Message button at this time doesn't have any functionality.
+- If you haven't had a game with someone for more than 7 days, any tips owed will be canceled.
 - It is **not recommended** to view the market pages while this script is running, or you might find it a bit hard to accept or create trade offers.
 
 ### Away Games
@@ -43,6 +44,7 @@ This script runs on the [Baseball Away Game's](https://politicsandwar.com/obl/pl
   - Clicking the Send Offer button will open the Create Offer screen. It is recommended to also have [Create Trade](https://github.com/BlackAsLight/DocScripts/blob/main/Trading/Create%20Trade.user.js) script installed so it auto fills the price, and quantity for you, and hides the sell/buy button that you don't want to click, otherwise only the resource, food, and nation part will be filled out.
   - The Adjust button creates a prompt allowing you to change the value of the amount owed. Setting it to zero will cause it to be removed from the books, while setting it blank or invalid number will cause nothing to happen.
   - The Message button at this time doesn't have any functionality.
+- If you haven't had a game with someone for more than 7 days, any tips owed will be canceled.
 - It is **not recommended** to view the market pages while this script is running, or you might find it a bit hard to accept or create trade offers.
 
 ### Team Building
