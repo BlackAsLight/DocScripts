@@ -1,6 +1,6 @@
 # Baseball
 
-Orbital Baseball Leage: https://discord.gg/eE7pN4up6h
+Orbital Baseball League: https://discord.gg/eE7pN4up6h
 
 ## Description
 
