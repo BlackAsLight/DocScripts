@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Home Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.8
+// @version      0.9
 // @description  Make Hosting Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -225,21 +225,19 @@ async function GetGameStats(gameID) {
 		const doc = new DOMParser().parseFromString(await (await fetch(`https://politicsandwar.com/obl/game/id=${gameID}`)).text(), 'text/html');
 		const trTags = doc.getElementsByClassName('nationtable')[0].children[0].children;
 		const isAwayGame = trTags[2].children[0].children[0].children[0].href.split('=')[1] == nationID;
-		if (!isAwayGame) {
-			let games = JSON.parse(localStorage.getItem('Doc_SB_Games'));
-			if (games) {
-				games.count++;
-				games.date = new Date().getTime();
-			}
-			else {
-				games = {
-					count: 1,
-					date: new Date().getTime()
-				};
-			}
-			document.getElementById('GAMES').innerText = `${games.count}/250`;
-			localStorage.setItem('Doc_SB_Games', JSON.stringify(games));
+		let games = JSON.parse(localStorage.getItem('Doc_SB_Games'));
+		if (games) {
+			games.count++;
+			games.date = new Date().getTime();
 		}
+		else {
+			games = {
+				count: 1,
+				date: new Date().getTime()
+			};
+		}
+		document.getElementById('GAMES').innerText = `${games.count}/250`;
+		localStorage.setItem('Doc_SB_Games', JSON.stringify(games));
 		return {
 			isAwayGame: isAwayGame,
 			otherID: parseInt(trTags[2].children[isAwayGame + 0].children[0].children[0].href.split('=')[1]),
