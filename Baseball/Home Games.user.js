@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Home Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.9
+// @version      1.0
 // @description  Make Hosting Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -31,20 +31,13 @@ function SetUpButtons() {
 		formTag.remove();
 		return divTag;
 	})();
-	divTag.style.width = '100%';
-	divTag.style.textAlign = 'center';
-	divTag.style.fontSize = '1.25em';
-	divTag.appendChild((() => {
+	divTag.id = 'DIV';
+	divTag.append((() => {
 		const buttonTag = document.createElement('button');
 		buttonTag.id = 'HOST';
-		buttonTag.innerText = 'Host Game';
+		buttonTag.append('Host Game');
 		buttonTag.className = 'btn';
-		buttonTag.style.padding = '0.5em';
 		buttonTag.style.backgroundColor = '#2648DA';
-		buttonTag.style.color = '#FFFFFF';
-		buttonTag.style.width = '150px';
-		buttonTag.style.fontSize = 'inherit';
-		buttonTag.style.borderRadius = '0.5em';
 		buttonTag.disabled = isHosting;
 		buttonTag.onclick = async () => {
 			await ToggleHostingStatus(buttonTag);
@@ -53,36 +46,17 @@ function SetUpButtons() {
 		};
 		return buttonTag;
 	})());
-	divTag.appendChild((() => {
+	divTag.append((() => {
 		const pTag = document.createElement('p');
-		pTag.style.display = 'inline';
-		pTag.style.borderWidth = '0 2px';
-		pTag.style.borderStyle = 'solid';
-		pTag.style.borderColor = 'black';
-		pTag.style.hight = 'auto';
-		pTag.style.padding = '0';
-		pTag.style.margin = '0 0.25em';
-		pTag.appendChild((() => {
+		pTag.append((() => {
 			const pTag = document.createElement('p');
 			pTag.id = 'CHECKS';
-			pTag.innerText = '0'
-			pTag.style.borderWidth = '0 1px 0 0';
-			pTag.style.borderStyle = 'solid';
-			pTag.style.borderColor = 'black';
-			pTag.style.display = 'inline';
-			pTag.style.padding = '0 0.25em';
-			pTag.style.margin = '0';
+			pTag.innerText = '0';
 			return pTag;
 		})());
-		pTag.appendChild((() => {
+		pTag.append((() => {
 			const pTag = document.createElement('p');
 			pTag.id = 'GAMES';
-			pTag.style.borderWidth = '0 0 0 1px';
-			pTag.style.borderStyle = 'solid';
-			pTag.style.borderColor = 'black';
-			pTag.style.display = 'inline';
-			pTag.style.padding = '0 0.25em';
-			pTag.style.margin = '0';
 			const games = JSON.parse(localStorage.getItem('Doc_SB_Games'));
 			const date = new Date();
 			if (games && games.date > date.getTime() - (((date.getUTCHours() * 60 + date.getUTCMinutes()) * 60 + date.getUTCSeconds()) * 1000 + date.getUTCMilliseconds())) {
@@ -96,17 +70,12 @@ function SetUpButtons() {
 		})());
 		return pTag;
 	})());
-	divTag.appendChild((() => {
+	divTag.append((() => {
 		const buttonTag = document.createElement('button');
 		buttonTag.id = 'CANCEL';
-		buttonTag.innerText = 'Cancel Game';
+		buttonTag.append('Cancel Game');
 		buttonTag.className = 'btn';
-		buttonTag.style.padding = '0.5em';
 		buttonTag.style.backgroundColor = '#D9534F';
-		buttonTag.style.color = '#FFFFFF';
-		buttonTag.style.width = '150px';
-		buttonTag.style.fontSize = 'inherit';
-		buttonTag.style.borderRadius = '0.5em';
 		buttonTag.disabled = !isHosting;
 		buttonTag.onclick = () => {
 			ToggleHostingStatus(buttonTag);
@@ -255,6 +224,7 @@ async function GetGameStats(gameID) {
 	let exists = false;
 	const debt = Math.round(((game.hosting + game.winnings) * 0.3 - (game.isAwayGame != game.otherTeamWon ? game.winnings : 0)) * (game.isAwayGame ? 100 : -100));
 	console.info(game.otherTeam, MoneyFormat(debt / 100));
+	AddNotify({ message: `Tip: ${MoneyFormat(debt / -100)}`, ms: 5000, title: game.otherTeam });
 	for (let i = 0; i < books.length; ++i) {
 		if (books[i].id == game.otherID) {
 			exists = true;
@@ -287,11 +257,6 @@ async function GetGameStats(gameID) {
 function CreateTable() {
 	const divTag = document.createElement('div');
 	divTag.id = 'STATS';
-	divTag.style.display = 'flex';
-	divTag.style.flexDirection = 'column';
-	divTag.style.padding = '1em';
-	divTag.style.width = '100%';
-	divTag.style.transitionDuration = '10s';
 	let books = JSON.parse(localStorage.getItem('Doc_SB_Books'));
 	if (books) {
 		let edited = false;
@@ -302,7 +267,7 @@ function CreateTable() {
 				edited = true;
 			}
 			else {
-				divTag.appendChild(CreateRow(books[i]));
+				divTag.append(CreateRow(books[i]));
 			}
 		}
 		if (edited) {
@@ -334,47 +299,38 @@ function UpdateTable(book) {
 		}
 	}
 	else {
-		document.getElementById('STATS').appendChild(CreateRow(book));
+		document.getElementById('STATS').append(CreateRow(book));
 	}
 }
 
 function CreateRow(book) {
 	const divTag = document.createElement('div');
 	divTag.id = `Doc_Stats_${book.id}`;
-	divTag.style.display = 'grid';
-	divTag.style.gridGap = '0 0.5em';
-	divTag.style.gridTemplateColumns = '50% auto 50%';
-	divTag.style.justifyContent = 'center';
+	divTag.className = 'Doc_Stats_Row';
 	divTag.style.order = book.debit; // Different for Away
-	divTag.appendChild((() => {
+	divTag.append((() => {
 		const pTag = document.createElement('p');
-		pTag.style.margin = '0';
-		pTag.style.textAlign = 'right';
-		pTag.appendChild((() => {
+		pTag.append((() => {
 			const aTag = document.createElement('a');
 			aTag.href = `https://politicsandwar.com/nation/id=${book.id}`;
 			aTag.target = '_blank';
-			aTag.innerText = book.nation;
+			aTag.append(book.nation);
 			return aTag;
 		})());
 		pTag.append(` ${book.team}`);
 		return pTag;
 	})());
-	divTag.appendChild((() => {
+	divTag.append((() => {
 		const pTag = document.createElement('p');
 		pTag.innerText = MoneyFormat(Math.abs(book.debit / 100));
 		pTag.style.color = book.debit > 0 ? '#5CB85C' : '#D9534F';
-		pTag.style.margin = '0';
-		pTag.style.textAlign = 'left';
 		return pTag;
 	})());
-	divTag.appendChild((() => {
+	divTag.append((() => {
 		const pTag = document.createElement('p');
-		pTag.style.margin = '0';
-		pTag.style.textAlign = 'left';
-		pTag.appendChild((() => {
+		pTag.append((() => {
 			const aTag = document.createElement('a');
-			aTag.innerText = 'Info';
+			aTag.append('Info');
 			aTag.onclick = () => {
 				ToggleInfo(book.id);
 			};
@@ -382,15 +338,12 @@ function CreateRow(book) {
 		})());
 		return pTag;
 	})());
-	divTag.appendChild((() => {
+	divTag.append((() => {
 		const divTag = document.createElement('div');
 		divTag.style.display = 'none';
-		divTag.style.gridColumn = '1 / 4';
-		divTag.style.margin = '0 0 1em 0';
-		divTag.style.textAlign = 'center';
-		divTag.appendChild((() => {
+		divTag.append((() => {
 			const aTag = document.createElement('a');
-			aTag.innerText = 'Send Offer';
+			aTag.append('Send Offer');
 			const link = CreateOfferLink(book.nation, book.debit / 100);
 			if (link) {
 				aTag.href = link;
@@ -402,9 +355,9 @@ function CreateRow(book) {
 			return aTag;
 		})());
 		divTag.append(' | ');
-		divTag.appendChild((() => {
+		divTag.append((() => {
 			const aTag = document.createElement('a');
-			aTag.innerText = 'Adjust';
+			aTag.append('Adjust');
 			aTag.onclick = () => {
 				const response = Math.round(parseFloat(prompt(`Adjust Book Value:\nYou're Owed Money > 0 | You Owe Money < 0 | Zero will Remove. Blank or Invalid will Cancel`, book.debit / 100)) * 100);
 				if (`${response}` != 'NaN') {
@@ -428,9 +381,9 @@ function CreateRow(book) {
 			return aTag;
 		})());
 		divTag.append(' | ');
-		divTag.appendChild((() => {
+		divTag.append((() => {
 			const aTag = document.createElement('a');
-			aTag.innerText = 'Message';
+			aTag.append('Message');
 			return aTag;
 		})());
 		return divTag;
@@ -464,12 +417,81 @@ function MoneyFormat(money) {
 		}
 		return 0;
 	})();
+	if (money < 0) {
+		money *= -1;
+		return `$(${money.toLocaleString()}${decimals ? (decimals < 2 ? '0' : '') : '.00'})`
+	}
 	return `$${money.toLocaleString()}${decimals ? (decimals < 2 ? '0' : '') : '.00'}`;
 }
+
+/* Notifications
+-------------------------*/
+function NotifySection() {
+	if (!document.getElementById('notify')) {
+		const divTag = document.createElement('div');
+		divTag.id = 'notify';
+		document.body.append(divTag);
+	}
+}
+
+function AddNotify(obj) {
+	if (obj.message) {
+		const pTag = document.createElement('p');
+		pTag.className = 'notify';
+		if (obj.title) {
+			pTag.append((() => {
+				const bTag = document.createElement('b');
+				bTag.append(obj.title);
+				return bTag;
+			})());
+			pTag.append(document.createElement('br'));
+		}
+		pTag.append(obj.message);
+		if (obj.ms) {
+			setTimeout(() => {
+				RemoveNotify(pTag);
+			}, obj.ms);
+		}
+		document.getElementById('notify').append(pTag);
+	}
+}
+
+function RemoveNotify(pTag) {
+	pTag.style.opacity = '0';
+	setTimeout(() => {
+		pTag.style.fontSize = '0';
+		pTag.style.padding = '0';
+		pTag.style.margin = '0';
+		setTimeout(() => {
+			pTag.remove();
+		}, 1000);
+	}, 1000);
+}
+
+/* Styling
+-------------------------*/
+document.head.append((() => {
+	const styleTag = document.createElement('style');
+	styleTag.append('#notify { bottom: 1em; font-size: 12px; left: 0; position: fixed; }');
+	styleTag.append('.notify { background-color: #FF4D6A; border-radius: 0.5em; color: #F2F2F2; margin: 1em; padding: 0.75em; transition: 1s; }');
+	styleTag.append('#STATS { display: flex; flex-direction: column; padding: 1em; width: 100%; }');
+	styleTag.append('.Doc_Stats_Row { display: grid; grid-gap: 0 0.5em; grid-template-columns: 50% auto 50%; justify-content: center; }');
+	styleTag.append('.Doc_Stats_Row p { margin: 0; text-align: left; }');
+	styleTag.append('.Doc_Stats_Row p:first-child { text-align: right; }');
+	styleTag.append('.Doc_Stats_Row div { grid-column: 1 / 4; margin: 0 0 1em 0; text-align: center; }');
+	styleTag.append('#DIV { font-size: 1.25em; text-align: center; width: 100%; }');
+	styleTag.append('#HOST, #CANCEL { border-radius: 0.5em; color: #FFFFFF; font-size: inherit; padding: 0.5em; width: 150px; }');
+	styleTag.append('#DIV > p { border-color: black; border-style: solid; border-width: 0 2px; display: inline; margin: 0 0.25em; padding: 0; }');
+	styleTag.append('#CHECKS, #GAMES { border: inherit; display: inline; margin: 0; padding: 0 0.25em; }');
+	styleTag.append('#CHECKS { border-width: 0 1px 0 0; }');
+	styleTag.append('#GAMES { border-width: 0 0 0 1px }');
+	return styleTag;
+})());
 
 /* Start
 -------------------------*/
 async function Main() {
+	NotifySection();
 	const divTag = SetUpButtons();
 	if (isHosting) {
 		CheckHostingStatus();
