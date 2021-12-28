@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Team Building
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.2
+// @version      0.3
 // @description  Increase Player Stats with less Clicks.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/team/id=*
@@ -13,9 +13,9 @@
 let upping = false;
 
 if (Array.from(document.getElementsByTagName('a')).filter(x => x.textContent == 'Baseball')[0].href.split('=')[1] = location.href.split('=')[1]) {
-	let inputTags = Array.from(document.getElementsByTagName('input')).filter(x => x.name == 'verify');
-	while (inputTags.length) {
-		let formTag = inputTags.shift().parentElement;
+	let formTags = Array.from(document.getElementsByTagName('input')).filter(x => x.name == 'verify').map(x => x.parentElement).filter(x => x.action.endsWith('#roster'));
+	while (formTags.length) {
+		const formTag = formTags.shift();
 		const id = RandomText(10);
 		formTag.parentElement.appendChild((() => {
 			const buttonTag = document.createElement('button');
