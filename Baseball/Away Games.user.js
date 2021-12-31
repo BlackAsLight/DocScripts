@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Away Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.8
+// @version      0.9
 // @description  Make Playing Away Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/play/
@@ -243,8 +243,8 @@ async function GetGameStats(gameID) {
 	}
 	let exists = false;
 	const debt = Math.round(((game.hosting + game.winnings) * 0.3 - (game.isAwayGame != game.otherTeamWon ? game.winnings : 0)) * (game.isAwayGame ? 100 : -100));
-	console.info(game.otherTeam, MoneyFormat(debt / 100));
-	AddNotify({ message: `Tip: ${MoneyFormat(debt / -100)}`, ms: 5000, title: game.otherTeam });
+	console.info(game.otherTeam, MoneyFormat(game.hosting), MoneyFormat(game.winnings), MoneyFormat(debt / 100));
+	AddNotify({ message: [`Total: ${MoneyFormat(game.hosting + game.winnings)}`, `Tip: ${MoneyFormat(debt / -100)}`], ms: 5000, title: game.otherTeam });
 	for (let i = 0; i < books.length; ++i) {
 		if (books[i].id == game.otherID) {
 			exists = true;
@@ -328,40 +328,45 @@ function UpdateTable(book) {
 function CreateRow(book) {
 	const divTag = document.createElement('div');
 	divTag.id = `Doc_Stats_${book.id}`;
-	divTag.className = 'Doc_Stats_Row';
 	divTag.style.order = book.debit * -1; // Different for Home
 	divTag.append((() => {
-		const pTag = document.createElement('p');
-		pTag.append((() => {
-			const aTag = document.createElement('a');
-			aTag.href = `https://politicsandwar.com/nation/id=${book.id}`;
-			aTag.target = '_blank';
-			aTag.append(book.nation);
-			return aTag;
+		const divTag = document.createElement('div');
+		divTag.className = 'Doc_Stats_Row';
+		divTag.append((() => {
+			const pTag = document.createElement('p');
+			pTag.append((() => {
+				const aTag = document.createElement('a');
+				aTag.href = `https://politicsandwar.com/nation/id=${book.id}`;
+				aTag.target = '_blank';
+				aTag.append(book.nation);
+				return aTag;
+			})());
+			pTag.append(` ${book.team}`);
+			return pTag;
 		})());
-		pTag.append(` ${book.team}`);
-		return pTag;
-	})());
-	divTag.append((() => {
-		const pTag = document.createElement('p');
-		pTag.innerText = MoneyFormat(Math.abs(book.debit / 100));
-		pTag.style.color = book.debit > 0 ? '#5CB85C' : '#D9534F';
-		return pTag;
-	})());
-	divTag.append((() => {
-		const pTag = document.createElement('p');
-		pTag.append((() => {
-			const aTag = document.createElement('a');
-			aTag.append('Info');
-			aTag.onclick = () => {
-				ToggleInfo(book.id);
-			};
-			return aTag;
+		divTag.append((() => {
+			const pTag = document.createElement('p');
+			pTag.innerText = MoneyFormat(Math.abs(book.debit / 100));
+			pTag.style.color = book.debit > 0 ? '#5CB85C' : '#D9534F';
+			return pTag;
 		})());
-		return pTag;
+		divTag.append((() => {
+			const pTag = document.createElement('p');
+			pTag.append((() => {
+				const aTag = document.createElement('a');
+				aTag.append('Info');
+				aTag.onclick = () => {
+					ToggleInfo(book.id);
+				};
+				return aTag;
+			})());
+			return pTag;
+		})());
+		return divTag;
 	})());
 	divTag.append((() => {
 		const divTag = document.createElement('div');
+		divTag.className = 'Doc_Info';
 		divTag.style.display = 'none';
 		divTag.append((() => {
 			const aTag = document.createElement('a');
@@ -415,13 +420,13 @@ function CreateRow(book) {
 
 function ToggleInfo(id) {
 	const divTag = document.getElementById(`Doc_Stats_${id}`);
-	if (divTag.children[3].style.display == 'none') {
-		divTag.children[3].style.display = 'block';
-		divTag.children[2].children[0].style.fontStyle = 'italic';
+	if (divTag.children[1].style.display == 'none') {
+		divTag.children[1].style.display = 'block';
+		divTag.children[0].children[2].children[0].style.fontStyle = 'italic';
 	}
 	else {
-		divTag.children[3].style.display = 'none';
-		divTag.children[2].children[0].style.fontStyle = 'normal';
+		divTag.children[1].style.display = 'none';
+		divTag.children[0].children[2].children[0].style.fontStyle = 'normal';
 	}
 }
 
@@ -468,7 +473,16 @@ function AddNotify(obj) {
 			})());
 			pTag.append(document.createElement('br'));
 		}
-		pTag.append(obj.message);
+		if (typeof obj.message == 'string') {
+			pTag.append(obj.message);
+		}
+		else {
+			pTag.append(obj.message.shift())
+			for (let i = 0; i < obj.message.length; ++i) {
+				pTag.append(document.createElement('br'))
+				pTag.append(obj.message[i])
+			}
+		}
 		if (obj.ms) {
 			setTimeout(() => {
 				RemoveNotify(pTag);
@@ -497,12 +511,17 @@ document.head.append((() => {
 	styleTag.append('#notify { bottom: 0.75em; font-size: 12px; left: 0; position: fixed; }');
 	styleTag.append('.notify { background-color: #FF4D6A; border-radius: 0.5em; color: #F2F2F2; margin: 1em; padding: 0.75em; transition: 1s; }');
 	styleTag.append('#STATS { display: flex; flex-direction: column; padding: 1em; width: 100%; }');
-	styleTag.append('.Doc_Stats_Row { display: grid; grid-gap: 0 0.5em; grid-template-columns: 50% auto 50%; justify-content: center; }');
+	styleTag.append('.Doc_Stats_Row { display: flex; grid-gap: 0 0.5em; justify-content: center; }');
 	styleTag.append('.Doc_Stats_Row p { margin: 0; text-align: left; }');
 	styleTag.append('.Doc_Stats_Row p:first-child { text-align: right; }');
-	styleTag.append('.Doc_Stats_Row div { grid-column: 1 / 4; margin: 0 0 1em 0; text-align: center; }');
+	styleTag.append('.Doc_Stats_Row p:first-child, .Doc_Stats_Row p:nth-child(3) { flex-basis: 50%; }');
+	styleTag.append('@media only screen and (max-width: 992px) { .Doc_Stats_Row p:first-child { flex-basis: 60%; } .Doc_Stats_Row p:nth-child(3) { flex-basis: 40%; } }');
+	styleTag.append('@media only screen and (max-width: 640px) { .Doc_Stats_Row p:first-child { flex-basis: 70%; } .Doc_Stats_Row p:nth-child(3) { flex-basis: 30%; } }');
+	styleTag.append('.Doc_Info { text-align: center; }');
 	styleTag.append('#DIV { font-size: 1.25em; text-align: center; width: 100%; }');
-	styleTag.append('#AWAY, #CANCEL { border-radius: 0.5em; color: #FFFFFF; font-size: inherit; padding: 0.5em; width: 150px; }');
+	styleTag.append('@media only screen and (max-width: 502px) { #DIV { font-size: 1em; } }');
+	styleTag.append('@media only screen and (max-width: 407px) { #DIV { font-size: 12px; } }');
+	styleTag.append('#AWAY, #CANCEL { border-radius: 0.5em; color: #FFFFFF; font-size: inherit; padding: 0.5em; width: 9em; }');
 	styleTag.append('#DIV > p { border-color: black; border-style: solid; border-width: 0 2px; display: inline; margin: 0 0.25em; padding: 0; }');
 	styleTag.append('#CHECKS, #GAMES { border: inherit; display: inline; margin: 0; padding: 0 0.25em; }');
 	styleTag.append('#CHECKS { border-width: 0 1px 0 0; }');
