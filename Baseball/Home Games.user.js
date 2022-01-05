@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Home Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.2
+// @version      1.3
 // @description  Make Hosting Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -34,7 +34,7 @@ function SetUpButtons() {
 	divTag.id = 'DIV';
 	divTag.append((() => {
 		const buttonTag = document.createElement('button');
-		buttonTag.id = 'HOST';
+		buttonTag.id = 'PLAY';
 		buttonTag.append('Host Game');
 		buttonTag.className = 'btn';
 		buttonTag.style.backgroundColor = '#2648DA';
@@ -124,7 +124,7 @@ async function CheckHostingStatus() {
 				}
 				throw Error();
 			})();
-			document.getElementById('HOST').disabled = isHosting;
+			document.getElementById('PLAY').disabled = isHosting;
 			document.getElementById('CANCEL').disabled = !isHosting;
 			checking = false;
 			if (isHosting) {
@@ -499,7 +499,7 @@ document.head.append((() => {
 	styleTag.append('#DIV { font-size: 1.25em; text-align: center; width: 100%; }');
 	styleTag.append('@media only screen and (max-width: 502px) { #DIV { font-size: 1em; } }');
 	styleTag.append('@media only screen and (max-width: 407px) { #DIV { font-size: 12px; } }');
-	styleTag.append('#AWAY, #CANCEL { border-radius: 0.5em; color: #FFFFFF; font-size: inherit; padding: 0.5em; width: 9em; }');
+	styleTag.append('#PLAY, #CANCEL { border-radius: 0.5em; color: #FFFFFF; font-size: inherit; padding: 0.5em; width: 9em; }');
 	styleTag.append('#DIV > p { border-color: black; border-style: solid; border-width: 0 2px; display: inline; margin: 0 0.25em; padding: 0; }');
 	styleTag.append('#CHECKS, #GAMES { border: inherit; display: inline; margin: 0; padding: 0 0.25em; }');
 	styleTag.append('#CHECKS { border-width: 0 1px 0 0; }');
