@@ -46,7 +46,3 @@ This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&disp
 - When no mistrade is detected and you haven't accepted an offer, you will get scrolled down to the change between the two markets **if** you're viewing both sides of the market at once.
 
 The Outbid, Match, and TopUp buttons only appear if the calculated quantity is greater than zero. So if you have zero of said resource to sell, then no button will appear offering for you to sell it.
-
-### Quick Scroll
-
-**Depreciated**
