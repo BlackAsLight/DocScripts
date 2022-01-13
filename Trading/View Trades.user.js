@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      4.9
+// @version      5.0
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -429,12 +429,21 @@ function GenerateNationInfo(divTag, tdTag) {
 	divTag.append(document.createElement('br'));
 	divTag.append(tdTag.children[1].nextSibling.textContent.trim());
 	divTag.append(document.createElement('br'));
-	divTag.append((() => {
-		const aTag = document.createElement('a');
-		aTag.href = tdTag.lastChild.href;
-		aTag.append(tdTag.lastChild.textContent);
-		return aTag;
-	})());
+	if (tdTag.lastChild.href) {
+		divTag.append((() => {
+			const aTag = document.createElement('a');
+			aTag.href = tdTag.lastChild.href;
+			aTag.append(tdTag.lastChild.textContent);
+			return aTag;
+		})());
+	}
+	else {
+		divTag.append((() => {
+			const iTag = document.createElement('i');
+			iTag.append(tdTag.lastChild.textContent);
+			return iTag;
+		})());
+	}
 }
 
 function UpdateTotal(inputTag) {
