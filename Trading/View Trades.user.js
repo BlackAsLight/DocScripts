@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      4.6
+// @version      4.7
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -14,8 +14,6 @@
 'use strict';
 /* Global Variables
 -------------------------*/
-const sellColor = '#5cb85c';
-const buyColor = '#337ab7';
 const nationLink = Array.from(document.getElementsByTagName('a')).filter(x => x.textContent == 'View')[0].href;
 
 const resources = (() => {
@@ -485,19 +483,45 @@ function Mistrade() {
 		}
 		return checkOne && checkTwo;
 	})()) {
-		const favouringSelling = document.querySelector('.Hide').textContent === 'SELLERS WANTED';
-		const sellTag = favouringSelling ? Array.from(document.querySelectorAll('.sOffer')).pop() : document.querySelector('.sOffer');
-		const buyTag = favouringSelling ? document.querySelector('.bOffer') : Array.from(document.querySelectorAll('.bOffer')).pop();
-		if (!(sellTag && buyTag)) {
+		const sell = (() => {
+			let sellTags = Array.from(document.querySelectorAll('.sOffer'));
+			const firstTag = sellTags.shift();
+			if (!firstTag) {
+				return [undefined];
+			}
+			const secondTag = sellTags.pop();
+			const firstPrice = parseInt(firstTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
+			const secondPrice = parseInt(secondTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
+			if (firstPrice > secondPrice) {
+				return [firstTag, firstPrice];
+			}
+			return [secondTag, secondPrice];
+		})();
+		const buy = (() => {
+			let buyTags = Array.from(document.querySelectorAll('.bOffer'));
+			const firstTag = buyTags.shift();
+			if (!firstTag) {
+				return [undefined];
+			}
+			const secondTag = buyTags.pop();
+			const firstPrice = parseInt(firstTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
+			const secondPrice = parseInt(secondTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
+			if (firstPrice < secondPrice) {
+				return [firstTag, firstPrice];
+			}
+			return [secondTag, secondPrice];
+		})();
+		if (!(sell[0] && buy[0])) {
 			return false;
 		}
-		if (parseInt(sellTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', '')) > parseInt(buyTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''))) {
-			(new Date(sellTag.querySelector('.Date').textContent).getTime() > new Date(buyTag.querySelector('.Date').textContent).getTime() ? sellTag : buyTag).scrollIntoView({
+		if (sell[1] > buy[1]) {
+			(new Date(sell[0].querySelector('.Date').textContent).getTime() > new Date(buy[0].querySelector('.Date').textContent).getTime() ? sell[0] : buy[0]).scrollIntoView({
 				behavour: 'smooth',
 				block: 'center'
 			});
 			// TODO: Add CSS for outline to highlight the mistrade.
-			const linkTag = Array.from(document.querySelectorAll('link')).filter(x => x.href === 'https://politicsandwar.com/css/dark-theme.css')[0];
+			const linkTag = Array.from(document.querySelectorAll('link')).filter(x => x.href === 'https://politicsandwar.com/css/dark-theme.min.css')[0];
+			document.querySelector('#TableTheme').innerText = `.Offer:nth-child(2n) { background: ${linkTag ? '#d2d3e8' : '#1f1f1f'}; }`;
 			if (linkTag) {
 				linkTag.remove();
 			}
@@ -976,10 +1000,9 @@ function CreateOfferLink(resource, price, isSellOffer) {
 
 /* Start
 -------------------------*/
-(() => {
+document.head.append((() => {
 	const styleTag = document.createElement('style');
 	styleTag.append('#Offers { text-align: center;; }');
-	styleTag.append('.Offer:nth-child(2n) { background: #d2d3e8; }');
 	styleTag.append('.Offer { display: grid; grid-template-columns: repeat(8, 1fr); align-items: center; grid-gap: 1em; padding: 1em}');
 	styleTag.append('.Nations { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-areas: "Left Right"; align-items: center; grid-gap: 1em; }')
 	styleTag.append('.sOffer { grid-template-areas: "Nations Nations Nations Nations Date Quantity Price Form" "Nations Nations Nations Nations Date Quantity Create Form"; }');
@@ -993,8 +1016,14 @@ function CreateOfferLink(resource, price, isSellOffer) {
 	styleTag.append('.Offer input.sSubmit { background-color: #5cb85c; }');
 	styleTag.append('.Offer input.bSubmit { background-color: #337ab7; }');
 	styleTag.append('.ReGain { text-align: center; }');
-	document.head.append(styleTag);
-})();
+	return styleTag;
+})());
+document.head.append((() => {
+	const styleTag = document.createElement('style');
+	styleTag.id = 'TableTheme';
+	styleTag.append(`.Offer:nth-child(2n) { background: ${Array.from(document.querySelectorAll('link')).filter(x => x.href === 'https://politicsandwar.com/css/dark-theme.min.css').length ? '#1f1f1f' : '#d2d3e8'}; }`);
+	return styleTag;
+})());
 
 async function Main() {
 	console.time('Convert Table');

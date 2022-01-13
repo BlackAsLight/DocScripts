@@ -1,5 +1,7 @@
 {
 	"cSpell.words": [
+		"acctrade",
+		"behavour",
 		"buysell",
 		"cancelhomegame",
 		"customise",
@@ -12,11 +14,14 @@
 		"playerid",
 		"prefilled",
 		"priceper",
+		"rcustomamount",
 		"rightcolumn",
 		"spawndate",
 		"submitawaygame",
 		"submithomegame",
+		"tinyflag",
 		"topup",
+		"tradeaccid",
 		"xmlhttp"
 	]
 }
