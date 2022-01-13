@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      4.5
+// @version      4.6
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -267,7 +267,7 @@ function ConvertRow(tdTags) {
 			divTag.append(`$${price.toLocaleString()}/Ton`);
 			divTag.append((() => {
 				const divTag = document.createElement('div');
-				divTag.append(`$${(price * amount).toLocaleString()}`);
+				divTag.append(`$${(price * (tdTags[6].children[0].tagName == 'FORM' ? amount : quantity)).toLocaleString()}`);
 				return divTag;
 			})());
 			return divTag;
