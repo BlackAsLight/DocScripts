@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      4.7
+// @version      4.8
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -444,7 +444,7 @@ function UpdateTotal(inputTag) {
 	if (inputTag.value.toString().indexOf('.') >= 0) {
 		inputTag.value = Math.floor(inputTag.value);
 	}
-	const divTag = inputTag.parentElement.parentElement.parentElement.children[2];
+	const divTag = inputTag.parentElement.parentElement.parentElement.querySelector('.Price');
 	const price = parseInt(divTag.textContent.slice(1).split('/')[0].replaceAll(',', ''));
 	divTag.children[0].textContent = `$${(price * inputTag.value).toLocaleString()}`;
 }
@@ -454,9 +454,12 @@ async function DeleteOffer() {
 	const data = this.children[0].textContent.split(' ');
 	await fetch(data.shift());
 	const divTag = this.parentElement.parentElement;
-	console.log(myOffers[data[1]]);
-	myOffers[data[1]] -= (data[0] == 'true' ? parseInt(divTag.textContent.slice(1).split('/')[0].replaceAll(',', '')) : 1) * parseInt(divTag.children[1].textContent.trim().replaceAll(',', ''));
-	console.log(myOffers[data[1]]);
+	if (data[0] == 'true') {
+		myOffers.Money -= parseInt(divTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', '')) * parseInt(divTag.querySelector('.Quantity').textContent.trim().replaceAll(',', ''));
+	}
+	else {
+		myOffers[data[1]] -= parseInt(divTag.querySelector('.Quantity').textContent.trim().replaceAll(',', ''));
+	}
 	divTag.remove();
 	if (!localStorage.getItem('Doc_VT_ZeroAccountability')) {
 		UpdateLinks();
