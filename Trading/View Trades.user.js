@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      4.8
+// @version      4.9
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -965,11 +965,12 @@ function UpdateLinks() {
 				const price = parseInt(aTag.parentElement.parentElement.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
 				const link = CreateOfferLink(resource, price + (i % 2 ? 1 : -1), i % 2);
 				if (link) {
-					aTag.href = link;
-					aTag.style.display = 'inline';
+					aTag.setAttribute('href', link);
+					aTag.style.textDecoration = 'none';
 				}
 				else {
-					aTag.style.display = 'none';
+					aTag.removeAttribute('href');
+					aTag.style.textDecoration = 'line-through';
 				}
 			}
 			aTags = Array.from(document.querySelectorAll(`.${i % 2 ? 's' : 'b'}Match_${resource}`)).concat(Array.from(document.querySelectorAll(`.${i % 2 ? 's' : 'b'}TopUp_${resource}`)));
@@ -978,11 +979,12 @@ function UpdateLinks() {
 				const price = parseInt(aTag.parentElement.parentElement.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
 				const link = CreateOfferLink(resource, price, i % 2);
 				if (link) {
-					aTag.href = link;
-					aTag.style.display = 'inline';
+					aTag.setAttribute('href', link);
+					aTag.style.textDecoration = 'none';
 				}
 				else {
-					aTag.style.display = 'none';
+					aTag.removeAttribute('href');
+					aTag.style.textDecoration = 'line-through';
 				}
 			}
 		}
@@ -1007,7 +1009,7 @@ document.head.append((() => {
 	const styleTag = document.createElement('style');
 	styleTag.append('#Offers { text-align: center;; }');
 	styleTag.append('.Offer { display: grid; grid-template-columns: repeat(8, 1fr); align-items: center; grid-gap: 1em; padding: 1em}');
-	styleTag.append('.Nations { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-areas: "Left Right"; align-items: center; grid-gap: 1em; }')
+	styleTag.append('.Nations { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-areas: "Left Right"; align-items: center; grid-gap: 1em; overflow-wrap: anywhere; }')
 	styleTag.append('.sOffer { grid-template-areas: "Nations Nations Nations Nations Date Quantity Price Form" "Nations Nations Nations Nations Date Quantity Create Form"; }');
 	styleTag.append('.bOffer { grid-template-areas: "Nations Nations Nations Nations Date Quantity Price Form" "Nations Nations Nations Nations Date Quantity Create Form"; }');
 	styleTag.append('.Show { display: none; }');
@@ -1058,7 +1060,7 @@ async function Main() {
 	await InfiniteScroll();
 	if (!(mistradeExists || Mistrade() || buttonExists)) {
 		if (buttonExists === false) {
-			await Sleep(1500);
+			await Sleep(3000);
 		}
 		MiddleScroll();
 	}
