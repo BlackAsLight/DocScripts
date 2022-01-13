@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      4.4
+// @version      4.5
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -1020,8 +1020,8 @@ async function Main() {
 	})();
 	console.timeEnd('Convert Table');
 	const mistradeExists = Mistrade();
-	MarketLinks();
 	const buttonExists = ReGain();
+	MarketLinks();
 	ReGainCurrentLevels();
 	await InfiniteScroll();
 	if (!(mistradeExists || Mistrade() || buttonExists)) {
