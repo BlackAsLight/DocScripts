@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      5.1
+// @version      5.2
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -402,7 +402,7 @@ function ConvertRow(tdTags) {
 					buttonTag.append((() => {
 						const divTag = document.createElement('div');
 						divTag.style.display = 'none';
-						divTag.append(`${tdTags[6].querySelector('img')} ${offerType === 'Personal' ? sellerWanted : tdTags[2].children[0].href === nationLink} ${resource}`);
+						divTag.append(`${tdTags[6].querySelector('a').href} ${offerType === 'Personal' ? sellerWanted : tdTags[2].children[0].href === nationLink} ${resource}`);
 						return divTag;
 					})());
 					buttonTag.append(tdTags[6].querySelector('img'));
