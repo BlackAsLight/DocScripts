@@ -12,37 +12,40 @@ This script runs on the [Create Offer](https://politicsandwar.com/nation/trade/c
 - When trades are successfully created, you get auto returned to the [Trades](https://politicsandwar.com/index.php?id=90&display=world&resource1=food&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go) Page that you were last on...
 - Unless the Quantity provided in the URL was greater than 1m tons. In which case it will return to the [Create Offer](https://politicsandwar.com/nation/trade/create/) Page, with an adjusted quantity.
   - When you do get return to the [Create Offer](https://politicsandwar.com/nation/trade/create/) Page, the Sell/Buy button that is still present will be disabled for 5s so you don't run into an error message.
-- Formats the 'Top Offers' Table to match tht of the Sell/Buy buttons and fixes the bad formatting of the tables.
+- Formats the 'Top Offers' Table to match that of the Sell/Buy buttons and fixes the bad formatting of the tables.
 
-This script requires the View Trades Script for the majority of it's functionality to be used.
+This script requires the View Trades Script for the majority of its functionality to be used.
 
 ### View Trade
 
 This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&display=world&resource1=food&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go) Page, and is designed to work in tandem with the Create Trade Script.
 
-- Sets the Sell/Buy Button's colour to match that of the [Create Trade](https://politicsandwar.com/nation/trade/create/) Page.
-- Injects a bunch of Market Links, above the Market's filters, to each market with pre-defined filters to view both sides of the market at once. *Why? Because looking at both sides of the market at once is the superior choice.*
-- When the quantity you're able to Sell/Buy is less than the Trade Offer, it's quantity listed in the box will be auto changed to what you're actually able to Sell/Buy.
-- Provides the ability to set your own minimums, with the default being zero, of amount of resources or money you'd like to have on your nation. The above functionality will take into account this minimum when updating the boxes.
-  - Setting can be found at the bottom of the left sidebar.
-  - Amount can be any number greater than or equal to zero, rounded to two decimal points. Putting in an invalid number or a negative number will cause it to be reset to zero.
-- When you successfully accept a trade offer, a Re-Sell/Buy button appears by it. Clicking it will cause the script to remember this trade and update all the corresponding boxes so you can easily Re-Sell/Buy this resource for a Profit. This will persist throughout refreshes of the page until you make a profit off the trade or click the Forget button.
-  - This Re-Sell/Buy button won't appear, when a trade is accepted, you already have a trade for the opposite side of the market remembered.
-  - This feature can remember multiple trades for the same resource, but only one side of the market at a time.
-- A list of the currently remembered trades will appear between the Market Links and the Market's filters. Each one will list the quantity, price and if you bought or sold said resource. Along with a Forget button that will make the script forget about it. There is also a Forget All button at the end of the list which will delete all trades of that resource from memory.
-  - The list is filtered for whichever resource is currently loaded in, so if the Market's filter is set to 'Any Resource', this list will not appear.
-- An asterisk `*` will appear at the end of any Market Link that has trades remembered to be Re-Sold/Bought.
-- Provides the ability for all offers according to that Market's filters to be loaded in meaning there is no longer a default max. This feature is called 'Infinite Scroll' and can be toggled off and on from the bottom of the left sidebar.
-  - Some other features change in their calculations based on if this feature is activated or not.
-- An Outbid and Match button will appear on other people's offers. These buttons will lead to the [Create Trade](https://politicsandwar.com/nation/trade/create/) Page with a unique URL defining the resource, quantity, price, and whether you're buying or selling.
-  - The Outbid button's price will be $1 better than that current offer's price, while the Match button's price will be the same as their offer's price.
-  - By default the Quantity selected for these buttons will be calculated based off how much you're actually able to Sell/Buy. Taking into account any minimums you have set as well as current offers loaded in on the page. It's recommended for 'Infinite Scroll' to be toggled on to avoid any errors.
-  - If the Quantity for these buttons is zero or less then these button's will not appear for that offer.
-- A TopUp button will appear on your own offers. This button is just like the Match button, but it's Quantity will subtract your offer's current Quantity.
-  - Like the Match button, this button will not appear if it's calculated Quantity is zero or less.
-- When you delete your own trade, instead of refreshing the page, the delete button gets disabled for a moment as it gets deleted. When it is finished it will disappear off your screen and all the Outbid, Match, and TopUp buttons will have their quantities updated. Some may even appear as a result.
-- An option called 'Zero Accountability', can be found at the bottom of the left sidebar, changes how the Quantity on the Outbid, Match and TopUp buttons are calculated. Where, by default, it took into account your minimum amount set for that resource and all offers currently loaded on the page, this setting toggled on will now only make it take into account the amount of resources listed in you host bar.
-- When a mistrade is spotted upon loading a page, the script will auto scroll you down to it, making it the centre of your page for you to easily click on to accept. It will also toggle you from Light to Dark mode or Dark to Light mode whenever it detects a mistrade, **AND** click on the Re-Sell/Buy button if it exists.
-- When no mistrade is detected and you haven't accepted an offer, you will get scrolled down to the change between the two markets **if** you're viewing both sides of the market at once.
-
-The Outbid, Match, and TopUp buttons only appear if the calculated quantity is greater than zero. So if you have zero of said resource to sell, then no button will appear offering for you to sell it.
+- At the bottom of the sidebar, you'll be able to:
+  - Toggle Infinite Scroll, which makes it so every offer that meets the Market's filters are displayed on screen.
+    - This feature doesn't when viewing your personal market, only global and alliance market.
+  - Toggle Zero Accountibility, which makes the Outbid, Match, and TopUp buttons not take into account your current offers on the page.
+    - This feature can be toggled on and off without a page refresh. The links will update immediately upon toggle.
+  - Set a Min Amount for a resource or money that you want to be excluded when creating or accepting offers. 
+    - This will only effect quantities the script calculates. You can easily override them by inputting a new amount in the boxes before accepting or creating an offer.
+    - The amount can only be a positive number rounded to two digits. Setting a negative number will reset it to zero, while inputting something invalid will result in nothing changing.
+- Converts the entire table into a cleaner table that folds better on smaller screens.
+  - The Sell button is green, and Buy button is blue, so they match that of the [Create Trade](https://politicsandwar.com/nation/trade/create/) Page.
+  - The listed quantity in the boxes is either how much you can afford to buy/sell, taking into account any minimum you have set, or the amount the offer wants. Whichever is less, so you only have to accept the offer and don't need to do dumb *maths* to figure out how much you can buy/sell.
+- Adds Outbid, and Match buttons to other people's offers, and a TopUp button to yours.
+  - The Outbid button will be $1 better than the offer is it appearing on, while the Match and TopUp buttons will be the same price.
+  - If the quantity calculated for these scripts is zero or less, then they'll appear crossed out and won't lead anywhere.
+  - These buttons lead to the [Create Trade](https://politicsandwar.com/nation/trade/create/) Page with unique URLs that will fill out the resource, quantity, and price boxes, and hide the corresponding Sell/Buy button.
+  - The Create Trade script is **required** for this links to be of any real use.
+- Detects if mis-trade is listed on the page when viewing both sides of the market. If one is detected it:
+  - Auto scrolls down to the mis-trade, making it the centre of your screen.
+  - Adds a red outline to the offer, clearly displaying which one is the mistake.
+  - Switches your theme from light to dark or dark to light.
+  - And adds an invisible tag to the html document for another private script.
+- Provides a Re-Sell/Buy button when you accept a trade. Clicking this button will cause the script to remember it's existence and update all the relevant boxes on the screen to now display the quantity of this offer, or it's previously calculated amount, whichever is less, or zero if the price of the offer would cause a negative or zero profit.
+  - This button will be auto clicked if a mis-trade is detected on the page.
+  - This button won't display if the accepting offer is in responce to another accepted offer that cancels out the quantities.
+- Injects Market Links above the Market's filters. Links lead to every resource market plus your own offers, and your market activity.
+  - An asterisk will appear on the resource Market Link if the script is remembering trades for that market.
+- Injects horizontal list of all the trades the script is remembering, listing their quantity, price, and if it was bought or sold, as well as a Forget button, if you no longer want it to remember it.
+- Auto Scrolls to the middle split of the market **if** both sides are displayed, no mis-trade was detected, and the Re-Sell/Buy button doesn't exist. If you have an accepted offer on page, but the Re-Sell/Buy didn't appear, then it will scroll after 3s, allowing you to view the listed Profit calculated.
+- Makes it so Deleting your own offer doesn't refresh the page. Instead the button will be disabled for a moment, and then when the offer disappears off the page, it has been deleted.
