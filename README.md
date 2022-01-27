@@ -2,17 +2,13 @@
 
 This is a GitHub respository of a bunch of scripts made by Doctor for a game called Politics and War.
 
-**Please** scroll down and read how to [install](https://github.com/BlackAsLight/DocScripts#installation) these scripts and look in the individual folders for descriptions of said scripts.
+## DO NOT
 
-**DO NOT** ask me how to do this or that unless you have read, followed, and _failed_ the [installation](https://github.com/BlackAsLight/DocScripts#installation) instructions.
+...ask me how to do this or that unless you have read, followed, and *failed* the [installation](https://github.com/BlackAsLight/DocScripts/wiki/Installation) instructions found on the wiki.
 
-## Installation
+## Installation && Updates
 
-Head to the [Wiki](https://github.com/BlackAsLight/DocScripts/wiki) for instructions on how to install these scripts.
-
-## Updates
-
-Head to the [Wiki](https://github.com/BlackAsLight/DocScripts/wiki) for instructions on how to update these scripts.
+Head to the [Wiki](https://github.com/BlackAsLight/DocScripts/wiki) for instructions on how to install/update these scripts.
 
 ## Server
 
