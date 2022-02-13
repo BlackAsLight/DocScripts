@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Home Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.3
+// @version      1.4
 // @description  Make Hosting Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -174,18 +174,20 @@ async function CheckStats() {
 	let latestGameID = lastGameID;
 	const doc = new DOMParser().parseFromString(await (await fetch(`https://politicsandwar.com/obl/history/team/id=${teamID}`)).text(), 'text/html');
 	let trTags = Array.from(doc.getElementsByClassName('nationtable')[0].children[0].children).slice(1);
-	let promises = [];
-	while (trTags.length) {
-		const gameID = parseInt(trTags.shift().children[7].children[0].href.split('=')[1]);
-		if (gameID > lastGameID) {
-			if (gameID > latestGameID) {
-				latestGameID = gameID;
+	if (trTags.length !== 1 || trTags[0].textContent !== 'This team hasn\'t played any games.') {
+		let promises = [];
+		while (trTags.length) {
+			const gameID = parseInt(trTags.shift().children[7].children[0].href.split('=')[1]);
+			if (gameID > lastGameID) {
+				if (gameID > latestGameID) {
+					latestGameID = gameID;
+				}
+				promises.push(GetGameStats(gameID));
 			}
-			promises.push(GetGameStats(gameID));
 		}
+		localStorage.setItem('Doc_SB_GameID', latestGameID);
+		await Promise.all(promises);
 	}
-	localStorage.setItem('Doc_SB_GameID', latestGameID);
-	await Promise.all(promises);
 	checkingStats = false;
 }
 
