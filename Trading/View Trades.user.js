@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      5.2
+// @version      5.3
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -14,10 +14,10 @@
 'use strict';
 /* Global Variables
 -------------------------*/
-const nationLink = Array.from(document.getElementsByTagName('a')).filter(x => x.textContent == 'View')[0].href;
+const nationLink = Array.from(document.querySelectorAll('a')).filter(x => x.textContent == 'View')[0].href;
 
 const resources = (() => {
-	const resources = ReplaceAll(document.getElementById('rssBar').children[0].children[0].children[0].textContent.trim().replaceAll('\n', ''), '  ', ' ').replaceAll(',', '').split(' ');
+	const resources = ReplaceAll(document.querySelector('#rssBar').children[0].children[0].children[0].textContent.trim().replaceAll('\n', ''), '  ', ' ').replaceAll(',', '').split(' ');
 	return {
 		Money: parseFloat(resources[13]) - MinAmount('Money'),
 		Oil: parseFloat(resources[2]) - MinAmount('Oil'),
@@ -89,18 +89,14 @@ let myOffers = {
 /* User Configuration Settings
 -------------------------*/
 (() => {
-	const leftColumn = document.getElementById('leftcolumn');
+	const leftColumn = document.querySelector('#leftcolumn');
 
 	// Toggle Infinite Scroll
-	leftColumn.appendChild((() => {
-		const codeTag = document.createElement('code');
-		codeTag.innerText = 'Infinite Scroll: ';
-		codeTag.appendChild((() => {
-			const inputTag = document.createElement('input');
+	leftColumn.append(CreateElement('code', codeTag => {
+		codeTag.append('Infinite Scroll: ');
+		codeTag.append(CreateElement('input', inputTag => {
 			inputTag.type = 'checkbox';
-			if (localStorage.getItem('Doc_VT_InfiniteScroll')) {
-				inputTag.checked = true;
-			}
+			inputTag.checked = localStorage.getItem('Doc_VT_InfiniteScroll') != undefined;
 			inputTag.onchange = () => {
 				if (inputTag.checked) {
 					localStorage.setItem('Doc_VT_InfiniteScroll', true);
@@ -110,21 +106,15 @@ let myOffers = {
 				}
 				location.reload();
 			};
-			return inputTag;
-		})());
-		return codeTag;
-	})());
+		}));
+	}));
 
 	// Toggle Zero Accountability
-	leftColumn.appendChild((() => {
-		const codeTag = document.createElement('code');
-		codeTag.innerText = 'Zero Accountability: ';
-		codeTag.appendChild((() => {
-			const inputTag = document.createElement('input');
+	leftColumn.append(CreateElement('code', codeTag => {
+		codeTag.append('Zero Accountability: ');
+		codeTag.append(CreateElement('input', inputTag => {
 			inputTag.type = 'checkbox';
-			if (localStorage.getItem('Doc_VT_ZeroAccountability')) {
-				inputTag.checked = true;
-			}
+			inputTag.checked = localStorage.getItem('Doc_VT_ZeroAccountability') != undefined;
 			inputTag.onchange = () => {
 				if (inputTag.checked) {
 					localStorage.setItem('Doc_VT_ZeroAccountability', true);
@@ -134,17 +124,13 @@ let myOffers = {
 				}
 				UpdateLinks();
 			};
-			return inputTag;
-		})());
-		return codeTag;
-	})());
+		}));
+	}));
 
 	// Set Min Amount
-	leftColumn.appendChild((() => {
-		const codeTag = document.createElement('code');
-		codeTag.appendChild((() => {
-			const buttonTag = document.createElement('button');
-			buttonTag.innerText = `Min ${currentResource}`;
+	leftColumn.append(CreateElement('code', codeTag => {
+		codeTag.append(CreateElement('button', buttonTag => {
+			buttonTag.append(`Min ${currentResource}`);
 			buttonTag.onclick = () => {
 				const currentMin = MinAmount(currentResource);
 				const newMin = (Math.round(parseFloat(prompt(`Set the minimum amount of ${currentResource} that you would not like to sell:`, currentMin)) * 100) / 100).toString();
@@ -160,14 +146,18 @@ let myOffers = {
 					}
 				}
 			};
-			return buttonTag;
-		})());
-		return codeTag;
-	})());
+		}));
+	}));
 })();
 
 /* Functions
 -------------------------*/
+function CreateElement(type, func) {
+	const tag = document.createElement(type);
+	func(tag);
+	return tag;
+}
+
 function ReplaceAll(text, search, replace) {
 	if (search == replace || replace.search(search) != -1) {
 		throw 'Infinite Loop!';
@@ -217,8 +207,7 @@ function ConvertRow(tdTags) {
 		}
 		return -1;
 	})();
-	document.querySelector('#Offers').append((() => {
-		const divTag = document.createElement('div');
+	document.querySelector('#Offers').append(CreateElement('div', divTag => {
 		divTag.classList.add('Offer');
 		if (offerType === 'Open' || offerType === 'Personal' || offerType === 'Embargo') {
 			divTag.classList.add(`${sellerWanted ? 's' : 'b'}Offer`);
@@ -228,224 +217,165 @@ function ConvertRow(tdTags) {
 		}
 
 		// Nations
-		divTag.append((() => {
-			const divTag = document.createElement('div');
+		divTag.append(CreateElement('div', divTag => {
 			divTag.classList.add('Nations');
 			divTag.style.gridArea = 'Nations';
 
-			divTag.append((() => {
-				const divTag = document.createElement('div');
+			divTag.append(CreateElement('div', divTag => {
 				divTag.style.gridArea = 'Left';
 				GenerateNationInfo(offerType, divTag, tdTags[1], sellerWanted, 'SELLERS WANTED');
-				return divTag;
-			})());
-			divTag.append((() => {
-				const divTag = document.createElement('div');
+			}));
+			divTag.append(CreateElement('div', divTag => {
 				divTag.style.gridArea = 'Right';
 				GenerateNationInfo(offerType, divTag, tdTags[2], buyerWanted, 'BUYERS WANTED');
-				return divTag;
-			})());
-			return divTag;
-		})());
+			}));
+		}));
 
 		// Quantity
-		divTag.append((() => {
-			const divTag = document.createElement('div');
+		divTag.append(CreateElement('div', divTag => {
 			divTag.classList.add('Quantity');
 			divTag.style.gridArea = 'Quantity';
-			divTag.append((() => {
-				const imgTag = document.createElement('img');
+			divTag.append(CreateElement('img', imgTag => {
 				imgTag.src = tdTags[4].children[0].src;
-				return imgTag;
-			})());
+			}));
 			divTag.append(` ${quantity.toLocaleString()}`);
-			return divTag;
-		})());
+		}));
 
 		// Price
-		divTag.append((() => {
-			const divTag = document.createElement('div');
+		divTag.append(CreateElement('div', divTag => {
 			divTag.classList.add('Price');
 			divTag.style.gridArea = 'Price';
 			divTag.append(`$${price.toLocaleString()}/Ton`);
-			divTag.append((() => {
-				const divTag = document.createElement('div');
-				divTag.append(`$${(price * (amount === -1 ? quantity : amount)).toLocaleString()}`);
-				return divTag;
-			})());
-			return divTag;
-		})());
+			divTag.append(CreateElement('div', divTag => divTag.append(`$${(price * (amount === -1 ? quantity : amount)).toLocaleString()}`)));
+		}));
 
 		// Create
-		divTag.append((() => {
-			const divTag = document.createElement('div');
+		divTag.append(CreateElement('div', divTag => {
 			divTag.style.gridArea = 'Create';
 			if (offerType === 'Personal') {
-				divTag.append((() => {
-					const aTag = document.createElement('a');
+				divTag.append(CreateElement('a', aTag => {
 					aTag.className = `${sellerWanted ? 's' : 'b'}TopUp_${resource}`;
 					aTag.append('TopUp');
-					return aTag;
-				})());
+				}));
 				if (sellerWanted) {
 					myOffers.Money += price * quantity;
 				}
 				else {
 					myOffers[resource] += quantity;
 				}
-				return divTag;
+				return;
 			}
-			divTag.append((() => {
-				const aTag = document.createElement('a');
+			divTag.append(CreateElement('a', aTag => {
 				aTag.className = `${sellerWanted ? 's' : 'b'}Outbid_${resource}`;
 				aTag.append('Outbid');
-				return aTag;
-			})());
+			}));
 			divTag.append(document.createElement('br'));
-			divTag.append((() => {
-				const aTag = document.createElement('a');
+			divTag.append(CreateElement('a', aTag => {
 				aTag.className = `${sellerWanted ? 's' : 'b'}Match_${resource}`;
 				aTag.append('Match');
-				return aTag;
-			})());
-			return divTag;
-		})());
+			}));
+		}));
 
 		// Form
-		divTag.append((() => {
-			const divTag = document.createElement('div');
+		divTag.append(CreateElement('div', divTag => {
 			divTag.style.gridArea = 'Form';
 			if (offerType === 'Open' || offerType === 'rPersonal') {
-				divTag.append((() => {
-					const formTag = document.createElement('form');
+				divTag.append(CreateElement('form', formTag => {
 					formTag.method = 'POST';
-					formTag.append((() => {
-						const inputTag = document.createElement('input');
+					formTag.append(CreateElement('input', inputTag => {
 						inputTag.type = 'hidden';
 						inputTag.name = 'tradeaccid';
 						inputTag.value = tdTags[6].querySelector('input[name="tradeaccid"]').value;
-						return inputTag;
-					})());
-					formTag.append((() => {
-						const inputTag = document.createElement('input');
+					}));
+					formTag.append(CreateElement('input', inputTag => {
 						inputTag.type = 'hidden';
 						inputTag.name = 'ver';
 						inputTag.value = tdTags[6].querySelector('input[name="ver"]').value;
-						return inputTag;
-					})());
-					formTag.append((() => {
-						const inputTag = document.createElement('input');
+					}));
+					formTag.append(CreateElement('input', inputTag => {
 						inputTag.type = 'hidden';
 						inputTag.name = 'token';
 						inputTag.value = tdTags[6].querySelector('input[name="token"]').value;
-						return inputTag;
-					})());
-					formTag.append((() => {
-						const inputTag = document.createElement('input');
+					}));
+					formTag.append(CreateElement('input', inputTag => {
 						inputTag.classList.add('tradeForm');
 						inputTag.type = 'number';
 						inputTag.name = 'rcustomamount';
 						inputTag.value = amount;
 						inputTag.onchange = UpdateTotal;
-						return inputTag;
-					})());
-					formTag.append((() => {
-						const inputTag = document.createElement('input');
+					}));
+					formTag.append(CreateElement('input', inputTag => {
 						inputTag.classList.add('tradeForm');
 						inputTag.type = 'submit';
 						inputTag.name = 'acctrade';
 						if (offerType === 'Open') {
 							inputTag.classList.add(`${sellerWanted ? 's' : 'b'}Submit`);
 							inputTag.value = sellerWanted ? 'Sell' : 'Buy';
-							return inputTag;
+							return;
 						}
 						inputTag.classList.add(`${tdTags[1].children[0].href === nationLink ? 's' : 'b'}Submit`);
 						inputTag.value = tdTags[1].children[0].href === nationLink ? 'Sell' : 'Buy';
-						return inputTag;
-					})());
-					return formTag;
-				})());
+					}));
+				}));
 				if (offerType === 'rPersonal') {
-					divTag.append((() => {
-						const buttonTag = document.createElement('button');
+					divTag.append(CreateElement('button', buttonTag => {
 						buttonTag.classList.add('btn');
 						buttonTag.classList.add('btn-danger');
-						buttonTag.append((() => {
-							const divTag = document.createElement('div');
+						buttonTag.append(CreateElement('div', divTag => {
 							divTag.style.display = 'none';
 							divTag.append(`${tdTags[6].querySelector('a').href} ${tdTags[1].children[0].href === nationLink} ${resource}`);
-							return divTag;
-						})());
+						}));
 						buttonTag.append(tdTags[6].querySelector('a img'));
 						buttonTag.append(' Delete');
 						buttonTag.onclick = DeleteOffer;
-						return buttonTag;
-					})());
+					}));
 				}
-				return divTag;
+				return;
 			}
 			if (offerType.endsWith('Personal')) {
-				divTag.append((() => {
-					const bTag = document.createElement('b');
+				divTag.append(CreateElement('b', bTag => {
 					bTag.classList.add('Show');
 					if (offerType === 'Personal') {
 						bTag.append(sellerWanted ? 'BUYING' : 'SELLING');
-						return bTag;
+						return;
 					}
 					bTag.append(tdTags[1].children[0].href === nationLink ? 'SELLING' : 'BUYING');
-					return bTag;
-				})());
-				divTag.append((() => {
-					const buttonTag = document.createElement('button');
+				}));
+				divTag.append(CreateElement('button', buttonTag => {
 					buttonTag.classList.add('btn')
 					buttonTag.classList.add('btn-danger');
-					buttonTag.append((() => {
-						const divTag = document.createElement('div');
+					buttonTag.append(CreateElement('div', divTag => {
 						divTag.style.display = 'none';
 						divTag.append(`${tdTags[6].querySelector('a').href} ${offerType === 'Personal' ? sellerWanted : tdTags[2].children[0].href === nationLink} ${resource}`);
-						return divTag;
-					})());
+					}));
 					buttonTag.append(tdTags[6].querySelector('img'));
 					buttonTag.append(' Delete');
 					buttonTag.onclick = DeleteOffer;
-					return buttonTag;
-				})());
-				return divTag;
+				}));
+				return;
 			}
 			divTag.append(tdTags[6].querySelector('img'));
 			if (tdTags[6].childElementCount) {
-				divTag.append((() => {
-					const bTag = document.createElement('b');
-					bTag.append(tdTags[1].children[0].href == nationLink ? ' SOLD' : ' BOUGHT');
-					return bTag;
-				})());
+				divTag.append(CreateElement('b', bTag => bTag.append(tdTags[1].children[0].href == nationLink ? ' SOLD' : ' BOUGHT')));
 				divTag.append(document.createElement('br'));
 				divTag.append(`${tdTags[6].children[1].childNodes[0].textContent} ${tdTags[6].children[1].childNodes[2].textContent}`);
 			}
-			return divTag;
-		})());
+		}));
 
 		// Date
-		divTag.append((() => {
-			const divTag = document.createElement('div');
+		divTag.append(CreateElement('div', divTag => {
 			divTag.classList.add('Date');
 			divTag.style.gridArea = 'Date';
 			divTag.append(`${tdTags[3].childNodes[0].textContent} ${tdTags[3].childNodes[2].textContent}`);
-			return divTag;
-		})());
-		return divTag;
-	})());
+		}));
+	}));
 }
 
 function GenerateNationInfo(offerType, divTag, tdTag, offerWanted, message) {
 	if (offerType === 'Open' || offerType === 'Personal' || offerType === 'Embargo') {
 		if (offerWanted) {
 			divTag.classList.add('Hide');
-			divTag.append((() => {
-				const bTag = document.createElement('b');
-				bTag.append(message);
-				return bTag;
-			})());
+			divTag.append(CreateElement('b', bTag => bTag.append(message)));
 			return;
 		}
 	}
@@ -456,35 +386,25 @@ function GenerateNationInfo(offerType, divTag, tdTag, offerWanted, message) {
 }
 
 function GetNationData(divTag, tdTag) {
-	divTag.append((() => {
-		const aTag = document.createElement('a');
+	divTag.append(CreateElement('a', aTag => {
 		aTag.href = tdTag.children[0].href
 		aTag.append(tdTag.children[0].textContent)
-		aTag.append((() => {
-			const imgTag = document.createElement('img');
+		aTag.append(CreateElement('img', imgTag => {
 			imgTag.classList.add('tinyflag');
 			imgTag.src = tdTag.children[0].children[0].src;
-			return imgTag;
-		})())
-		return aTag;
-	})());
+		}));
+	}));
 	divTag.append(document.createElement('br'));
 	divTag.append(tdTag.children[1].nextSibling.textContent.trim());
 	divTag.append(document.createElement('br'));
 	if (tdTag.lastChild.href) {
-		divTag.append((() => {
-			const aTag = document.createElement('a');
+		divTag.append(CreateElement('a', aTag => {
 			aTag.href = tdTag.lastChild.href;
 			aTag.append(tdTag.lastChild.textContent);
-			return aTag;
-		})());
+		}));
 	}
 	else {
-		divTag.append((() => {
-			const iTag = document.createElement('i');
-			iTag.append(tdTag.lastChild.textContent);
-			return iTag;
-		})());
+		divTag.append(CreateElement('i', iTag => iTag.append(tdTag.lastChild.textContent)));
 	}
 }
 
@@ -567,21 +487,17 @@ function Mistrade() {
 				linkTag.remove();
 			}
 			else {
-				document.head.appendChild((() => {
-					const linkTag = document.createElement('link');
+				document.head.append(CreateElement('link', linkTag => {
 					linkTag.rel = 'stylesheet';
 					linkTag.href = 'https://politicsandwar.com/css/dark-theme.css';
-					return linkTag;
-				})());
+				}));
 			}
 
 			// Announce that you detected a mistrade for Mistrade Detection Script.
-			document.body.appendChild((() => {
-				const divTag = document.createElement('div');
+			document.body.append(CreateElement('div', divTag => {
 				divTag.style.display = 'none';
 				divTag.id = 'Doc_Scrolled';
-				return divTag;
-			})());
+			}));
 			return true;
 		}
 	}
@@ -590,8 +506,7 @@ function Mistrade() {
 
 function MarketLinks() {
 	const formTag = Array.from(document.querySelector('#rightcolumn').children).filter(tag => tag.tagName == 'FORM')[0];
-	formTag.parentElement.insertBefore((() => {
-		const pTag = document.createElement('P');
+	formTag.parentElement.insertBefore(CreateElement('p', pTag => {
 		pTag.style.textAlign = 'center';
 		pTag.append(MarketLink('Oil'));
 		pTag.append(' | ');
@@ -617,42 +532,35 @@ function MarketLinks() {
 		pTag.append(' | ');
 		pTag.append(MarketLink('Credits'));
 		pTag.append(document.createElement('br'));
-		pTag.append((() => {
-			const aTag = document.createElement('a');
+		pTag.append(CreateElement('a', aTag => {
 			aTag.href = 'https://politicsandwar.com/index.php?id=26&display=nation&resource1=&buysell=&ob=date&od=DESC&maximum=100&minimum=0&search=Go';
 			aTag.append('My Trades');
-			return aTag;
-		})());
+		}));
 		pTag.append(' | ');
-		pTag.append((() => {
-			const aTag = document.createElement('a');
+		pTag.append(CreateElement('a', aTag => {
 			aTag.href = `${nationLink}&display=trade`;
 			aTag.append('Activity');
-			return aTag;
-		})());
-		return pTag;
-	})(), formTag);
+		}));
+	}), formTag);
 	formTag.parentElement.insertBefore(document.createElement('hr'), formTag);
 }
 
 function MarketLink(resource) {
-	const aTag = document.createElement('a');
-	aTag.href = `https://politicsandwar.com/index.php?id=90&display=world&resource1=${resource.toLowerCase()}&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go`;
-	aTag.append((() => {
-		const imgTag = document.createElement('img');
-		if (resource == 'Food') {
-			imgTag.src = 'https://politicsandwar.com/img/icons/16/steak_meat.png';
-		}
-		else if (resource == 'Credits') {
-			imgTag.src = 'https://politicsandwar.com/img/icons/16/point_gold.png';
-		}
-		else {
-			imgTag.src = `https://politicsandwar.com/img/resources/${resource.toLowerCase()}.png`;
-		}
-		return imgTag;
-	})());
-	aTag.append(` ${resource}${localStorage.getItem(`Doc_VT_ReGain_${resource}`) ? '*' : ''}`);
-	return aTag;
+	return CreateElement('a', aTag => {
+		aTag.href = `https://politicsandwar.com/index.php?id=90&display=world&resource1=${resource.toLowerCase()}&buysell=&ob=price&od=ASC&maximum=100&minimum=0&search=Go`;
+		aTag.append(CreateElement('img', imgTag => {
+			if (resource == 'Food') {
+				imgTag.src = 'https://politicsandwar.com/img/icons/16/steak_meat.png';
+			}
+			else if (resource == 'Credits') {
+				imgTag.src = 'https://politicsandwar.com/img/icons/16/point_gold.png';
+			}
+			else {
+				imgTag.src = `https://politicsandwar.com/img/resources/${resource.toLowerCase()}.png`;
+			}
+		}));
+		aTag.append(` ${resource}${localStorage.getItem(`Doc_VT_ReGain_${resource}`) ? '*' : ''}`);
+	});
 }
 
 function ReGain() {
@@ -705,9 +613,8 @@ function ReGain() {
 	data = JSON.parse(localStorage.getItem(key));
 	let buttonExists = false;
 	if ((!data || data.bought == bought) && quantity) {
-		pTag.append((() => {
-			buttonExists = true;
-			const aTag = document.createElement('a');
+		buttonExists = true;
+		pTag.append(CreateElement('a', aTag => {
 			aTag.id = 'Doc_ReGain';
 			aTag.innerText = `Re${bought ? 'sell' : 'buy'} for Profit?`;
 			aTag.onclick = () => {
@@ -751,8 +658,7 @@ function ReGain() {
 				}
 				MiddleScroll();
 			};
-			return aTag;
-		})());
+		}));
 	}
 	if ((!data || data.bought == bought) && profit && quantity) {
 		pTag.append(' | ');
@@ -768,8 +674,7 @@ function ReGainCurrentLevels() {
 		const data = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${currentResource}`));
 		if (data) {
 			const formTag = Array.from(document.querySelector('#rightcolumn').children).filter(tag => tag.tagName == 'FORM')[0];
-			formTag.parentElement.insertBefore((() => {
-				const divTag = document.createElement('div');
+			formTag.parentElement.insertBefore(CreateElement('div', divTag => {
 				divTag.id = 'RegainLevelDiv';
 				divTag.style.display = 'flex';
 				divTag.style.flexDirection = 'row';
@@ -778,42 +683,33 @@ function ReGainCurrentLevels() {
 				divTag.style.alignContent = 'center';
 				divTag.style.textAlign = 'center';
 				for (let i = 0; i < data.levels.length; ++i) {
-					divTag.appendChild((() => {
-						const pTag = document.createElement('p');
+					divTag.append(CreateElement('p', pTag => {
 						pTag.id = `RegainLevel${i}`;
 						pTag.style.padding = '0.5em';
 						pTag.style.margin = '0';
 						pTag.innerText = `${data.bought ? 'Bought' : 'Sold'} ${data.levels[i].quantity.toLocaleString()} Ton${data.levels[i].quantity > 1 ? 's' : ''} @ $${data.levels[i].price.toLocaleString()}/ton | `;
-						pTag.appendChild((() => {
-							const aTag = document.createElement('a');
+						pTag.append(CreateElement('a', aTag => {
 							aTag.innerText = 'Forget';
 							aTag.onclick = () => {
 								ForgetAboutIt(data.levels[i].price, i);
 							};
-							return aTag;
-						})());
-						return pTag;
-					})());
+						}));
+					}));
 				}
 				if (data.levels.length > 1) {
-					divTag.appendChild((() => {
-						const aTag = document.createElement('a');
+					divTag.append(CreateElement('a', aTag => {
 						aTag.style.padding = '0.5em';
 						aTag.style.margin = '0';
 						aTag.innerText = 'Forget All';
 						aTag.onclick = () => {
 							ForgetAboutIt(-1);
 						};
-						return aTag;
-					})());
+					}));
 				}
-				return divTag;
-			})(), formTag);
-			formTag.parentElement.insertBefore((() => {
-				const hrTag = document.createElement('hr');
+			}), formTag);
+			formTag.parentElement.insertBefore(CreateElement('hr', hrTag => {
 				hrTag.id = 'RegainLevelHr';
-				return hrTag;
-			})(), formTag);
+			}), formTag);
 		}
 	}
 }
@@ -863,13 +759,11 @@ async function InfiniteScroll() {
 			pTags[3].innerText = `Note: The game by default only loaded ${alreadyLoaded} trade offers.`;
 			pTags[3].append(document.createElement('br'));
 			pTags[3].append('We strongly recommend going to your ');
-			pTags[3].append((() => {
-				const aTag = document.createElement('a');
+			pTags[3].append(CreateElement('a', aTag => {
 				aTag.target = '_blank';
 				aTag.href = 'https://politicsandwar.com/account/#4';
 				aTag.innerText = 'Account';
-				return aTag;
-			})());
+			}));
 			pTags[3].append(' settings and changing the default search results to 50,');
 			pTags[3].append(document.createElement('br'));
 			pTags[3].append('or if this was a link provided by some bot, that you ask the maximum query in the link to be set to at least 50, preferably 100.');
@@ -1048,8 +942,7 @@ function CreateOfferLink(resource, price, isSellOffer) {
 
 /* Start
 -------------------------*/
-document.head.append((() => {
-	const styleTag = document.createElement('style');
+document.head.append(CreateElement('style', styleTag => {
 	styleTag.append('#Offers { text-align: center;; }');
 	styleTag.append('.Offer { display: grid; grid-template-columns: repeat(8, 1fr); align-items: center; grid-gap: 1em; padding: 1em}');
 	styleTag.append('.Nations { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-areas: "Left Right"; align-items: center; grid-gap: 1em; overflow-wrap: anywhere; }')
@@ -1066,19 +959,15 @@ document.head.append((() => {
 	styleTag.append('.ReGain { text-align: center; }');
 	styleTag.append('.Outline { outline-style: solid; outline-color: #d9534f; outline-width: 0.25em; }');
 	styleTag.append('#Offers hr { border: 0.25em solid #d9534f; margin: 0; }');
-	return styleTag;
-})());
-document.head.append((() => {
-	const styleTag = document.createElement('style');
+}));
+document.head.append(CreateElement('style', styleTag => {
 	styleTag.id = 'TableTheme';
 	styleTag.append(`.Offer:nth-child(2n) { background: ${Array.from(document.querySelectorAll('link')).filter(x => x.href === 'https://politicsandwar.com/css/dark-theme.min.css').length ? '#1f1f1f' : '#d2d3e8'}; }`);
-	return styleTag;
-})());
+}));
 
 async function Main() {
 	console.time('Convert Table');
-	const divTag = (() => {
-		const divTag = document.createElement('div');
+	const divTag = CreateElement('div', divTag => {
 		divTag.id = 'Offers';
 		const tableTag = document.querySelector('.nationtable');
 		tableTag.parentElement.insertBefore(divTag, tableTag);
@@ -1095,8 +984,7 @@ async function Main() {
 			}
 		}
 		tableTag.remove();
-		return divTag;
-	})();
+	});
 	console.timeEnd('Convert Table');
 	const mistradeExists = Mistrade();
 	const buttonExists = ReGain();
