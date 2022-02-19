@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      5.3
+// @version      5.4
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -88,67 +88,80 @@ let myOffers = {
 
 /* User Configuration Settings
 -------------------------*/
-(() => {
-	const leftColumn = document.querySelector('#leftcolumn');
-
-	// Toggle Infinite Scroll
-	leftColumn.append(CreateElement('code', codeTag => {
-		codeTag.append('Infinite Scroll: ');
-		codeTag.append(CreateElement('input', inputTag => {
-			inputTag.type = 'checkbox';
-			inputTag.checked = localStorage.getItem('Doc_VT_InfiniteScroll') != undefined;
-			inputTag.onchange = () => {
-				if (inputTag.checked) {
-					localStorage.setItem('Doc_VT_InfiniteScroll', true);
-				}
-				else {
-					localStorage.removeItem('Doc_VT_InfiniteScroll');
-				}
-				location.reload();
-			};
-		}));
+document.querySelector('#leftcolumn').append(CreateElement('div', divTag => {
+	divTag.classList.add('Doc_Config');
+	divTag.append(document.createElement('hr'));
+	divTag.append(CreateElement('b', bTag => bTag.append('View Trades Config')));
+	divTag.append(document.createElement('br'));
+	divTag.append('Infinite Scroll: ');
+	divTag.append(CreateElement('input', inputTag => {
+		inputTag.type = 'checkbox';
+		inputTag.checked = localStorage.getItem('Doc_VT_InfiniteScroll') != undefined;
+		inputTag.onchange = () => {
+			if (inputTag.checked) {
+				localStorage.setItem('Doc_VT_InfiniteScroll', true);
+			}
+			else {
+				localStorage.removeItem('Doc_VT_InfiniteScroll');
+			}
+			location.reload();
+		};
 	}));
-
-	// Toggle Zero Accountability
-	leftColumn.append(CreateElement('code', codeTag => {
-		codeTag.append('Zero Accountability: ');
-		codeTag.append(CreateElement('input', inputTag => {
-			inputTag.type = 'checkbox';
-			inputTag.checked = localStorage.getItem('Doc_VT_ZeroAccountability') != undefined;
-			inputTag.onchange = () => {
-				if (inputTag.checked) {
-					localStorage.setItem('Doc_VT_ZeroAccountability', true);
-				}
-				else {
-					localStorage.removeItem('Doc_VT_ZeroAccountability');
-				}
-				UpdateLinks();
-			};
-		}));
+	divTag.append(document.createElement('br'));
+	divTag.append('Zero Accountability: ');
+	divTag.append(CreateElement('input', inputTag => {
+		inputTag.type = 'checkbox';
+		inputTag.checked = localStorage.getItem('Doc_VT_ZeroAccountability') != undefined;
+		inputTag.onchange = () => {
+			if (inputTag.checked) {
+				localStorage.setItem('Doc_VT_ZeroAccountability', true);
+			}
+			else {
+				localStorage.removeItem('Doc_VT_ZeroAccountability');
+			}
+			UpdateLinks();
+		};
 	}));
-
-	// Set Min Amount
-	leftColumn.append(CreateElement('code', codeTag => {
-		codeTag.append(CreateElement('button', buttonTag => {
-			buttonTag.append(`Min ${currentResource}`);
+	if (currentResource != 'Money') {
+		divTag.append(document.createElement('br'));
+		divTag.append(CreateElement('button', buttonTag => {
+			buttonTag.append(`Max ${currentResource}`);
 			buttonTag.onclick = () => {
-				const currentMin = MinAmount(currentResource);
-				const newMin = (Math.round(parseFloat(prompt(`Set the minimum amount of ${currentResource} that you would not like to sell:`, currentMin)) * 100) / 100).toString();
-				if (newMin != 'NaN' && newMin != currentMin) {
-					const key = `Doc_MinResource_${currentResource}`;
-					if (newMin > 0) {
-						localStorage.setItem(key, newMin);
-						location.reload();
+				const key = `Doc_MaxResource_${currentResource}`;
+				const currentMax = parseFloat(localStorage.getItem(key)) || 0;
+				const newMax = parseInt(prompt(`Set the maximum amount of ${currentResource} that you would like to be set when creating an offer:`, currentMax)).toString();
+				if (newMax != 'NaN' && newMax != currentMax) {
+					if (newMax > 0) {
+						localStorage.setItem(key, newMax);
 					}
-					else if (currentMin > 0) {
+					else if (currentMax > 0) {
 						localStorage.removeItem(key);
-						location.reload();
 					}
+					UpdateLinks();
 				}
 			};
 		}));
+	}
+	divTag.append(document.createElement('br'));
+	divTag.append(CreateElement('button', buttonTag => {
+		buttonTag.append(`Min ${currentResource}`);
+		buttonTag.onclick = () => {
+			const currentMin = MinAmount(currentResource);
+			const newMin = (Math.round(parseFloat(prompt(`Set the minimum amount of ${currentResource} that you would not like to sell:`, currentMin)) * 100) / 100).toString();
+			if (newMin != 'NaN' && newMin != currentMin) {
+				const key = `Doc_MinResource_${currentResource}`;
+				if (newMin > 0) {
+					localStorage.setItem(key, newMin);
+					location.reload();
+				}
+				else if (currentMin > 0) {
+					localStorage.removeItem(key);
+					location.reload();
+				}
+			}
+		};
 	}));
-})();
+}));
 
 /* Functions
 -------------------------*/
@@ -935,16 +948,17 @@ function CreateOfferLink(resource, price, isSellOffer) {
 		}
 		return Math.max(Math.floor(isSellOffer ? (resources.Money - myOffers.Money) / price : resources[resource] - myOffers[resource]), 0);
 	})();
+	const max = parseInt(localStorage.getItem(`Doc_MaxResource_${resource}`));
 	if (quantity > 0) {
-		return `https://politicsandwar.com/nation/trade/create/?resource=${resource.toLowerCase()}&p=${price}&q=${quantity}&t=${isSellOffer ? 'b' : 's'}`;
+		return `https://politicsandwar.com/nation/trade/create/?resource=${resource.toLowerCase()}&p=${price}&q=${quantity > max ? max : quantity}&t=${isSellOffer ? 'b' : 's'}`;
 	}
 }
 
 /* Start
 -------------------------*/
 document.head.append(CreateElement('style', styleTag => {
-	styleTag.append('#Offers { text-align: center;; }');
-	styleTag.append('.Offer { display: grid; grid-template-columns: repeat(8, 1fr); align-items: center; grid-gap: 1em; padding: 1em}');
+	styleTag.append('#Offers { text-align: center; }');
+	styleTag.append('.Offer { display: grid; grid-template-columns: repeat(8, 1fr); align-items: center; grid-gap: 1em; padding: 1em; }');
 	styleTag.append('.Nations { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-areas: "Left Right"; align-items: center; grid-gap: 1em; overflow-wrap: anywhere; }')
 	styleTag.append('.sOffer { grid-template-areas: "Nations Nations Nations Nations Date Quantity Price Form" "Nations Nations Nations Nations Date Quantity Create Form"; }');
 	styleTag.append('.bOffer { grid-template-areas: "Nations Nations Nations Nations Date Quantity Price Form" "Nations Nations Nations Nations Date Quantity Create Form"; }');
@@ -959,6 +973,11 @@ document.head.append(CreateElement('style', styleTag => {
 	styleTag.append('.ReGain { text-align: center; }');
 	styleTag.append('.Outline { outline-style: solid; outline-color: #d9534f; outline-width: 0.25em; }');
 	styleTag.append('#Offers hr { border: 0.25em solid #d9534f; margin: 0; }');
+	styleTag.append('.Doc_Config { text-align: center; padding: 0 1em; font-size: 0.8em; }');
+	styleTag.append('.Doc_Config b { font-size: 1.25em; }');
+	styleTag.append('.Doc_Config button { font-size: inherit; font-weight: normal; padding: 0; }');
+	styleTag.append('.Doc_Config hr { margin: 0.5em 0; }');
+	styleTag.append('.Doc_Config input { margin: 0; }');
 }));
 document.head.append(CreateElement('style', styleTag => {
 	styleTag.id = 'TableTheme';

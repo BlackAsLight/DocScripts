@@ -25,7 +25,10 @@ This script runs on the [Trades](https://politicsandwar.com/index.php?id=90&disp
     - This feature doesn't when viewing your personal market, only global and alliance market.
   - Toggle Zero Accountability, which makes the Outbid, Match, and TopUp buttons not take into account your current offers on the page.
     - This feature can be toggled on and off without a page refresh. The links will update immediately upon toggling.
-  - Set a Min Amount for a resource or money that you want to be excluded when creating or accepting offers. 
+  - Set a Max Amount for a resource that you want to be set when creating an offer through the Outbid, Match, or TopUp buttons.
+    - This will only affect the Outbid, Match, and TopUp button's links. It will not affect the total amount you can have when adding up all quantities of existing offers.
+	- The amount can only be a positive number rounded down to a whole number. Setting it to zero or less will result in this feature being disabled for that resource, while inputting something invalid will result in nothing changing.
+  - Set a Min Amount for a resource or money that you want to be excluded when creating or accepting offers.
     - This will only affect quantities the script calculates. You can easily override them by inputting a new amount in the boxes before accepting or creating an offer.
     - The amount can only be a positive number rounded to two digits. Setting a negative number will reset it to zero while inputting something invalid will result in nothing changing.
 - Converts the entire table into a cleaner table that folds better on smaller screens.
