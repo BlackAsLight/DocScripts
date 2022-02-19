@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.6
+// @version      1.7
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -10,212 +10,183 @@
 // ==/UserScript==
 
 'use strict';
+function Migrate(oldText, newText) {
+	if (localStorage.getItem(oldText)) {
+		localStorage.setItem(newText, localStorage.getItem(oldText));
+		localStorage.removeItem(oldText);
+	}
+}
 
-// If on Trade Successfully Made Page.
-if (document.getElementsByClassName('alert-success').length) {
+function TradeWasMade() {
 	let recursive = false;
-	let args = location.search.slice(1).split('&');
-	if (localStorage.Doc_IgnoreRecursive != 'true') {
-		// Read Arguments to...
-		for (let i = 0; i < args.length; ++i) {
-			args[i] = args[i].split('=');
-			// Update the Price in the URL.
-			if (args[i][0] == 'p') {
-				args[i][1] = localStorage.Doc_LastPrice;
+	const args = location.search.slice(1).split('&');
+
+	if (!localStorage.getItem('Doc_CT_IgnoreRecursive')) {
+		args.map(x => {
+			x = x.split('=');
+			if (x[0] === 'p') {
+				const acceptedPrice = localStorage.getItem('Doc_CT_AcceptedPrice');
+				if (acceptedPrice) {
+					x[1] = acceptedPrice;
+				}
+				localStorage.removeItem('Doc_CT_AcceptedPrice');
 			}
-			// See if the Quantity listed is greater than 1,000,000.
-			else if (args[i][0] == 'q') {
-				const quantity = parseInt(args[i][1]);
-				// If so subtract it and set recursive to true.
-				if (quantity > 1000000) {
-					args[i][1] = quantity - 1000000;
+			else if (x[0] === 'q') {
+				const quantity = parseInt(x[1]) - 1000000;
+				if (quantity > 0) {
+					x[1] = quantity;
 					recursive = true;
 				}
 			}
-			args[i] = args[i].join('=');
-		}
+			return x.join('=');
+		});
 	}
-	localStorage.Doc_Recursive = `${recursive}`;
-	// If recursive is true then return to Create Trade Page.
+
 	if (recursive) {
-		location = location.origin + location.pathname + '?' + args.join('&');
+		localStorage.setItem('Doc_CT_LastClicked', new Date().getTime());
+		location = `${location.origin}${location.pathname}?${args.join('&')}`;
+		return;
 	}
-	// Otherwise Return to Market Page.
-	else {
-		// If User has the Infinite Scroll feature on from View Trade Script...
-		if (localStorage.Doc_LoadAllOffers == 'true') {
-			let args = document.getElementsByClassName('alert-success')[0].children[1].children[0].href.split('&');
-			for (let i = 0; i < args.length; i++) {
-				args[i] = args[i].split('=');
-				// Then adjust the minimum value to zero so everything looks normal.
-				if (args[i][0] == 'minimum') {
-					args[i][1] = 0;
-				}
-				args[i] = args[i].join('=');
+	localStorage.removeItem('Doc_CT_IgnoreRecursive');
+	if (localStorage.getItem('Doc_VT_InfiniteScroll')) {
+		location = document.querySelectorAll('.alert-success a')[1].href.split('&').map(x => {
+			if (x.startsWith('minimum=')) {
+				return 'minimum=0';
 			}
-			location = args.join('&');
-		}
-		// Otherwise just use whatever link the game suggested.
-		else {
-			location = document.getElementsByClassName('alert-success')[0].children[1].children[0].href;
+			return x;
+		}).join('&');
+		return;
+	}
+	location = document.querySelector('.alert-success a')[1].href;
+}
+
+function Buttons(tagA, tagB, value, quantity) {
+	tagB.remove();
+	tagA.style.borderRadius = '6px';
+	tagA.type = 'submit';
+	tagA.name = 'submit';
+	tagA.value = value;
+	tagA.dataset.target = '';
+	const ticks = parseInt(localStorage.getItem('Doc_CT_LastClicked'));
+	if (ticks) {
+		const time = 5000 + ticks - new Date().getTime();
+		if (time > 0) {
+			setTimeout(() => { tagA.disabled = false; }, time);
+			tagA.disabled = true;
+			localStorage.removeItem('Doc_CT_LastClicked');
 		}
 	}
+	tagA.onclick = () => {
+		if (Math.min(quantity, 1000000) !== parseInt(document.querySelector('#amount').value)) {
+			localStorage.setItem('Doc_CT_IgnoreRecursive', true);
+			localStorage.removeItem('Doc_CT_AcceptedPrice');
+		}
+	};
 }
-// If of Create Trade Page.
-else {
-	document.getElementById('priceper').parentElement.parentElement.parentElement.nextElementSibling.nextElementSibling.scrollIntoView({
+
+function FillOutForm() {
+	document.querySelector('#calc_resource_after_sell').scrollIntoView({
 		behavior: 'smooth',
 		block: 'center'
 	});
-	localStorage.Doc_IgnoreRecursive = 'false';
-	let args = location.search.slice(1).split('&');
+	localStorage.removeItem('Doc_CT_IgnoreRecursive');
 	let quantity;
-	for (let i = 0; i < args.length; ++i) {
-		args[i] = args[i].split('=');
-		// Getting Price from URL to fill in.
-		if (args[i][0] == 'p') {
-			const price = parseInt(args[i][1]);
-			let priceTag = document.getElementById('priceper');
-			priceTag.value = price;
-			// Logging Price in case Recursive gets activated.
-			localStorage.Doc_LastPrice = `${price}`;
-			priceTag.onchange = () => {
-				localStorage.Doc_LastPrice = document.getElementById('priceper').value;
+	location.search.slice(1).split('&').forEach(x => {
+		x = x.split('=');
+		if (x[0] === 'p') {
+			localStorage.setItem('Doc_CT_AcceptedPrice', x[1]);
+			const inputTag = document.querySelector('#priceper');
+			inputTag.value = x[1];
+			inputTag.onchange = () => {
+				localStorage.setItem('Doc_CT_AcceptedPrice', inputTag.value);
 			};
 		}
-		// Getting Quantity from URL to fill in.
-		else if (args[i][0] == 'q') {
-			quantity = parseInt(args[i][1]);
-			document.getElementById('amount').value = quantity > 1000000 ? 1000000 : quantity;
+		else if (x[0] === 'q') {
+			quantity = parseInt(x[1]);
+			document.querySelector('#amount').value = Math.min(quantity, 1000000);
 		}
-		// Getting Type from URL to figure out which button to hide.
-		else if (args[i][0] == 't') {
-			let sellButton = document.getElementsByClassName('nationtable')[0].children[0].children[9].children[0].children[0].children[0];
-			let buyButton = document.getElementsByClassName('nationtable')[0].children[0].children[9].children[0].children[0].children[1];
-			if (args[i][1] == 's') {
-				buyButton.style.display = 'none';
-				sellButton.style.borderRadius = '6px';
-				sellButton.type = 'submit';
-				sellButton.name = 'submit';
-				sellButton.value = 'Sell';
-				sellButton.dataset.target = '';
-				DisableButton(sellButton);
-				ButtonClicked(sellButton, quantity);
+		else if (x[0] === 't') {
+			const sellTag = document.querySelector('.nationtable button');
+			const buyTag = sellTag.nextElementSibling;
+			if (x[1] === 's') {
+				Buttons(sellTag, buyTag, 'Sell', quantity);
 			}
 			else {
-				sellButton.style.display = 'none';
-				buyButton.style.borderRadius = '6px';
-				buyButton.type = 'submit';
-				buyButton.name = 'submit';
-				buyButton.value = 'Buy';
-				buyButton.dataset.target = '';
-				DisableButton(buyButton);
-				ButtonClicked(buyButton, quantity);
+				Buttons(buyTag, sellTag, 'Buy', quantity);
 			}
 		}
-	}
-
-	// Code to format the Show Top Offers Table.
-	// - Does anyone actually use that?
-	document.getElementById('showTopOffersBtn').onclick = () => {
-		setTimeout(() => {
-			let tables = Array.from(document.getElementById('topOffersSection').getElementsByClassName('nationtable'));
-			for (let i = 0; i < 2; ++i) {
-				let table = tables.shift();
-				let rows = Array.from(table.children[0].children);
-				for (let j = 0; j < rows[0].childElementCount; j++) {
-					rows[0].children[j].style = 'background: ' + (i ? '#2d6a9f' : '#3e8e3e');
-				}
-				rows.shift();
-				for (let j = 0; j < rows.length; ++j) {
-					for (let k = 0; k < rows[j].childElementCount; ++k) {
-						let background = '';
-						if (j % 2) {
-							background = 'background: ' + (i ? '#9cc2e3;' : '#a6d8a6;');
-						}
-						if (k == 0) {
-							rows[j].children[k].style = background + 'text-align: center;';
-							rows[j].children[k].textContent = (() => {
-								let date = new Date(rows[j].children[k].textContent);
-								let text = '';
-								if (date.getHours() < 10) {
-									text += '0';
-								}
-								text += date.getHours() + ':';
-								if (date.getMinutes() < 10) {
-									text += '0';
-								}
-								text += date.getMinutes() + ' ';
-								if (date.getDate() < 10) {
-									text += '0';
-								}
-								text += date.getDate() + '/';
-								switch (date.getMonth()) {
-									case 0:
-										text += 'Jan/';
-										break;
-									case 1:
-										text += 'Feb/';
-										break;
-									case 2:
-										text += 'Mar/';
-										break;
-									case 3:
-										text += 'Apr/';
-										break;
-									case 4:
-										text += 'May/';
-										break;
-									case 5:
-										text += 'Jun/';
-										break;
-									case 6:
-										text += 'Jul/';
-										break;
-									case 7:
-										text += 'Aug/';
-										break;
-									case 8:
-										text += 'Sep/';
-										break;
-									case 9:
-										text += 'Oct/';
-										break;
-									case 10:
-										text += 'Nov/';
-										break;
-									case 11:
-										text += 'Dec/';
-										break;
-								}
-								text += date.getFullYear();
-								return text;
-							})();
-						}
-						else {
-							rows[j].children[k].style = background + 'text-align: right;';
-						}
-					}
-				}
-			}
-		}, 500)
-	};
+	});
 }
 
-// Disables Button for 5 seconds if Recursive Feature is active.
-function DisableButton(tag) {
-	if (localStorage.Doc_Recursive == 'true') {
-		tag.disabled = true;
-		setTimeout(() => { tag.disabled = false; }, 5000);
-		localStorage.Doc_Recursive = 'false';
+// Does anyone actually use this?
+async function FormatTopOffers() {
+	while (!document.querySelector('#topOffersSection').childElementCount) {
+		await new Promise(resolve => setTimeout(() => resolve(true), 50));
+	}
+	let countA = 0;
+	document.querySelectorAll('#topOffersSection .nationtable').forEach(tableTag => {
+		const trTags = [...tableTag.querySelectorAll('tr')];
+		[...trTags.shift().children].forEach(thTag => {
+			thTag.style.background = countA ? '#2d6a9f' : '#3e8e3e';
+		});
+		let countB = 0;
+		trTags.forEach(trTag => {
+			let countC = 0;
+			[...trTag.children].forEach(tdTag => {
+				if (countB % 2) {
+					tdTag.style.background = countA ? '#9cc2e3' : '#a6d8a6';
+				}
+				if (countC) {
+					tdTag.style.textAlign = 'right';
+				}
+				else {
+					tdTag.style.textAlign = 'center';
+					tdTag.textContent = (() => {
+						let date = new Date(tdTag.textContent);
+						let text = '';
+						if (date.getHours() < 10) {
+							text += '0';
+						}
+						text += date.getHours() + ':';
+						if (date.getMinutes() < 10) {
+							text += '0';
+						}
+						text += date.getMinutes() + ' ';
+						if (date.getDate() < 10) {
+							text += '0';
+						}
+						text += date.getDate() + '/';
+						text += ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()] + '/';
+						text += date.getFullYear();
+						return text;
+					})();
+				}
+				++countC;
+			});
+			++countB;
+		});
+		++countA;
+	});
+}
+
+function Main() {
+	// Migration for Older Versions
+	if (localStorage.getItem('Doc_IgnoreRecursive') === 'false') {
+		localStorage.removeItem('Doc_IgnoreRecursive');
+	}
+	Migrate('Doc_IgnoreRecursive', 'Doc_CT_IgnoreRecursive');
+	Migrate('Doc_LastPrice', 'Doc_CT_AcceptedPrice');
+	if (localStorage.getItem('Doc_Recursive')) {
+		localStorage.removeItem('Doc_Recursive');
+	}
+
+	if (document.querySelector('.alert-success')) {
+		TradeWasMade();
+	}
+	else {
+		FillOutForm();
+		document.querySelector('#showTopOffersBtn').onclick = FormatTopOffers;
 	}
 }
 
-// Ignores Checking for Recursive if amount isn't what was prefilled.
-function ButtonClicked(tag, quantity) {
-	tag.onclick = () => {
-		if ((quantity > 1000000 ? 1000000 : quantity) != parseInt(document.getElementById('amount').value)) {
-			localStorage.Doc_IgnoreRecursive = 'true';
-		}
-	};
-}
+Main();
