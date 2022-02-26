@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Find War
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.5
+// @version      1.6
 // @description  Consolidates information about potential raiding targets.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=15*
@@ -94,7 +94,7 @@ if (run) {
 	for (let i = 0; i < idCache.length; i++) {
 		nationIDs.push(idCache[i].nationID);
 	}
-	SendPost(nationIDs);
+	GetNations(nationIDs).then(x => UpdateTable(x));
 }
 
 // Alters a row to meet the new template.
@@ -163,29 +163,13 @@ function GridItem(text, id) {
 	return '<div id="' + id + '" class="grid-item">' + text + '</div>';
 }
 
-// Send a POST request.
-function SendPost(data) {
-	GM_xmlhttpRequest({
-		method: 'POST',
-		data: JSON.stringify(data),
-		url: `https://api.politicsandwar.com/graphql?api_key=${localStorage.Doc_APIKey}&query={ nations(first: 50, id: [${data.join(', ')}]) { data { id leader_name continent last_active soldiers tanks aircraft ships missiles nukes treasures { name color continent bonus spawndate } offensive_wars { id date war_type winner attacker { id nation_name leader_name alliance { id name }} defender { id nation_name leader_name alliance { id name }} attacks { type loot_info }} defensive_wars { id date war_type winner attacker { id nation_name leader_name alliance { id name }} defender { id nation_name leader_name alliance { id name } } attacks { type loot_info }}}}}`,
-		onload: (e) => {
-			try {
-				ReceivePost(JSON.parse(e.response).data.nations.data);
-				localStorage.Doc_RefreshCount = 0;
-			}
-			catch {
-				if (localStorage.Doc_RefreshCount < '5') {
-					window.location.reload();
-					localStorage.Doc_RefreshCount = parseInt(localStorage.Doc_RefreshCount) + 1;
-				}
-			}
-		}
-	});
+// Send a GET request.
+async function GetNations(nationIDs) {
+	return JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={ nations(first: 50, id: [${nationIDs.join(', ')}]) { data { id leader_name continent last_active soldiers tanks aircraft ships missiles nukes treasures { name color continent bonus spawndate } offensive_wars { id date war_type winner attacker { id nation_name leader_name alliance { id name }} defender { id nation_name leader_name alliance { id name }} attacks { type loot_info }} defensive_wars { id date war_type winner attacker { id nation_name leader_name alliance { id name }} defender { id nation_name leader_name alliance { id name } } attacks { type loot_info }}}}}`)).text()).data.nations.data
 }
 
-// Deal with the response of a Post Request.
-function ReceivePost(jsonData) {
+// Deal with the response of a GET Request.
+function UpdateTable(jsonData) {
 	while (jsonData.length) {
 		let api = jsonData.shift();
 		for (let i = 0; i < idCache.length; i++) {
@@ -244,7 +228,7 @@ function UpdateTargetInfo(api, militaryID, continentID, lastActiveID, warHistory
 	}
 
 	// Fill in Last Active.
-	document.getElementById(lastActiveID).innerText = 'Last Active: ' + FormatDateTime(new Date(api.last_active.replace(' ', 'T') + 'Z'));
+	document.getElementById(lastActiveID).innerText = 'Last Active: ' + FormatDateTime(new Date(api.last_active));
 
 	// Fill in War History.
 	let wars = api.offensive_wars.concat(api.defensive_wars);
@@ -316,44 +300,7 @@ function FormatDate(date) {
 		text += '0';
 	}
 	text += date.getDate() + '/';
-	switch (date.getMonth()) {
-		case 0:
-			text += 'Jan/';
-			break;
-		case 1:
-			text += 'Feb/';
-			break;
-		case 2:
-			text += 'Mar/';
-			break;
-		case 3:
-			text += 'Apr/';
-			break;
-		case 4:
-			text += 'May/';
-			break;
-		case 5:
-			text += 'Jun/';
-			break;
-		case 6:
-			text += 'Jul/';
-			break;
-		case 7:
-			text += 'Aug/';
-			break;
-		case 8:
-			text += 'Sep/';
-			break;
-		case 9:
-			text += 'Oct/';
-			break;
-		case 10:
-			text += 'Nov/';
-			break;
-		case 11:
-			text += 'Dec/';
-			break;
-	}
+	text += ['Jan', 'Feb', 'Mar', 'Api', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()] + '/';
 	text += date.getFullYear();
 	return text;
 }
