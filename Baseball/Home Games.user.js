@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Home Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.5
+// @version      1.6
 // @description  Make Hosting Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -16,8 +16,14 @@ if (document.querySelector('#Doc_Home'))
 	return;
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_Home';
-	divTag.style.display = none;
+	divTag.style.display = 'none';
 }));
+
+function CreateElement(type, func) {
+	const tag = document.createElement(type);
+	func(tag);
+	return tag;
+}
 
 /* Global Variables
 -------------------------*/

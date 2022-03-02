@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.9
+// @version      2.0
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -16,8 +16,14 @@ if (document.querySelector('#Doc_CreateTrade'))
 	return;
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_CreateTrade';
-	divTag.style.display = none;
+	divTag.style.display = 'none';
 }));
+
+function CreateElement(type, func) {
+	const tag = document.createElement(type);
+	func(tag);
+	return tag;
+}
 
 function TradeWasMade() {
 	let recursive = false;

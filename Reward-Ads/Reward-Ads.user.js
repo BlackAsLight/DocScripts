@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Reward-Ads
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.8
+// @version      0.9
 // @description  Autoplay Reward Ads
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/rewarded-ads/
@@ -16,8 +16,14 @@ if (document.querySelector('#Doc_RewardAds'))
 	return;
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_RewardAds';
-	divTag.style.display = none;
+	divTag.style.display = 'none';
 }));
+
+function CreateElement(type, func) {
+	const tag = document.createElement(type);
+	func(tag);
+	return tag;
+}
 
 // Creates an observer for mutations for elements.
 const observer = new MutationObserver((list) => {

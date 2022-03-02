@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Find War
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.7
+// @version      1.8
 // @description  Consolidates information about potential raiding targets.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=15*
@@ -17,8 +17,14 @@ if (document.querySelector('#Doc_FindWar'))
 	return;
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_FindWar';
-	divTag.style.display = none;
+	divTag.style.display = 'none';
 }));
+
+function CreateElement(type, func) {
+	const tag = document.createElement(type);
+	func(tag);
+	return tag;
+}
 
 // Global Variables.
 const char = [

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Team Building
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.4
+// @version      0.5
 // @description  Increase Player Stats with less Clicks.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/team/id=*
@@ -16,8 +16,14 @@ if (document.querySelector('#Doc_TeamBuilding'))
 	return;
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_TeamBuilding';
-	divTag.style.display = none;
+	divTag.style.display = 'none';
 }));
+
+function CreateElement(type, func) {
+	const tag = document.createElement(type);
+	func(tag);
+	return tag;
+}
 
 let upping = false;
 

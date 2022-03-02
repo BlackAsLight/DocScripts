@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Espionage Report
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.3
+// @version      0.4
 // @description  Send a Copy of the Espionage Report to a Google Spreadsheet
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/espionage/*
@@ -16,8 +16,14 @@ if (document.querySelector('#Doc_EspionageReport'))
 	return;
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_EspionageReport';
-	divTag.style.display = none;
+	divTag.style.display = 'none';
 }));
+
+function CreateElement(type, func) {
+	const tag = document.createElement(type);
+	func(tag);
+	return tag;
+}
 
 // Adds button to insert or update the URL to report espionage operations to.
 (() => {

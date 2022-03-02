@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Hide Nation Descriptions
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.6
+// @version      0.7
 // @description  Hides Nation's Descriptions set up by the user. Why? Because some people like to make them excessively long.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/id=*
@@ -16,8 +16,14 @@ if (document.querySelector('#Doc_NationDescription'))
 	return;
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_NationDescription';
-	divTag.style.display = none;
+	divTag.style.display = 'none';
 }));
+
+function CreateElement(type, func) {
+	const tag = document.createElement(type);
+	func(tag);
+	return tag;
+}
 
 const descDivTag = document.getElementById('descCollapseDiv');
 
