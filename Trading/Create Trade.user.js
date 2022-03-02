@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.8
+// @version      1.9
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -10,12 +10,14 @@
 // ==/UserScript==
 
 'use strict';
-function Migrate(oldText, newText) {
-	if (localStorage.getItem(oldText)) {
-		localStorage.setItem(newText, localStorage.getItem(oldText));
-		localStorage.removeItem(oldText);
-	}
-}
+/* Double Injection Protection
+-------------------------*/
+if (document.querySelector('#Doc_CreateTrade'))
+	return;
+document.body.append(CreateElement('div', divTag => {
+	divTag.id = 'Doc_CreateTrade';
+	divTag.style.display = none;
+}));
 
 function TradeWasMade() {
 	let recursive = false;
@@ -170,16 +172,6 @@ async function FormatTopOffers() {
 }
 
 function Main() {
-	// Migration for Older Versions
-	if (localStorage.getItem('Doc_IgnoreRecursive') === 'false') {
-		localStorage.removeItem('Doc_IgnoreRecursive');
-	}
-	Migrate('Doc_IgnoreRecursive', 'Doc_CT_IgnoreRecursive');
-	Migrate('Doc_LastPrice', 'Doc_CT_AcceptedPrice');
-	if (localStorage.getItem('Doc_Recursive')) {
-		localStorage.removeItem('Doc_Recursive');
-	}
-
 	if (document.querySelector('.alert-success')) {
 		TradeWasMade();
 	}

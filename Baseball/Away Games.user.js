@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Away Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.2
+// @version      1.3
 // @description  Make Playing Away Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/play/
@@ -10,6 +10,15 @@
 // ==/UserScript==
 
 'use strict';
+/* Double Injection Protection
+-------------------------*/
+if (document.querySelector('#Doc_Away'))
+	return;
+document.body.append(CreateElement('div', divTag => {
+	divTag.id = 'Doc_Away';
+	divTag.style.display = none;
+}));
+
 /* Global Variables
 -------------------------*/
 const nationID = Array.from(document.getElementsByTagName('a')).filter(x => x.textContent == 'View')[0].href.split('=')[1];

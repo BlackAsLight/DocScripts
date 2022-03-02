@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Team Building
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.3
+// @version      0.4
 // @description  Increase Player Stats with less Clicks.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/team/id=*
@@ -10,6 +10,15 @@
 // ==/UserScript==
 
 'use strict';
+/* Double Injection Protection
+-------------------------*/
+if (document.querySelector('#Doc_TeamBuilding'))
+	return;
+document.body.append(CreateElement('div', divTag => {
+	divTag.id = 'Doc_TeamBuilding';
+	divTag.style.display = none;
+}));
+
 let upping = false;
 
 if (Array.from(document.getElementsByTagName('a')).filter(x => x.textContent == 'Baseball')[0].href.split('=')[1] = location.href.split('=')[1]) {

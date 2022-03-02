@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Home Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.4
+// @version      1.5
 // @description  Make Hosting Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -10,6 +10,15 @@
 // ==/UserScript==
 
 'use strict';
+/* Double Injection Protection
+-------------------------*/
+if (document.querySelector('#Doc_Home'))
+	return;
+document.body.append(CreateElement('div', divTag => {
+	divTag.id = 'Doc_Home';
+	divTag.style.display = none;
+}));
+
 /* Global Variables
 -------------------------*/
 const nationID = Array.from(document.getElementsByTagName('a')).filter(x => x.textContent == 'View')[0].href.split('=')[1];

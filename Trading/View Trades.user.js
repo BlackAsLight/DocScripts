@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      5.4
+// @version      5.5
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -12,6 +12,15 @@
 // ==/UserScript==
 
 'use strict';
+/* Double Injection Protection
+-------------------------*/
+if (document.querySelector('#Doc_ViewTrades'))
+	return;
+document.body.append(CreateElement('div', divTag => {
+	divTag.id = 'Doc_ViewTrades';
+	divTag.style.display = none;
+}));
+
 /* Global Variables
 -------------------------*/
 const nationLink = Array.from(document.querySelectorAll('a')).filter(x => x.textContent == 'View')[0].href;
