@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Reward-Ads
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.9
+// @version      1.0
 // @description  Autoplay Reward Ads
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/rewarded-ads/
@@ -12,8 +12,9 @@
 'use strict';
 /* Double Injection Protection
 -------------------------*/
-if (document.querySelector('#Doc_RewardAds'))
+if (document.querySelector('#Doc_RewardAds')) {
 	return;
+}
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_RewardAds';
 	divTag.style.display = 'none';

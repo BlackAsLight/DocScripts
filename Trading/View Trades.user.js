@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      5.6
+// @version      5.7
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -14,8 +14,9 @@
 'use strict';
 /* Double Injection Protection
 -------------------------*/
-if (document.querySelector('#Doc_ViewTrades'))
+if (document.querySelector('#Doc_ViewTrades')) {
 	return;
+}
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_ViewTrades';
 	divTag.style.display = 'none';

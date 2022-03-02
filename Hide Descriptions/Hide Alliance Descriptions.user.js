@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Hide Alliance Descriptions
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.4
+// @version      0.5
 // @description  Hides Alliances's Descriptions set up by their government. Why? Because some people like to make them excessively long.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/alliance/id=*
@@ -12,8 +12,9 @@
 'use strict';
 /* Double Injection Protection
 -------------------------*/
-if (document.querySelector('#Doc_AllianceDescription'))
+if (document.querySelector('#Doc_AllianceDescription')) {
 	return;
+}
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_AllianceDescription';
 	divTag.style.display = 'none';

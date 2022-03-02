@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Human
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.4
+// @version      0.5
 // @description  Play a tone.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/human/
@@ -12,8 +12,9 @@
 'use strict';
 /* Double Injection Protection
 -------------------------*/
-if (document.querySelector('#Doc_Human'))
+if (document.querySelector('#Doc_Human')) {
 	return;
+}
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_Human';
 	divTag.style.display = 'none';
