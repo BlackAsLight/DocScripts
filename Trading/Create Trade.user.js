@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.7
+// @version      1.8
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -22,7 +22,7 @@ function TradeWasMade() {
 	const args = location.search.slice(1).split('&');
 
 	if (!localStorage.getItem('Doc_CT_IgnoreRecursive')) {
-		args.map(x => {
+		args = args.map(x => {
 			x = x.split('=');
 			if (x[0] === 'p') {
 				const acceptedPrice = localStorage.getItem('Doc_CT_AcceptedPrice');
