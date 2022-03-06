@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      5.7
+// @version      5.8
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
 // @match        https://politicsandwar.com/index.php?id=90*
 // @match        https://politicsandwar.com/nation/trade/*
+// @exclude      https://politicsandwar.com/nation/trade/create/*
 // @icon         https://avatars.githubusercontent.com/u/44320105
 // @grant        none
 // ==/UserScript==
