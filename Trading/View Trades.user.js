@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      5.9
+// @version      6.0
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -619,107 +619,107 @@ function MarketLink(resource) {
 }
 
 function ReGain() {
-    const pTag = (() => {
-        const imgTag = document.querySelector('img[alt="Success"]');
-        return imgTag ? imgTag.parentElement : null;
-    })();
-    if (!pTag) {
-        return;
-    }
-    const text = ReplaceAll(pTag.textContent.trim(), '  ', ' ').split(' ');
-    if (text[2] !== 'accepted') {
-        return;
-    }
+	const pTag = (() => {
+		const imgTag = document.querySelector('img[alt="Success"]');
+		return imgTag ? imgTag.parentElement : null;
+	})();
+	if (!pTag) {
+		return;
+	}
+	const text = ReplaceAll(pTag.textContent.trim(), '  ', ' ').split(' ');
+	if (text[2] !== 'accepted') {
+		return;
+	}
 
-    pTag.classList.add('ReGain');
-    let profit = 0;
-    let quantity = parseInt(text[8].replaceAll(',', ''));
-    const price = parseInt(text[14].slice(1, -1).replaceAll(',', '')) / quantity;
-    const bought = text[7] === 'bought';
-    const key = `Doc_VT_ReGain_${text[9][0].toUpperCase() + text[9].slice(1, -1)}`;
-    const data = JSON.parse(localStorage.getItem(key));
-    pTag.append(` $${price.toLocaleString()}/Ton.`);
-    pTag.append(document.createElement('br'));
+	pTag.classList.add('ReGain');
+	let profit = 0;
+	let quantity = parseInt(text[8].replaceAll(',', ''));
+	const price = parseInt(text[14].slice(1, -1).replaceAll(',', '')) / quantity;
+	const bought = text[7] === 'bought';
+	const key = `Doc_VT_ReGain_${text[9][0].toUpperCase() + text[9].slice(1, -1)}`;
+	const data = JSON.parse(localStorage.getItem(key));
+	pTag.append(` $${price.toLocaleString()}/Ton.`);
+	pTag.append(document.createElement('br'));
 
-    if (data && data.bought !== bought) {
-        data.levels = data.levels.map(level => {
-            if (!quantity) {
-                return level;
-            }
-            if ((!bought && price > level.price) || (bought && price < level.price)) {
-                const amount = Math.min(level.quantity, quantity);
-                profit += amount * Math.abs(level.price - price)
-                level.quantity -= amount;
-                quantity -= amount;
-            }
-            return level;
-        })
-        .filter(level => level.quantity);
-    }
+	if (data && data.bought !== bought) {
+		data.levels = data.levels.map(level => {
+			if (!quantity) {
+				return level;
+			}
+			if ((!bought && price > level.price) || (bought && price < level.price)) {
+				const amount = Math.min(level.quantity, quantity);
+				profit += amount * Math.abs(level.price - price)
+				level.quantity -= amount;
+				quantity -= amount;
+			}
+			return level;
+		})
+			.filter(level => level.quantity);
+	}
 
-    /* One would think that based off the if statement above we'd only need to check if quantity was true-ish,
-       but in the one circumstance where the User sells a quantity at a price below the levels, either partly or fully below,
-       there would still be levels left to be regained and quantity left over. In this case we would not want to offer the button.
-       This circumstance also applies in the reverse. Where the User buys a quantity at a price above the levels.*/
-    let buttonExists = false;
-    if ((!data || data.bought === bought || !data.levels.length) && quantity) {
-        buttonExists = true;
-        pTag.append(CreateElement('a', aTag => {
-            aTag.id = 'Doc_ReGain';
-            aTag.append(`Re${bought ? 'sell' : 'buy'} for Profit?`);
-            aTag.onclick = () => {
-                if (data) {
-                    const index = data.levels.findIndex(level => level.price === price)
-                    data.levels[index].quantity += quantity;
-                    if (index > -1) {
-                        data.levels.push({
-                            quantity: quantity,
-                            price: price
-                        });
-                        data.levels.sort((x, y) => x.price - y.price);
-                        if (bought) {
-                            data.levels.reverse();
-                        }
-                    }
-                }
-                else {
-                    localStorage.setItem(key, JSON.stringify({
-                        bought: bought,
-                        levels: [
-                            {
-                                quantity: quantity,
-                                price: price
-                            }
-                        ]
-                    }));
-                }
+	/* One would think that based off the if statement above we'd only need to check if quantity was true-ish,
+	   but in the one circumstance where the User sells a quantity at a price below the levels, either partly or fully below,
+	   there would still be levels left to be regained and quantity left over. In this case we would not want to offer the button.
+	   This circumstance also applies in the reverse. Where the User buys a quantity at a price above the levels.*/
+	let buttonExists = false;
+	if ((!data || data.bought === bought || !data.levels.length) && quantity) {
+		buttonExists = true;
+		pTag.append(CreateElement('a', aTag => {
+			aTag.id = 'Doc_ReGain';
+			aTag.append(`Re${bought ? 'sell' : 'buy'} for Profit?`);
+			aTag.onclick = () => {
+				if (data) {
+					const index = data.levels.findIndex(level => level.price === price)
+					data.levels[index].quantity += quantity;
+					if (index > -1) {
+						data.levels.push({
+							quantity: quantity,
+							price: price
+						});
+						data.levels.sort((x, y) => x.price - y.price);
+						if (bought) {
+							data.levels.reverse();
+						}
+					}
+				}
+				else {
+					localStorage.setItem(key, JSON.stringify({
+						bought: bought,
+						levels: [
+							{
+								quantity: quantity,
+								price: price
+							}
+						]
+					}));
+				}
 
-                UpdateQuantities();
-                pTag.removeChild(aTag);
-                if (profit) {
-                    pTag.innerHTML = pTag.innerHTML.replaceAll(' | ', '');
-                }
-                MiddleScroll();
-            };
-        }));
-    }
+				UpdateQuantities();
+				pTag.removeChild(aTag);
+				if (profit) {
+					pTag.innerHTML = pTag.innerHTML.replaceAll(' | ', '');
+				}
+				MiddleScroll();
+			};
+		}));
+	}
 
-    if (buttonExists && profit) {
-        pTag.append(' | ');
-    }
-    if (profit) {
-        pTag.append(`Made $${profit.toLoacleString()} Profit.`);
-    }
+	if (buttonExists && profit) {
+		pTag.append(' | ');
+	}
+	if (profit) {
+		pTag.append(`Made $${profit.toLocaleString()} Profit.`);
+	}
 
-    if (data) {
-        if (data.levels.length) {
-            localStorage.setItem(key, JSON.stringify(data));
-        }
-        else {
-            localStorage.removeItem(key);
-        }
-    }
-    return buttonExists;
+	if (data) {
+		if (data.levels.length) {
+			localStorage.setItem(key, JSON.stringify(data));
+		}
+		else {
+			localStorage.removeItem(key);
+		}
+	}
+	return buttonExists;
 }
 
 function ReGainCurrentLevels() {
@@ -917,29 +917,29 @@ function Sleep(ms) {
 }
 
 function UpdateQuantities() {
-    if (currentResource === 'Money') {
-        return;
-    }
+	if (currentResource === 'Money') {
+		return;
+	}
 
-    const data = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${currentResource}`));
-    if (!data) {
-        return;
-    }
+	const data = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${currentResource}`));
+	if (!data) {
+		return;
+	}
 
-    [...document.querySelectorAll('.Offer')].forEach(divTag => {
-        const inputTag = divTag.querySelector('input[name="rcustomamount"]');
-        if (!inputTag || divTag.querySelector('.Hide').textContent !== 'SELLERS WANTED' === data.bought) {
-            return;
-        }
-        const price = parseInt(divTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
-        let quantity = 0;
-        data.levels.forEach(level => {
-            if ((data.bought && price > level.price) || (!data.bought && price < level.price)) {
-                quantity += level.quantity;
-            }
-        });
-        inputTag.value = data.bought ? Math.max(Math.min(Math.floor(resources[currentResource]), quantity, parseInt(divTag.querySelector('.Quantity').textContent.trim().replaceAll(',', ''))), 0) : Math.max(Math.floor(Math.min(resources.Money, quantity * price, parseInt(divTag.querySelector('.Quantity').textContent.trim().replaceAll(',', '')) * price) / price), 0)
-    });
+	[...document.querySelectorAll('.Offer')].forEach(divTag => {
+		const inputTag = divTag.querySelector('input[name="rcustomamount"]');
+		if (!inputTag || divTag.querySelector('.Hide').textContent !== 'SELLERS WANTED' === data.bought) {
+			return;
+		}
+		const price = parseInt(divTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
+		let quantity = 0;
+		data.levels.forEach(level => {
+			if ((data.bought && price > level.price) || (!data.bought && price < level.price)) {
+				quantity += level.quantity;
+			}
+		});
+		inputTag.value = data.bought ? Math.max(Math.min(Math.floor(resources[currentResource]), quantity, parseInt(divTag.querySelector('.Quantity').textContent.trim().replaceAll(',', ''))), 0) : Math.max(Math.floor(Math.min(resources.Money, quantity * price, parseInt(divTag.querySelector('.Quantity').textContent.trim().replaceAll(',', '')) * price) / price), 0)
+	});
 }
 
 function UpdateLinks() {
