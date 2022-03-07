@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      5.8
+// @version      5.9
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -16,7 +16,7 @@
 /* Double Injection Protection
 -------------------------*/
 if (document.querySelector('#Doc_ViewTrades')) {
-	return;
+	throw Error('This script was already injected...');
 }
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_ViewTrades';
@@ -172,6 +172,37 @@ document.querySelector('#leftcolumn').append(CreateElement('div', divTag => {
 			}
 		};
 	}));
+}));
+
+/* Styling
+-------------------------*/
+document.head.append(CreateElement('style', styleTag => {
+	styleTag.append('#Offers { text-align: center; }');
+	styleTag.append('.Offer { display: grid; grid-template-columns: repeat(8, 1fr); align-items: center; grid-gap: 1em; padding: 1em; }');
+	styleTag.append('.Nations { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-areas: "Left Right"; align-items: center; grid-gap: 1em; overflow-wrap: anywhere; }')
+	styleTag.append('.sOffer { grid-template-areas: "Nations Nations Nations Nations Date Quantity Price Form" "Nations Nations Nations Nations Date Quantity Create Form"; }');
+	styleTag.append('.bOffer { grid-template-areas: "Nations Nations Nations Nations Date Quantity Price Form" "Nations Nations Nations Nations Date Quantity Create Form"; }');
+	styleTag.append('.Show { display: none; }');
+	styleTag.append('@media only screen and (max-width: 991px) { .Show { display: block; } .Hide { display: none; } .Nations { grid-template-columns: 1fr; grid-template-areas: "Left" "Right"; } .Offer { grid-template-columns: repeat(6, 1fr); grid-template-areas: "Nations Nations Date Quantity Price Form" "Nations Nations Date Quantity Create Form"; } }');
+	styleTag.append('@media only screen and (max-width: 600px) { .Offer { grid-template-columns: repeat(4, 1fr); grid-template-areas: "Nations Quantity Price Form" "Nations Date Create Form"; } }');
+	styleTag.append('@media only screen and (max-width: 440px) { .Offer { grid-template-columns: repeat(3, 1fr); grid-template-areas: "Nations Quantity Form" "Nations Price Form" "Nations Create Form" "Date Date Date"; } }');
+	styleTag.append('.Offer input { transition: 300ms; }');
+	styleTag.append('.Offer input:hover, .Offer input:focus { border-radius: 10px; }');
+	styleTag.append('.Offer input.sSubmit { background-color: #5cb85c; }');
+	styleTag.append('.Offer input.bSubmit { background-color: #337ab7; }');
+	styleTag.append('.ReGain { text-align: center; }');
+	styleTag.append('.Outline { outline-style: solid; outline-color: #d9534f; outline-width: 0.25em; }');
+	styleTag.append('#Offers hr { border: 0.25em solid #d9534f; margin: 0; }');
+	styleTag.append('.Doc_Config { text-align: center; padding: 0 1em; font-size: 0.8em; }');
+	styleTag.append('.Doc_Config b { font-size: 1.25em; }');
+	styleTag.append('.Doc_Config button { font-size: inherit; font-weight: normal; padding: 0; }');
+	styleTag.append('.Doc_Config hr { margin: 0.5em 0; }');
+	styleTag.append('.Doc_Config input { margin: 0; }');
+}));
+
+document.head.append(CreateElement('style', styleTag => {
+	styleTag.id = 'TableTheme';
+	styleTag.append(`.Offer:nth-child(2n) { background: ${Array.from(document.querySelectorAll('link')).filter(x => x.href === 'https://politicsandwar.com/css/dark-theme.min.css').length ? '#1f1f1f' : '#d2d3e8'}; }`);
 }));
 
 /* Functions
@@ -588,109 +619,107 @@ function MarketLink(resource) {
 }
 
 function ReGain() {
-	const pTag = (() => {
-		const imgTag = document.querySelector('img[alt="Success"]');
-		if (imgTag) {
-			return imgTag.parentElement;
-		}
-	})();
-	if (!pTag) {
-		return;
-	}
-	pTag.className = 'ReGain';
-	const text = ReplaceAll(pTag.textContent.trim(), '  ', ' ').split(' ');
-	if (text[2] !== 'accepted') {
-		return;
-	}
-	let quantity = parseInt(text[8].replaceAll(',', ''));
-	const price = parseInt(text[14].slice(1, -1).replaceAll(',', '')) / quantity;
-	const bought = text[7] === 'bought';
-	const key = `Doc_VT_ReGain_${text[9][0].toUpperCase() + text[9].slice(1, -1).toLowerCase()}`;
-	let data = JSON.parse(localStorage.getItem(key));
-	let profit = 0;
+    const pTag = (() => {
+        const imgTag = document.querySelector('img[alt="Success"]');
+        return imgTag ? imgTag.parentElement : null;
+    })();
+    if (!pTag) {
+        return;
+    }
+    const text = ReplaceAll(pTag.textContent.trim(), '  ', ' ').split(' ');
+    if (text[2] !== 'accepted') {
+        return;
+    }
 
-	// Update Info if transaction was made in profit.
-	if (data && data.bought != bought) {
-		for (let i = 0; i < data.levels.length; ++i) {
-			if ((!bought && price > data.levels[i].price) || (bought && price < data.levels[i].price)) {
-				profit += Math.min(data.levels[i].quantity, quantity) * Math.abs(data.levels[i].price - price);
-				data.levels[i].quantity -= quantity;
-				if (data.levels[i].quantity >= 0) {
-					quantity = 0;
-					break;
-				}
-				quantity = data.levels[i].quantity * -1;
-			}
-		}
-		data.levels = data.levels.filter(x => x.quantity > 0);
-		if (data.levels.length) {
-			localStorage.setItem(key, JSON.stringify(data));
-		}
-		else {
-			localStorage.removeItem(key);
-		}
-	}
+    pTag.classList.add('ReGain');
+    let profit = 0;
+    let quantity = parseInt(text[8].replaceAll(',', ''));
+    const price = parseInt(text[14].slice(1, -1).replaceAll(',', '')) / quantity;
+    const bought = text[7] === 'bought';
+    const key = `Doc_VT_ReGain_${text[9][0].toUpperCase() + text[9].slice(1, -1)}`;
+    const data = JSON.parse(localStorage.getItem(key));
+    pTag.append(` $${price.toLocaleString()}/Ton.`);
+    pTag.append(document.createElement('br'));
 
-	pTag.append(` $${price.toLocaleString()}/Ton.`);
-	// Add Re-Sell/Buy for Profit Button.
-	pTag.append(document.createElement('br'));
-	data = JSON.parse(localStorage.getItem(key));
-	let buttonExists = false;
-	if ((!data || data.bought == bought) && quantity) {
-		buttonExists = true;
-		pTag.append(CreateElement('a', aTag => {
-			aTag.id = 'Doc_ReGain';
-			aTag.innerText = `Re${bought ? 'sell' : 'buy'} for Profit?`;
-			aTag.onclick = () => {
-				if (data) {
-					let exists = false;
-					for (let i = 0; i < data.levels.length; ++i) {
-						if (data.levels[i].price == price) {
-							exists = true;
-							data.levels[i].quantity += quantity;
-							break;
-						}
-					}
-					if (!exists) {
-						data.levels.push({
-							'quantity': quantity,
-							'price': price
-						});
-						data.levels.sort((x, y) => x.price - y.price);
-						if (bought) {
-							data.levels.reverse();
-						}
-					}
-					localStorage.setItem(key, JSON.stringify(data));
-				}
-				else {
-					localStorage.setItem(key, JSON.stringify({
-						'bought': bought,
-						'levels': [
-							{
-								'quantity': quantity,
-								'price': price,
-							}
-						]
-					}));
-				}
+    if (data && data.bought !== bought) {
+        data.levels = data.levels.map(level => {
+            if (!quantity) {
+                return level;
+            }
+            if ((!bought && price > level.price) || (bought && price < level.price)) {
+                const amount = Math.min(level.quantity, quantity);
+                profit += amount * Math.abs(level.price - price)
+                level.quantity -= amount;
+                quantity -= amount;
+            }
+            return level;
+        })
+        .filter(level => level.quantity);
+    }
 
-				UpdateQuantities();
-				pTag.removeChild(aTag);
-				if (profit) {
-					pTag.innerHTML = pTag.innerHTML.replaceAll(' | ', '');
-				}
-				MiddleScroll();
-			};
-		}));
-	}
-	if ((!data || data.bought == bought) && profit && quantity) {
-		pTag.append(' | ');
-	}
-	if (profit) {
-		pTag.append(`Made $${profit.toLocaleString()} Profit.`);
-	}
-	return buttonExists;
+    /* One would think that based off the if statement above we'd only need to check if quantity was true-ish,
+       but in the one circumstance where the User sells a quantity at a price below the levels, either partly or fully below,
+       there would still be levels left to be regained and quantity left over. In this case we would not want to offer the button.
+       This circumstance also applies in the reverse. Where the User buys a quantity at a price above the levels.*/
+    let buttonExists = false;
+    if ((!data || data.bought === bought || !data.levels.length) && quantity) {
+        buttonExists = true;
+        pTag.append(CreateElement('a', aTag => {
+            aTag.id = 'Doc_ReGain';
+            aTag.append(`Re${bought ? 'sell' : 'buy'} for Profit?`);
+            aTag.onclick = () => {
+                if (data) {
+                    const index = data.levels.findIndex(level => level.price === price)
+                    data.levels[index].quantity += quantity;
+                    if (index > -1) {
+                        data.levels.push({
+                            quantity: quantity,
+                            price: price
+                        });
+                        data.levels.sort((x, y) => x.price - y.price);
+                        if (bought) {
+                            data.levels.reverse();
+                        }
+                    }
+                }
+                else {
+                    localStorage.setItem(key, JSON.stringify({
+                        bought: bought,
+                        levels: [
+                            {
+                                quantity: quantity,
+                                price: price
+                            }
+                        ]
+                    }));
+                }
+
+                UpdateQuantities();
+                pTag.removeChild(aTag);
+                if (profit) {
+                    pTag.innerHTML = pTag.innerHTML.replaceAll(' | ', '');
+                }
+                MiddleScroll();
+            };
+        }));
+    }
+
+    if (buttonExists && profit) {
+        pTag.append(' | ');
+    }
+    if (profit) {
+        pTag.append(`Made $${profit.toLoacleString()} Profit.`);
+    }
+
+    if (data) {
+        if (data.levels.length) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+        else {
+            localStorage.removeItem(key);
+        }
+    }
+    return buttonExists;
 }
 
 function ReGainCurrentLevels() {
@@ -883,35 +912,34 @@ function MiddleScroll() {
 	}
 }
 
-async function Sleep(ms) {
-	return new Promise(resolve => {
-		setTimeout(() => {
-			resolve(true);
-		}, ms);
-	});
+function Sleep(ms) {
+	return new Promise(resolve => setTimeout(() => resolve(true), ms));
 }
 
 function UpdateQuantities() {
-	if (currentResource !== 'Money') {
-		const json = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${currentResource}`));
-		if (json) {
-			let divTags = Array.from(document.querySelectorAll('.Offer'));
-			while (divTags.length) {
-				const divTag = divTags.shift();
-				const inputTag = divTag.querySelector('input[name="rcustomamount"]');
-				if (inputTag && divTag.querySelector('.Hide').textContent === 'SELLERS WANTED' === json.bought) {
-					const offerPrice = parseInt(divTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
-					let quantity = 0;
-					for (let i = 0; i < json.levels.length; ++i) {
-						if ((json.bought && offerPrice > json.levels[i].price) || (!json.bought && offerPrice < json.levels[i].price)) {
-							quantity += json.levels[i].quantity;
-						}
-					}
-					inputTag.value = Math.min(parseInt(inputTag.value), quantity);
-				}
-			}
-		}
-	}
+    if (currentResource === 'Money') {
+        return;
+    }
+
+    const data = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${currentResource}`));
+    if (!data) {
+        return;
+    }
+
+    [...document.querySelectorAll('.Offer')].forEach(divTag => {
+        const inputTag = divTag.querySelector('input[name="rcustomamount"]');
+        if (!inputTag || divTag.querySelector('.Hide').textContent !== 'SELLERS WANTED' === data.bought) {
+            return;
+        }
+        const price = parseInt(divTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
+        let quantity = 0;
+        data.levels.forEach(level => {
+            if ((data.bought && price > level.price) || (!data.bought && price < level.price)) {
+                quantity += level.quantity;
+            }
+        });
+        inputTag.value = data.bought ? Math.max(Math.min(Math.floor(resources[currentResource]), quantity, parseInt(divTag.querySelector('.Quantity').textContent.trim().replaceAll(',', ''))), 0) : Math.max(Math.floor(Math.min(resources.Money, quantity * price, parseInt(divTag.querySelector('.Quantity').textContent.trim().replaceAll(',', '')) * price) / price), 0)
+    });
 }
 
 function UpdateLinks() {
@@ -967,34 +995,6 @@ function CreateOfferLink(resource, price, isSellOffer) {
 
 /* Start
 -------------------------*/
-document.head.append(CreateElement('style', styleTag => {
-	styleTag.append('#Offers { text-align: center; }');
-	styleTag.append('.Offer { display: grid; grid-template-columns: repeat(8, 1fr); align-items: center; grid-gap: 1em; padding: 1em; }');
-	styleTag.append('.Nations { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-areas: "Left Right"; align-items: center; grid-gap: 1em; overflow-wrap: anywhere; }')
-	styleTag.append('.sOffer { grid-template-areas: "Nations Nations Nations Nations Date Quantity Price Form" "Nations Nations Nations Nations Date Quantity Create Form"; }');
-	styleTag.append('.bOffer { grid-template-areas: "Nations Nations Nations Nations Date Quantity Price Form" "Nations Nations Nations Nations Date Quantity Create Form"; }');
-	styleTag.append('.Show { display: none; }');
-	styleTag.append('@media only screen and (max-width: 991px) { .Show { display: block; } .Hide { display: none; } .Nations { grid-template-columns: 1fr; grid-template-areas: "Left" "Right"; } .Offer { grid-template-columns: repeat(6, 1fr); grid-template-areas: "Nations Nations Date Quantity Price Form" "Nations Nations Date Quantity Create Form"; } }');
-	styleTag.append('@media only screen and (max-width: 600px) { .Offer { grid-template-columns: repeat(4, 1fr); grid-template-areas: "Nations Quantity Price Form" "Nations Date Create Form"; } }');
-	styleTag.append('@media only screen and (max-width: 440px) { .Offer { grid-template-columns: repeat(3, 1fr); grid-template-areas: "Nations Quantity Form" "Nations Price Form" "Nations Create Form" "Date Date Date"; } }');
-	styleTag.append('.Offer input { transition: 300ms; }');
-	styleTag.append('.Offer input:hover, .Offer input:focus { border-radius: 10px; }');
-	styleTag.append('.Offer input.sSubmit { background-color: #5cb85c; }');
-	styleTag.append('.Offer input.bSubmit { background-color: #337ab7; }');
-	styleTag.append('.ReGain { text-align: center; }');
-	styleTag.append('.Outline { outline-style: solid; outline-color: #d9534f; outline-width: 0.25em; }');
-	styleTag.append('#Offers hr { border: 0.25em solid #d9534f; margin: 0; }');
-	styleTag.append('.Doc_Config { text-align: center; padding: 0 1em; font-size: 0.8em; }');
-	styleTag.append('.Doc_Config b { font-size: 1.25em; }');
-	styleTag.append('.Doc_Config button { font-size: inherit; font-weight: normal; padding: 0; }');
-	styleTag.append('.Doc_Config hr { margin: 0.5em 0; }');
-	styleTag.append('.Doc_Config input { margin: 0; }');
-}));
-document.head.append(CreateElement('style', styleTag => {
-	styleTag.id = 'TableTheme';
-	styleTag.append(`.Offer:nth-child(2n) { background: ${Array.from(document.querySelectorAll('link')).filter(x => x.href === 'https://politicsandwar.com/css/dark-theme.min.css').length ? '#1f1f1f' : '#d2d3e8'}; }`);
-}));
-
 async function Main() {
 	console.time('Convert Table');
 	const divTag = CreateElement('div', divTag => {
