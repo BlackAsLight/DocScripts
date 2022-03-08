@@ -2,4 +2,6 @@
 
 ## Description
 
-This script allows you to sync your config settings from one browser to the next so all browsers using these scripts can share the same settings. The script will check if there is an update if it's been longer than 5mins since the last check on page load if there is less than 500 players online. If the number of players is between 500-800 then it will check every 30 mins for updates. If there is more than 800 players online then it won't check at all for updates.
+This script allows you to sync your config settings for other various scripts of this repository across multiple browsers by way of the [Dossier Page](https://politicsandwar.com/nation/dossier/). It runs in the background checking for updates at least every 5mins. If there is 500+ player online then it will push it's checking for updates to at least every 30mins. If the player count goes to 800+ then it won't check at all for updates.
+
+**Please Be Warned** Config settings may be lost or altered if scripts between browsers update out of sync. 

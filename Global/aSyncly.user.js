@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Sync the aSyncly
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.1
+// @version      0.2
 // @description  Saves Settings to the Dossier Page
 // @author       You
 // @match        https://politicsandwar.com/*
@@ -65,7 +65,6 @@ function UpdateLocal(data) {
 		localStorage.removeItem(key);
 	}
 	localStorage.setItem('Doc_aSyncly_LastChecked', data.lastChecked);
-	localStorage.setItem('Doc_aSyncly_Hash', data.hash);
 }
 
 async function UpdateForeign(hash, token) {
