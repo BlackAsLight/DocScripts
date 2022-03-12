@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Sync the aSyncly
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.2
+// @version      0.3
 // @description  Saves Settings to the Dossier Page
 // @author       You
 // @match        https://politicsandwar.com/*
@@ -118,7 +118,7 @@ function Main() {
 	}
 
 	// Don't run if it's been less than 5mins since last updated.
-	if (lastChecked > date.getTime() - 1000 * 60 * 5) {
+	if (lastChecked < date.getTime() - 1000 * 60 * 5) {
 		return;
 	}
 
