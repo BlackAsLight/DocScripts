@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Doc: Send Message
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.1
+// @version      0.2
 // @description  Easily Mass Message Players By Nation ID or Leader Name
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/inbox/message/
+// @match        https://politicsandwar.com/inbox/message/receiver=*
 // @icon         https://avatars.githubusercontent.com/u/44320105
 // @grant        none
 // ==/UserScript==
@@ -175,6 +176,15 @@ async function WritePlaceHolder(text, inputTag) {
 	}
 }
 
+async function WriteValue(text, inputTag) {
+	inputTag.value = '';
+	text = text.split('');
+	while (text.length) {
+		inputTag.value += text.shift();
+		await Sleep(50 + Math.floor(Math.random() * 150));
+	}
+}
+
 async function WaitForTag(doc, query) {
 	let tag = doc.querySelector(query);
 	while (!tag) {
@@ -250,7 +260,13 @@ async function Main() {
 	});
 
 	await WaitForTag(document, '#to');
-	magic = localStorage.getItem('Doc_APIKey') !== null
+	if (location.href.includes('receiver=')) {
+		Sleep(1500).then(() => WriteValue(location.href.slice(location.href.indexOf('/message/') + 9).split('&').filter(x => x.startsWith('receiver='))[0].split('=')[1], document.querySelector('#to')));
+		magic = false;
+	}
+	else {
+		magic = localStorage.getItem('Doc_APIKey') !== null
+	}
 	while (magic) {
 		const inputTag = document.querySelector('#to');
 		const text = await GetPlaceHolder();
