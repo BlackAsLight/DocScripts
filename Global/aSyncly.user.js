@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Sync the aSyncly
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.5
+// @version      0.6
 // @description  Saves Settings to the Dossier Page
 // @author       You
 // @match        https://politicsandwar.com/*
@@ -113,12 +113,12 @@ function Main() {
 
 	const lastChecked = parseInt(localStorage.getItem('Doc_aSyncly_LastChecked')) || 0;
 	// Don't run if there is 500+ players online and has been less than 30mins since last updated.
-	if (players >= 500 && lastChecked < date.getTime() - 1000 * 60 * 30) { // ms * secs * mins
+	if (players >= 500 && lastChecked > date.getTime() - 1000 * 60 * 30) { // ms * secs * mins
 		return;
 	}
 
 	// Don't run if it's been less than 5mins since last updated.
-	if (lastChecked < date.getTime() - 1000 * 60 * 5) {
+	if (lastChecked > date.getTime() - 1000 * 60 * 5) {
 		return;
 	}
 
