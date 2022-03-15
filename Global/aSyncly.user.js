@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Sync the aSyncly
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.3
+// @version      0.4
 // @description  Saves Settings to the Dossier Page
 // @author       You
 // @match        https://politicsandwar.com/*
@@ -100,20 +100,20 @@ async function UpdateForeign(hash, token) {
 
 function Main() {
 	// Don't run between 23:55 and 00:05 | inclusive/exclusive.
-	const date = new Date()
+	const date = new Date();
 	if ((date.getUTCHours() === 23 && date.getUTCMinutes() >= 55) || (date.getUTCHours() === 0 && date.getUTCMinutes() < 5)) {
 		return;
 	}
 
-	const players = parseInt(document.querySelector('#leftcolumn div.sidebar').textContent.split('\n').map(x => x.trim()).filter(x => x.length).pop())
+	const players = parseInt(document.querySelector('#leftcolumn div.sidebar').textContent.split('\n').map(x => x.trim()).filter(x => x.length).pop());
 	// Don't run if 800+ players are online.
 	if (players >= 800) {
 		return;
 	}
 
-	const lastChecked = parseInt(localStorage.getItem('Doc_aSyncly_LastChecked')) || 0;
+	const lastChecked = parseInt(localStorage.getItem('Doc_aSyncly_LastChecked')) || date.getTime();
 	// Don't run if there is 500+ players online and has been less than 30mins since last updated.
-	if (players >= 500 && lastChecked > date.getTime() - 1000 * 60 * 30) { // ms * secs * mins
+	if (players >= 500 && lastChecked < date.getTime() - 1000 * 60 * 30) { // ms * secs * mins
 		return;
 	}
 
