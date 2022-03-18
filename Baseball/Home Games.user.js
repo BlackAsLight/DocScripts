@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Home Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.7
+// @version      1.8
 // @description  Make Hosting Games Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -25,6 +25,24 @@ function CreateElement(type, func) {
 	func(tag);
 	return tag;
 }
+
+/* Depreciated
+-------------------------*/
+document.body.appendChild((() => {
+	const pTag = document.createElement('p');
+	pTag.innerHTML = '<b>Depreciated | Doc: Home Games</b><br>This script is now depreciated as it\'s functionality has been merged with Doc: Away Games to make a new script called Doc: Play Baseball.'
+		+ '<br>Delete Doc: Home Games and Doc: Away Games to make this message disappear, and download the new Doc: Play Baseball instead.'
+		+ '<br><a href="https://github.com/BlackAsLight/DocScripts" target="_blank">DocScripts</a>'
+	pTag.style.position = 'fixed';
+	pTag.style.bottom = '1em';
+	pTag.style.right = '1em';
+	pTag.style.backgroundColor = '#ff4d6a';
+	pTag.style.padding = '1em';
+	pTag.style.borderRadius = '0.5em';
+	pTag.style.color = '#f2f2f2'
+	pTag.style.fontSize = '12px';
+	return pTag;
+})());
 
 /* Global Variables
 -------------------------*/
