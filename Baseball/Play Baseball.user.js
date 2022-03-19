@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.1
+// @version      0.2
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -194,7 +194,7 @@ async function CheckStats() {
 		.map(game => {
 			return {
 				gameID: parseInt(game.id),
-				date: new Date(game.date).getTime(),
+				date: new Date(game.date.replaceAll(' ', 'T')).getTime(),
 				revenue: game.home_revenue,
 				winnings: game.spoils,
 				isHost: parseInt(game.home_id) === teamID,
@@ -668,7 +668,7 @@ function Main() {
 				})();
 				if (apiKey) {
 					played = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_teams(id:[${teamID}],first:1){data{games{date}}}}`)).text()).data.baseball_teams.data[0].games
-						.filter(game => new Date(game.date).getTime() > ticks).length;
+						.filter(game => new Date(game.date.replaceAll(' ', 'T')).getTime() > ticks).length;
 					pTag.textContent = `${played}/250`;
 				}
 			}));
