@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.3
+// @version      0.4
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -339,6 +339,9 @@ async function ToggleHostGame() {
 				return formData;
 			})()
 		});
+		if (doc.querySelector('.alert-danger')) {
+			throw Error(`Error: ${doc.querySelector('.alert-danger').textContent.slice(5)}`);
+		}
 		token = doc.querySelector('input[name="token"]').value;
 		isPlaying = doc.querySelector('input[name="cancelhomegame"]') ? true : false;
 		pauseCheckingStatus = false;
