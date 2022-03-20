@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.2
+// @version      0.3
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/
@@ -257,7 +257,7 @@ async function CheckStats() {
 			}
 		}
 		return game.date > ticks ? game.gameID : 0;
-	}).reduce((x, y) => x > y ? x : y));
+	}).reduce((x, y) => x > y ? x : y), lastGameID);
 
 	// Save Changes To Books.
 	books = books.filter(book => book.credit).sort((x, y) => Math.abs(y.credit) - Math.abs(x.credit));
