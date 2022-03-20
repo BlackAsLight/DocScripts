@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Sync the aSyncly
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.6
+// @version      0.7
 // @description  Saves Settings to the Dossier Page
 // @author       You
 // @match        https://politicsandwar.com/*
@@ -72,6 +72,7 @@ async function UpdateForeign(hash, token) {
 		lastChecked: new Date().getTime(),
 		localStorage: {}
 	};
+	localStorage.setItem('Doc_aSyncly_LastChecked', data.lastChecked);
 	for (let i = 0; i < localStorage.length; ++i) {
 		const key = localStorage.key(i);
 		if (!key.startsWith('Doc') || bannedKeys.map(x => key.startsWith(x)).filter(x => x).length) {
@@ -95,7 +96,6 @@ async function UpdateForeign(hash, token) {
 			return formData;
 		})()
 	})).text(), 'text/html').querySelector('textarea[name="dossier"]').textContent);
-	localStorage.setItem('Doc_aSyncly_LastChecked', data.lastChecked);
 }
 
 function Main() {
