@@ -1,6 +1,6 @@
 # DocScripts
 
-This is a GitHub respository of a bunch of scripts made by Doctor for a game called Politics and War.
+This is a GitHub repository of a bunch of scripts made by Doctor for a game called Politics and War.
 
 ## DO NOT
 
