@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.4
+// @version      0.5
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
-// @match        https://politicsandwar.com/obl/host/
-// @match        https://politicsandwar.com/obl/play/
+// @match        https://politicsandwar.com/obl/host/*
+// @match        https://politicsandwar.com/obl/play/*
 // @icon         https://avatars.githubusercontent.com/u/44320105
 // @grant        none
 // ==/UserScript==
@@ -184,80 +184,50 @@ async function CheckStats() {
 	if (checkingStats) {
 		return;
 	}
-
 	checkingStats = true;
 
 	// Get All Unrecorded Games.
-	const lastGameID = parseInt(localStorage.getItem('Doc_SB_GameID')) || 0;
-	const games = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={baseball_teams(id:[${teamID}],first:1){data{ games{ id date home_revenue spoils open home_score away_score home_id away_id}}}}`)).text()).data.baseball_teams.data[0].games
-		.filter(game => game.open === 0 && parseInt(game.id) > lastGameID)
-		.map(game => {
-			return {
-				gameID: parseInt(game.id),
-				date: new Date(game.date.replaceAll(' ', 'T')).getTime(),
-				revenue: game.home_revenue,
-				winnings: game.spoils,
-				isHost: parseInt(game.home_id) === teamID,
-				otherTeamID: parseInt(parseInt(game.home_id) === teamID ? game.away_id : game.home_id),
-				otherTeamWon: (game.home_score > game.away_score) === (parseInt(game.away_id) === teamID)
-			};
-		});
+	const games = await GetGames();
 	if (!games.length) {
 		checkingStats = false;
 		return;
 	}
 
-	// Get Needed Variables For Next Bit.
-	const ticks = (() => {
-		const date = new Date();
-		return date.getTime() - (((date.getUTCHours() * 60 + date.getUTCMinutes()) * 60 + date.getUTCSeconds()) * 1000 + date.getUTCMilliseconds());
-	})();
-	const teams = [];
-	let books = JSON.parse(localStorage.getItem('Doc_SB_Books')) || [];
-
 	// Processes The Games And Updates The GameID.
-	localStorage.setItem('Doc_SB_GameID', games.map(game => {
-		// Calculate Debt Owed.
+	let books = JSON.parse(localStorage.getItem('Doc_SB_Books')) || [];
+	while (games.length) {
+		const game = games.shift();
+		// Calculate Debt.
 		const credit = Math.round((0.3 * (game.revenue + game.winnings) - (game.isHost === game.otherTeamWon ? game.winnings : 0)) * (game.isHost ? 100 : -100));
-		console.info(`TeamID: ${game.otherTeamID}`, `Tip: ${MoneyFormat((game.revenue + game.winnings) * 0.3)}`, `Credit: ${MoneyFormat(credit / 100)}`);
+		console.info(`Team: ${game.otherTeamID} | ${game.otherTeam}`, `Tip: ${MoneyFormat(0.3 * (game.revenue + game.winnings))}`, `Credit: ${MoneyFormat(credit / 100)}`);
 
+		// Add Debt to Books.
 		const i = books.findIndex(book => book.teamID === game.otherTeamID);
 		if (i > -1) {
 			// Team Exists In Books.
 			books[i].credit += credit;
 			books[i].date = new Date().getTime();
-			AddNotify({
-				message: [
-					`Total: ${MoneyFormat(game.revenue + game.winnings)}`,
-					`Tip: ${MoneyFormat(credit / -100)}`
-				],
-				ms: 5000,
-				title: books[i].team
-			});
 		}
 		else {
 			// Team Doesn't Exist In Books.
-			const j = teams.findIndex(team => team.teamID === game.otherTeamID);
-			if (j > -1) {
-				// Team Exists In Teams.
-				teams[j].results.push({
-					total: game.revenue + game.winnings,
-					credit: credit
-				});
-			}
-			else {
-				// Team Doesn't Exist In Teams.
-				teams.push({
-					teamID: game.otherTeamID,
-					results: [{
-						total: game.revenue + game.winnings,
-						credit: credit
-					}]
-				});
-			}
+			books.push({
+				credit: credit,
+				date: new Date().getTime(),
+				nation: game.otherNation,
+				nationID: game.otherNationID,
+				team: game.otherTeam,
+				teamID: game.otherTeamID
+			});
 		}
-		return game.date > ticks ? game.gameID : 0;
-	}).reduce((x, y) => x > y ? x : y), lastGameID);
+		AddNotify({
+			message: [
+				`Total: ${MoneyFormat(game.revenue + game.winnings)}`,
+				`Tip: ${MoneyFormat(credit / -100)}`
+			],
+			ms: 5000,
+			title: `${game.otherNation} | ${game.otherTeam}`
+		});
+	}
 
 	// Save Changes To Books.
 	books = books.filter(book => book.credit).sort((x, y) => Math.abs(y.credit) - Math.abs(x.credit));
@@ -268,47 +238,39 @@ async function CheckStats() {
 		localStorage.removeItem('Doc_SB_Books');
 	}
 
-	// Process Any New Teams Introduced.
-	books = [];
-	while (teams.length) {
-		const subTeams = teams.splice(0, 50);
-		const data = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={baseball_teams(id:[${subTeams.map(team => team.teamID).join(',')}],first:50){data{nation{id nation_name}id name}}}`)).text()).data.baseball_teams.data;
-		while (data.length) {
-			const info = data.shift();
-			const team = subTeams.splice(subTeams.findIndex(team => team.teamID === parseInt(info.id)), 1)[0];
-			books.push({
-				teamID: team.teamID,
-				team: info.name,
-				nationID: parseInt(info.nation.id),
-				nation: info.nation.nation_name,
-				credit: team.results.map(x => x.credit).reduce((x, y) => x + y, 0),
-				date: new Date().getTime()
-			});
-			while (team.results.length) {
-				const result = team.results.shift();
-				AddNotify({
-					message: [
-						`Total: ${MoneyFormat(result.total)}`,
-						`Tip: ${MoneyFormat(result.credit / -100)}`
-					],
-					ms: 5000,
-					title: info.name
-				});
-			}
-		}
-	}
-	if (books.length) {
-		books = books.concat(JSON.parse(localStorage.getItem('Doc_SB_Books')) || []).filter(book => book.credit).sort((x, y) => Math.abs(y.credit) - Math.abs(x.credit));
-		if (books.length) {
-			localStorage.setItem('Doc_SB_Books', JSON.stringify(books));
-		}
-		else {
-			localStorage.removeItem('Doc_SB_Books');
-		}
-	}
-
 	checkingStats = false;
 	UpdateTable();
+}
+
+async function GetGames() {
+	const pages = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={baseball_games(first:50,team_id:[${teamID}]){paginatorInfo{lastPage}}}`)).text()).data.baseball_games.paginatorInfo.lastPage;
+	const lastGameID = parseInt(localStorage.getItem('Doc_SB_GameID')) || 0;
+	const games = [];
+	for (let i = 1; i <= pages; ++i) {
+		console.info(`Game Page: ${i}/${pages}`);
+		JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={baseball_games(first:50,page:${i},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){ data{ id date home_revenue spoils open home_score away_score home_team{id name}away_team{id name}home_nation{id nation_name}away_nation{id nation_name}}}}`)).text()).data.baseball_games.data
+			.filter(game => game.open === 0)
+			.forEach(game => {
+				const isHost = parseInt(game.home_team.id) === teamID;
+				games.push({
+					gameID: parseInt(game.id),
+					date: new Date(game.date.replace(' ', 'T')).getTime(),
+					revenue: game.home_revenue,
+					winnings: game.spoils,
+					isHost: isHost,
+					otherTeamID: parseInt(game[`${isHost ? 'away' : 'home'}_team`].id),
+					otherTeam: game[`${isHost ? 'away' : 'home'}_team`].name,
+					otherNationID: parseInt(game[`${isHost ? 'away' : 'home'}_nation`].id),
+					otherNation: game[`${isHost ? 'away' : 'home'}_nation`].nation_name,
+					otherTeamWon: (game.home_score < game.away_score) === isHost
+				});
+			});
+		if (games.map(game => game.gameID).includes(lastGameID)) {
+			break;
+		}
+	}
+	localStorage.setItem('Doc_SB_GameID', games.map(game => game.gameID).reduce((x, y) => x > y ? x : y, 0));
+	return games.filter(game => game.gameID > lastGameID);
 }
 
 function MoneyFormat(money) {
@@ -644,9 +606,6 @@ async function RemoveNotify(pTag, ms) {
 -------------------------*/
 function Main() {
 	NotifySection();
-	if (localStorage.getItem('Doc_APIKey')) {
-		CheckStats();
-	}
 	const divTag = CreateElement('div', divTag => {
 		divTag.id = 'Game';
 		divTag.append(CreateElement('button', buttonTag => {
@@ -669,11 +628,25 @@ function Main() {
 					const date = new Date();
 					return date.getTime() - (((date.getUTCHours() * 60 + date.getUTCMinutes()) * 60 + date.getUTCSeconds()) * 1000 + date.getUTCMilliseconds());
 				})();
-				if (apiKey) {
-					played = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_teams(id:[${teamID}],first:1){data{games{date}}}}`)).text()).data.baseball_teams.data[0].games
-						.filter(game => new Date(game.date.replaceAll(' ', 'T')).getTime() > ticks).length;
-					pTag.textContent = `${played}/250`;
+				if (!apiKey) {
+					return;
 				}
+				checkingStats = true;
+				const pages = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,team_id:[${teamID}]){paginatorInfo{lastPage}}}`)).text()).data.baseball_games.paginatorInfo.lastPage;
+				let plays = [];
+				const promises = [];
+				for (let i = 1; i <= pages; ++i) {
+					promises.push(new Promise(async resolve => {
+						plays.push(JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,page:${i},team_id:[${teamID}]){data{date}}}`)).text()).data.baseball_games.data
+							.filter(x => new Date(x.date.replace(' ', 'T')).getTime() > ticks).length);
+						resolve(true);
+					}));
+				}
+				await Promise.all(promises);
+				checkingStats = false;
+				played = plays.reduce((x, y) => x + y, 0);
+				pTag.textContent = `${played}/250`;
+				CheckStats();
 			}));
 		}));
 		divTag.append(CreateElement('button', buttonTag => {
