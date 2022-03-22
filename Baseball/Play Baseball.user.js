@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.5
+// @version      0.6
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -432,8 +432,8 @@ function UpdateTable() {
 	const books = JSON.parse(localStorage.getItem('Doc_SB_Books')) || [];
 	books.forEach(book => {
 		const divTag = (() => {
-			const i = divTags.findIndex(divTag => divTag.classList.contains(`Stats_${book.teamID}`));
-			return i > -1 ? divTags.splice(i, 1) : null;
+			const i = divTags.findIndex(divTag => divTag.id === `Stats_${book.teamID}`);
+			return i > -1 ? divTags.splice(i, 1)[0] : null;
 		})();
 		if (!divTag) {
 			document.querySelector('#Stats').append(CreateRow(book));
