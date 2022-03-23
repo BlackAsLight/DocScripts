@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.6
+// @version      0.7
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -524,6 +524,21 @@ function CreateRow(book) {
 					else {
 						books.splice(i, 1);
 					}
+					if (books.length) {
+						localStorage.setItem('Doc_SB_Books', JSON.stringify(books));
+					}
+					else {
+						localStorage.removeItem('Doc_SB_Books');
+					}
+					UpdateTable();
+				};
+			}));
+			divTag.append(' | ');
+			divTag.append(CreateElement('a', aTag => {
+				aTag.append('Delete');
+				aTag.onclick = () => {
+					const books = JSON.parse(localStorage.getItem('Doc_SB_Books'));
+					books.splice(books.findIndex(x => x.teamID === book.teamID), 1);
 					if (books.length) {
 						localStorage.setItem('Doc_SB_Books', JSON.stringify(books));
 					}
