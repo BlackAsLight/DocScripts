@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.7
+// @version      0.8
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -180,6 +180,18 @@ async function WaitForTag(query) {
 	return tag;
 }
 
+async function ManagePromises(pages, func, max = 10) {
+	const promises = [];
+	for (let i = 0; i < Math.min(pages, max); ++i) {
+		promises.push(func(i + 1).then(() => i));
+	}
+	for (let i = max; i < pages; ++i) {
+		const index = await Promise.race(promises);
+		promises[index] = func(i + 1).then(() => { index });
+	}
+	await Promise.all(promises);
+}
+
 async function CheckStats() {
 	if (checkingStats) {
 		return;
@@ -251,19 +263,25 @@ async function GetGames() {
 		JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={baseball_games(first:50,page:${i},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){ data{ id date home_revenue spoils open home_score away_score home_team{id name}away_team{id name}home_nation{id nation_name}away_nation{id nation_name}}}}`)).text()).data.baseball_games.data
 			.filter(game => game.open === 0)
 			.forEach(game => {
-				const isHost = parseInt(game.home_team.id) === teamID;
-				games.push({
-					gameID: parseInt(game.id),
-					date: new Date(game.date.replace(' ', 'T')).getTime(),
-					revenue: game.home_revenue,
-					winnings: game.spoils,
-					isHost: isHost,
-					otherTeamID: parseInt(game[`${isHost ? 'away' : 'home'}_team`].id),
-					otherTeam: game[`${isHost ? 'away' : 'home'}_team`].name,
-					otherNationID: parseInt(game[`${isHost ? 'away' : 'home'}_nation`].id),
-					otherNation: game[`${isHost ? 'away' : 'home'}_nation`].nation_name,
-					otherTeamWon: (game.home_score < game.away_score) === isHost
-				});
+				try {
+					const isHost = parseInt(game.home_team.id) === teamID;
+					games.push({
+						gameID: parseInt(game.id),
+						date: new Date(game.date.replace(' ', 'T')).getTime(),
+						revenue: game.home_revenue,
+						winnings: game.spoils,
+						isHost: isHost,
+						otherTeamID: parseInt(game[`${isHost ? 'away' : 'home'}_team`].id),
+						otherTeam: game[`${isHost ? 'away' : 'home'}_team`].name,
+						otherNationID: parseInt(game[`${isHost ? 'away' : 'home'}_nation`].id),
+						otherNation: game[`${isHost ? 'away' : 'home'}_nation`].nation_name,
+						otherTeamWon: (game.home_score < game.away_score) === isHost
+					});
+				}
+				catch (e) {
+					console.error(e)
+					console.log(game)
+				}
 			});
 		if (games.map(game => game.gameID).includes(lastGameID)) {
 			break;
@@ -649,15 +667,10 @@ function Main() {
 				checkingStats = true;
 				const pages = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,team_id:[${teamID}]){paginatorInfo{lastPage}}}`)).text()).data.baseball_games.paginatorInfo.lastPage;
 				let plays = [];
-				const promises = [];
-				for (let i = 1; i <= pages; ++i) {
-					promises.push(new Promise(async resolve => {
-						plays.push(JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,page:${i},team_id:[${teamID}]){data{date}}}`)).text()).data.baseball_games.data
-							.filter(x => new Date(x.date.replace(' ', 'T')).getTime() > ticks).length);
-						resolve(true);
-					}));
-				}
-				await Promise.all(promises);
+				await ManagePromises(pages, async i => {
+					plays.push(JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,page:${i},team_id:[${teamID}]){data{date}}}`)).text()).data.baseball_games.data
+						.filter(x => new Date(x.date.replace(' ', 'T')).getTime() > ticks).length);
+				});
 				checkingStats = false;
 				played = plays.reduce((x, y) => x + y, 0);
 				pTag.textContent = `${played}/250`;
