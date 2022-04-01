@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      6.0
+// @version      6.1
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -25,7 +25,7 @@ document.body.append(CreateElement('div', divTag => {
 
 /* Global Variables
 -------------------------*/
-const nationLink = Array.from(document.querySelectorAll('a')).filter(x => x.textContent == 'View')[0].href;
+const nationLink = [...document.querySelectorAll('a')].filter(x => x.textContent.trim() == 'View')[0].href;
 
 const resources = (() => {
 	const resources = ReplaceAll(document.querySelector('#rssBar').children[0].children[0].children[0].textContent.trim().replaceAll('\n', ''), '  ', ' ').replaceAll(',', '').split(' ');
@@ -202,7 +202,7 @@ document.head.append(CreateElement('style', styleTag => {
 
 document.head.append(CreateElement('style', styleTag => {
 	styleTag.id = 'TableTheme';
-	styleTag.append(`.Offer:nth-child(2n) { background: ${Array.from(document.querySelectorAll('link')).filter(x => x.href === 'https://politicsandwar.com/css/dark-theme.min.css').length ? '#1f1f1f' : '#d2d3e8'}; }`);
+	styleTag.append(`.Offer:nth-child(2n) { background: ${[...document.querySelectorAll('link')].filter(x => x.href === 'https://politicsandwar.com/css/dark-theme.min.css').length ? '#1f1f1f' : '#d2d3e8'}; }`);
 }));
 
 /* Functions
@@ -521,8 +521,8 @@ function Mistrade() {
 		}
 	}
 	if (checkOne && checkTwo) {
-		const sellTag = checkThree ? Array.from(document.querySelectorAll('.sOffer')).pop() : document.querySelector('.sOffer');
-		const buyTag = checkThree ? document.querySelector('.bOffer') : Array.from(document.querySelectorAll('.bOffer')).pop();
+		const sellTag = checkThree ? [...document.querySelectorAll('.sOffer')].pop() : document.querySelector('.sOffer');
+		const buyTag = checkThree ? document.querySelector('.bOffer') : [...document.querySelectorAll('.bOffer')].pop();
 		if (!(sellTag && buyTag)) {
 			return false;
 		}
@@ -536,7 +536,7 @@ function Mistrade() {
 			tag.classList.add('Outline');
 
 			// Switch Themes.
-			const linkTag = Array.from(document.querySelectorAll('link')).filter(x => x.href === 'https://politicsandwar.com/css/dark-theme.min.css')[0];
+			const linkTag = [...document.querySelectorAll('link')].filter(x => x.href === 'https://politicsandwar.com/css/dark-theme.min.css')[0];
 			document.querySelector('#TableTheme').innerText = `.Offer:nth-child(2n) { background: ${linkTag ? '#d2d3e8' : '#1f1f1f'}; }`;
 			if (linkTag) {
 				linkTag.remove();
@@ -560,7 +560,7 @@ function Mistrade() {
 }
 
 function MarketLinks() {
-	const formTag = Array.from(document.querySelector('#rightcolumn').children).filter(tag => tag.tagName == 'FORM')[0];
+	const formTag = [...document.querySelector('#rightcolumn').children].filter(tag => tag.tagName == 'FORM')[0];
 	formTag.parentElement.insertBefore(CreateElement('p', pTag => {
 		pTag.style.textAlign = 'center';
 		pTag.append(MarketLink('Oil'));
@@ -726,7 +726,7 @@ function ReGainCurrentLevels() {
 	if (currentResource != 'Money') {
 		const data = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${currentResource}`));
 		if (data) {
-			const formTag = Array.from(document.querySelector('#rightcolumn').children).filter(tag => tag.tagName == 'FORM')[0];
+			const formTag = [...document.querySelector('#rightcolumn').children].filter(tag => tag.tagName == 'FORM')[0];
 			formTag.parentElement.insertBefore(CreateElement('div', divTag => {
 				divTag.id = 'RegainLevelDiv';
 				divTag.style.display = 'flex';
@@ -792,7 +792,7 @@ function ForgetAboutIt(price, i) {
 
 async function InfiniteScroll() {
 	if (marketType > 0 && localStorage.getItem('Doc_VT_InfiniteScroll')) {
-		const pTags = Array.from(document.querySelectorAll('p.center'))
+		const pTags = [...document.querySelectorAll('p.center')]
 		const alreadyLoaded = (() => {
 			const nums = pTags[4].textContent.split(' ')[1].split('-');
 			if (nums[0] !== '0') {
@@ -832,11 +832,11 @@ async function InfiniteScroll() {
 				const doc = new DOMParser().parseFromString(await (await fetch(url)).text(), 'text/html');
 				console.timeEnd(`Load Page - ${i + 1}`);
 				console.time('Convert Table');
-				let trTags = Array.from(doc.querySelector('.nationtable').children[0].children).slice(1);
+				let trTags = [...doc.querySelector('.nationtable').children[0].children].slice(1);
 				while (trTags.length) {
 					const trTag = trTags.shift();
 					try {
-						ConvertRow(Array.from(trTag.children));
+						ConvertRow([...trTag.children]);
 					}
 					catch (e) {
 						console.error(trTag, e);
@@ -905,7 +905,7 @@ function MiddleScroll() {
 		return checkOne && checkTwo;
 	})()) {
 		document.querySelector('#Offers').insertBefore(document.createElement('hr'), document.querySelector(`.${document.querySelector('.Hide').textContent === 'SELLERS WANTED' ? 'b' : 's'}Offer`));
-		Array.from(document.querySelectorAll(`.${document.querySelector('.Hide').textContent === 'SELLERS WANTED' ? 's' : 'b'}Offer`)).pop().scrollIntoView({
+		[...document.querySelectorAll(`.${document.querySelector('.Hide').textContent === 'SELLERS WANTED' ? 's' : 'b'}Offer`)].pop().scrollIntoView({
 			behavior: 'smooth',
 			block: 'center'
 		});
@@ -948,7 +948,7 @@ function UpdateLinks() {
 			continue;
 		}
 		for (let i = 0; i < 2; ++i) {
-			let aTags = Array.from(document.querySelectorAll(`.${i % 2 ? 's' : 'b'}Outbid_${resource}`));
+			let aTags = [...document.querySelectorAll(`.${i % 2 ? 's' : 'b'}Outbid_${resource}`)];
 			while (aTags.length) {
 				const aTag = aTags.shift();
 				const price = parseInt(aTag.parentElement.parentElement.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
@@ -962,7 +962,7 @@ function UpdateLinks() {
 					aTag.style.textDecoration = 'line-through';
 				}
 			}
-			aTags = Array.from(document.querySelectorAll(`.${i % 2 ? 's' : 'b'}Match_${resource}`)).concat(Array.from(document.querySelectorAll(`.${i % 2 ? 's' : 'b'}TopUp_${resource}`)));
+			aTags = [...document.querySelectorAll(`.${i % 2 ? 's' : 'b'}Match_${resource}`), ...document.querySelectorAll(`.${i % 2 ? 's' : 'b'}TopUp_${resource}`)];
 			while (aTags.length) {
 				const aTag = aTags.shift();
 				const price = parseInt(aTag.parentElement.parentElement.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''));
@@ -1002,11 +1002,11 @@ async function Main() {
 		const tableTag = document.querySelector('.nationtable');
 		tableTag.parentElement.insertBefore(divTag, tableTag);
 
-		let trTags = Array.from(tableTag.children[0].children).slice(1);
+		let trTags = [...tableTag.children[0].children].slice(1);
 		while (trTags.length) {
 			const trTag = trTags.shift();
 			try {
-				ConvertRow(Array.from(trTag.children));
+				ConvertRow([...trTag.children]);
 				trTag.remove();
 			}
 			catch (e) {
@@ -1039,3 +1039,4 @@ async function Main() {
 if (marketType > -1) {
 	Main();
 }
+
