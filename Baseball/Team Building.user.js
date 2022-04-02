@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Team Building
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.6
+// @version      0.7
 // @description  Increase Player Stats with less Clicks.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/team/id=*
@@ -13,118 +13,32 @@
 /* Double Injection Protection
 -------------------------*/
 if (document.querySelector('#Doc_TeamBuilding')) {
-	return;
+	throw Error('This script was already injected...');
 }
 document.body.append(CreateElement('div', divTag => {
 	divTag.id = 'Doc_TeamBuilding';
 	divTag.style.display = 'none';
 }));
 
+/* Global Variables
+-------------------------*/
+let upping = false;
+
+/* Styling
+-------------------------*/
+document.head.append(CreateElement('style', styleTag => {
+	styleTag.append('.Up { background-color: #2648DA; color: #FFFFFF; font-size: inherit; padding: 0.5em; }');
+	styleTag.append('.Stop { background-color: #D9534F; color: #FFFFFF; display: none; font-size: inherit; padding: 0.5em; }');
+	styleTag.append('.Text { display: inline; margin: 0; padding: 0.25em; }');
+	styleTag.append('.Up:hover, .Stop:hover { color: #FFFFFF; }')
+}));
+
+/* Functions
+-------------------------*/
 function CreateElement(type, func) {
 	const tag = document.createElement(type);
 	func(tag);
 	return tag;
-}
-
-let upping = false;
-
-if (Array.from(document.getElementsByTagName('a')).filter(x => x.textContent == 'Baseball')[0].href.split('=')[1] = location.href.split('=')[1]) {
-	let formTags = Array.from(document.getElementsByTagName('input')).filter(x => x.name == 'verify').map(x => x.parentElement).filter(x => x.action.endsWith('#roster'));
-	while (formTags.length) {
-		const formTag = formTags.shift();
-		const id = RandomText(10);
-		formTag.parentElement.appendChild((() => {
-			const buttonTag = document.createElement('button');
-			buttonTag.id = `Up_${id}`;
-			buttonTag.className = 'btn Ups';
-			buttonTag.innerText = '+';
-			buttonTag.style.padding = '0.5em';
-			buttonTag.style.backgroundColor = '#2648DA';
-			buttonTag.style.color = '#FFFFFF';
-			buttonTag.style.fontSize = 'inherit';
-			buttonTag.onclick = () => {
-				IncreasePlayer(id, formTag.children[1].name, formTag.children[2].value, formTag.children[3].value);
-			};
-			return buttonTag;
-		})());
-		formTag.parentElement.appendChild((() => {
-			const buttonTag = document.createElement('button');
-			buttonTag.id = `Stop_${id}`;
-			buttonTag.className = 'btn';
-			buttonTag.innerText = '-';
-			buttonTag.style.display = 'none';
-			buttonTag.style.padding = '0.5em';
-			buttonTag.style.backgroundColor = '#D9534F';
-			buttonTag.style.color = '#FFFFFF';
-			buttonTag.style.fontSize = 'inherit';
-			buttonTag.onclick = StopIncrease;
-			return buttonTag;
-		})());
-		formTag.parentElement.appendChild((() => {
-			const pTag = document.createElement('p');
-			pTag.id = `Text_${id}`;
-			pTag.innerText = formTag.textContent;
-			pTag.style.display = 'inline';
-			pTag.style.padding = '0.25em';
-			pTag.style.margin = '0';
-			return pTag;
-		})());
-		formTag.remove();
-	}
-}
-
-async function IncreasePlayer(id, type, playerID, verify) {
-	const buttonTags = Array.from(document.getElementsByClassName('Ups'));
-	for (let i = 0; i < buttonTags.length; ++i) {
-		buttonTags[i].disabled = true;
-	}
-	document.getElementById(`Up_${id}`).style.display = 'none';
-	document.getElementById(`Stop_${id}`).style.display = 'inline';
-	upping = true;
-	let money = 0;
-	try {
-		while (upping) {
-			const doc = new DOMParser().parseFromString(await (await fetch(location.href, {
-				method: 'POST',
-				body: (() => {
-					let formData = new FormData();
-					formData.append(type, '+');
-					formData.append('playerid', playerID);
-					formData.append('verify', verify);
-					return formData;
-				})()
-			})).text(), 'text/html');
-			const formTag = (() => {
-				let inputTags = Array.from(doc.getElementsByTagName('input')).filter(x => x.name == 'playerid' && x.value == playerID).slice(1);
-				while (inputTags) {
-					const formTag = inputTags.shift().parentElement;
-					if (formTag.children[1].name == type) {
-						return formTag;
-					}
-				}
-				throw Error();
-			})();
-			if (parseFloat(formTag.textContent.trim()) == 100) {
-				upping = false;
-				Sound();
-			}
-			document.getElementById(`Text_${id}`).innerText = formTag.textContent;
-			money += 2000;
-		}
-	}
-	catch {
-		location.reload();
-	}
-	for (let i = 0; i < buttonTags.length; ++i) {
-		buttonTags[i].disabled = false;
-	}
-	document.getElementById(`Up_${id}`).style.display = 'inline';
-	document.getElementById(`Stop_${id}`).style.display = 'none';
-	console.log(`Money Spent: $${money.toLocaleString()}`);
-}
-
-function StopIncrease() {
-	upping = false;
 }
 
 function RandomText(length) {
@@ -138,6 +52,93 @@ function RandomText(length) {
 		text += char[Math.floor(Math.random() * char.length)];
 	}
 	return text;
+}
+
+async function IncreasePlayer(id, type, playerID, verify) {
+	[...document.querySelectorAll('.Up')].forEach(buttonTag => {
+		buttonTag.disabled = true;
+	});
+	document.querySelector(`#Up_${id}`).style.setProperty('display', 'none');
+	document.querySelector(`#Stop_${id}`).style.setProperty('display', 'inline');
+	upping = true;
+	let money = 0;
+	let total = 0;
+	try {
+		while (upping) {
+			const time = performance.now();
+			const doc = new DOMParser().parseFromString(await (await fetch(location.href, {
+				method: 'POST',
+				body: (() => {
+					let formData = new FormData();
+					formData.append(type, '+');
+					formData.append('playerid', playerID);
+					formData.append('verify', verify);
+					return formData;
+				})()
+			})).text(), 'text/html');
+			total += performance.now() - time;
+			const level = parseFloat([...doc.querySelectorAll('input[name="playerid"]')]
+				.filter(inputTag => inputTag.value == playerID)
+				.slice(1)
+				.map(inputTag => inputTag.parentElement)
+				.find(formTag => formTag.children[1].name === type).textContent.trim());
+			if (level === 100) {
+				upping = false;
+				Sound();
+			}
+			document.querySelector(`#Text_${id}`).textContent = level.toFixed(2);
+			money += 2000;
+		}
+	}
+	catch {
+		location.reload();
+	}
+	[...document.querySelectorAll('.Up')].forEach(buttonTag => {
+		buttonTag.disabled = false;
+	});
+	document.querySelector(`#Up_${id}`).style.removeProperty('display');
+	document.querySelector(`#Stop_${id}`).style.removeProperty('display');
+	console.log(`Money Spent: $${money.toLocaleString()} | Average Time: ${(total / money * 2000).toFixed(0)}ms`);
+}
+
+/* Start
+-------------------------*/
+function Main() {
+	[...document.querySelectorAll('input')]
+		.filter(inputTag => inputTag.name === 'verify')
+		.map(inputTag => inputTag.parentElement)
+		.filter(formTag => formTag.action.endsWith('#roster'))
+		.forEach(formTag => {
+			const id = RandomText(10);
+			formTag.parentElement.appendChild(CreateElement('button', buttonTag => {
+				buttonTag.id = `Up_${id}`;
+				buttonTag.classList.add('btn');
+				buttonTag.classList.add('Up');
+				buttonTag.append('+');
+				buttonTag.onclick = () => {
+					IncreasePlayer(id, formTag.children[1].name, formTag.children[2].value, formTag.children[3].value);
+				};
+			}));
+			formTag.parentElement.appendChild(CreateElement('button', buttonTag => {
+				buttonTag.id = `Stop_${id}`;
+				buttonTag.classList.add('btn');
+				buttonTag.classList.add('Stop');
+				buttonTag.append('x');
+				buttonTag.onclick = () => {
+					upping = false;
+				};
+			}));
+			formTag.parentElement.appendChild(CreateElement('p', pTag => {
+				pTag.id = `Text_${id}`;
+				pTag.classList.add('Text');
+				pTag.append(formTag.textContent.trim());
+			}));
+			formTag.remove();
+		});
+}
+
+if ([...document.querySelectorAll('#leftcolumn a')].filter(aTag => aTag.href.includes('/obl/team/id'))[0].href === location.href) {
+	Main();
 }
 
 function Sound() {
