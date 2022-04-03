@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.8
+// @version      0.9
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -180,16 +180,24 @@ async function WaitForTag(query) {
 	return tag;
 }
 
-async function ManagePromises(pages, func, max = 10) {
+async function APIRequest(pages, func, max = 5) {
+	console.time('Requests');
 	const promises = [];
 	for (let i = 0; i < Math.min(pages, max); ++i) {
-		promises.push(func(i + 1).then(() => i));
+		promises.push(MinWait(() => func(i + 1), 1000).then(() => i));
 	}
 	for (let i = max; i < pages; ++i) {
 		const index = await Promise.race(promises);
-		promises[index] = func(i + 1).then(() => { index });
+		promises[index] = MinWait(() => func(i + 1), 1000).then(() => index);
 	}
 	await Promise.all(promises);
+	console.timeEnd('Requests');
+}
+
+async function MinWait(func, ms) {
+	const time = performance.now();
+	await func();
+	await Sleep(Math.max(ms - performance.now() + time, 0))
 }
 
 async function CheckStats() {
@@ -647,6 +655,7 @@ function Main() {
 			buttonTag.append(isHost ? 'Host Game' : 'Away Game');
 			buttonTag.disabled = isPlaying;
 			buttonTag.onclick = isHost ? ToggleHostGame : AwayGame;
+			Sleep(0).then(() => buttonTag.focus());
 		}));
 		divTag.append(CreateElement('p', pTag => {
 			pTag.append(CreateElement('p', pTag => {
@@ -667,7 +676,7 @@ function Main() {
 				checkingStats = true;
 				const pages = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,team_id:[${teamID}]){paginatorInfo{lastPage}}}`)).text()).data.baseball_games.paginatorInfo.lastPage;
 				let plays = [];
-				await ManagePromises(pages, async i => {
+				await APIRequest(pages, async i => {
 					plays.push(JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,page:${i},team_id:[${teamID}]){data{date}}}`)).text()).data.baseball_games.data
 						.filter(x => new Date(x.date.replace(' ', 'T')).getTime() > ticks).length);
 				});
