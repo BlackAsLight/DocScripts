@@ -1,15 +1,32 @@
 // ==UserScript==
 // @name         Doc: Sync the aSyncly
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.7
+// @version      0.8
 // @description  Saves Settings to the Dossier Page
 // @author       You
 // @match        https://politicsandwar.com/*
+// @exclude      https://politicsandwar.com/human/
 // @icon         https://avatars.githubusercontent.com/u/44320105
 // @grant        none
 // ==/UserScript==
 
 'use strict';
+/* Double Injection Protection
+-------------------------*/
+if (document.querySelector('#Doc_aSyncly')) {
+	throw Error('This script was already injected...');
+}
+document.body.append(CreateElement('div', divTag => {
+	divTag.id = 'Doc_aSyncly';
+	divTag.style.display = 'none';
+}));
+
+function CreateElement(type, func) {
+	const tag = document.createElement(type);
+	func(tag);
+	return tag;
+}
+
 let updating = false
 const bannedKeys = ['Doc_aSyncly', 'Doc_Commendations', 'Doc_MarketWatcher'];
 
