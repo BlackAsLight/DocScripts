@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.1
+// @version      1.2
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -302,7 +302,11 @@ async function GetGames() {
 }
 
 function MoneyFormat(money) {
-	return `$${money < 0 ? '(' : ''}${Math.abs(money).toLocaleString().split('.')[0]}.${money.toFixed(2).split('.')[1]}${money < 0 ? ')' : ''}`;
+	return new Intl.NumberFormat('en-US', {
+		currency: 'USD',
+		currencySign: 'accounting',
+		style: 'currency'
+	}).format(money);
 }
 
 async function ToggleHostGame() {
