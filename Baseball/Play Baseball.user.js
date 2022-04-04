@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.0
+// @version      1.1
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -261,33 +261,41 @@ async function GetGames() {
 	const lastGameID = parseInt(localStorage.getItem('Doc_SB_GameID')) || 0;
 	const games = [];
 	for (let i = 1; i <= pages; ++i) {
-		console.info(`Game Page: ${i}/${pages}`);
-		JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={baseball_games(first:50,page:${i},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){ data{ id date home_revenue spoils open home_score away_score home_team{id name}away_team{id name}home_nation{id nation_name}away_nation{id nation_name}}}}`)).text()).data.baseball_games.data
-			.filter(game => game.open === 0)
-			.forEach(game => {
-				try {
-					const isHost = parseInt(game.home_team.id) === teamID;
-					games.push({
-						gameID: parseInt(game.id),
-						date: new Date(game.date).getTime(),
-						revenue: game.home_revenue,
-						winnings: game.spoils,
-						isHost: isHost,
-						otherTeamID: parseInt(game[`${isHost ? 'away' : 'home'}_team`].id),
-						otherTeam: game[`${isHost ? 'away' : 'home'}_team`].name,
-						otherNationID: parseInt(game[`${isHost ? 'away' : 'home'}_nation`].id),
-						otherNation: game[`${isHost ? 'away' : 'home'}_nation`].nation_name,
-						otherTeamWon: (game.home_score < game.away_score) === isHost
-					});
-				}
-				catch (e) {
-					console.error(e)
-					console.log(game)
-				}
-			});
-		if (games.map(game => game.gameID).includes(lastGameID)) {
-			break;
+		const time = performance.now();
+		try {
+			console.info(`Game Page: ${i}/${pages}`);
+			JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={baseball_games(first:50,page:${i},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){ data{ id date home_revenue spoils open home_score away_score home_team{id name}away_team{id name}home_nation{id nation_name}away_nation{id nation_name}}}}`)).text()).data.baseball_games.data
+				.filter(game => game.open === 0)
+				.forEach(game => {
+					try {
+						const isHost = parseInt(game.home_team.id) === teamID;
+						games.push({
+							gameID: parseInt(game.id),
+							date: new Date(game.date).getTime(),
+							revenue: game.home_revenue,
+							winnings: game.spoils,
+							isHost: isHost,
+							otherTeamID: parseInt(game[`${isHost ? 'away' : 'home'}_team`].id),
+							otherTeam: game[`${isHost ? 'away' : 'home'}_team`].name,
+							otherNationID: parseInt(game[`${isHost ? 'away' : 'home'}_nation`].id),
+							otherNation: game[`${isHost ? 'away' : 'home'}_nation`].nation_name,
+							otherTeamWon: (game.home_score < game.away_score) === isHost
+						});
+					}
+					catch (e) {
+						console.error(e)
+						console.log(game)
+					}
+				});
+			if (games.map(game => game.gameID).includes(lastGameID)) {
+				break;
+			}
 		}
+		catch (e) {
+			console.error(e);
+			--i;
+		}
+		await Sleep(Math.max(2000 - performance.now() + time, 0));
 	}
 	localStorage.setItem('Doc_SB_GameID', games.map(game => game.gameID).reduce((x, y) => x > y ? x : y, 0));
 	return games.filter(game => game.gameID > lastGameID);
