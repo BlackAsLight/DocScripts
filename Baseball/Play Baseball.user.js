@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.2
+// @version      1.3
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -178,20 +178,6 @@ async function WaitForTag(query) {
 		tag = document.querySelector(query);
 	}
 	return tag;
-}
-
-async function APIRequest(pages, func, max = 5) {
-	console.time('Requests');
-	const promises = [];
-	for (let i = 0; i < Math.min(pages, max); ++i) {
-		promises.push(func(i + 1).then(() => i));
-	}
-	for (let i = max; i < pages; ++i) {
-		const index = await Promise.race(promises);
-		promises[index] = func(i + 1).then(() => index);
-	}
-	await Promise.all(promises);
-	console.timeEnd('Requests');
 }
 
 async function CheckStats() {
@@ -681,22 +667,27 @@ function Main() {
 				}
 				checkingStats = true;
 				const pages = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,team_id:[${teamID}]){paginatorInfo{lastPage}}}`)).text()).data.baseball_games.paginatorInfo.lastPage;
-				let plays = [];
-				let stop = false;
-				await APIRequest(pages, async i => {
-					if (stop) {
-						return;
+				let plays = 0;
+				loop: for (let i = 1; i <= pages; i += 5) {
+					const time = performance.now();
+					let query = '';
+					for (let j = 0; j < Math.min(pages - i, 5); ++j) {
+						query += `${'abcde'[i + j - 1]}:baseball_games(first:50,page:${i + j},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){data{date}}`;
 					}
-					const result = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,page:${i},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){data{date}}}`)).text()).data.baseball_games.data
-						.map(x => new Date(x.date).getTime())
-						.reduce((arr, x) => [arr[0] + (x > ticks ? 1 : 0), arr[1] + 1], [0, 0]);
-					plays.push(result[0]);
-					if (result[0] < result[1]) {
-						stop = true;
+					const data = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={${query}}`)).text()).data;
+					for (const key in data) {
+						const result = data[key].data
+							.map(x => new Date(x.date).getTime())
+							.reduce((arr, x) => [arr[0] + (x > ticks ? 1 : 0), arr[1] + 1], [0, 0]);
+						plays += result[0];
+						if (result[0] < result[1]) {
+							break loop;
+						}
 					}
-				});
+					await Sleep(1000 - performance.now() + time);
+				}
 				checkingStats = false;
-				played = plays.reduce((x, y) => x + y, 0);
+				played = plays;
 				pTag.textContent = `${played}/250`;
 				CheckStats();
 			}));
