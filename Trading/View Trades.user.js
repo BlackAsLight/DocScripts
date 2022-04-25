@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      6.2
+// @version      6.3
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/index.php?id=26*
@@ -227,7 +227,6 @@ document.head.append(CreateElement('style', styleTag => {
 	styleTag.append('.Doc_Config strong { font-size: 1.25em; }');
 	styleTag.append('.Doc_Config input { margin: 0; }');
 	styleTag.append('.Doc_Config button { font-size: inherit; font-weight: normal; padding: 0; }');
-	styleTag.append('.Doc_Config div {  }');
 	styleTag.append('.Doc_Config div strong { display: block; }');
 	styleTag.append('.Doc_Config div label { display: inline-block; font-weight: normal; margin: 0 0 0 25%; text-align: left; width: 25%; }');
 	styleTag.append('.Doc_Config div input { display: inline-block; margin: 0 25% 0 0; width: 25%; }');
@@ -287,7 +286,7 @@ document.head.append(CreateElement('style', styleTag => {
 // Dark Theme 2.0 = 2
 // Dark Theme 1.0 = 1
 // Light Theme = 0
-function GetTheme(styleTag = document.querySelector('#GameTheme')) {
+function GetTheme() {
 	const links = [...document.querySelectorAll('link')].map(linkTag => linkTag.href);
 	if (links.includes('https://politicsandwar.com/css/dark-theme-2.0-beta.css')) {
 		return 2;
@@ -312,7 +311,7 @@ function SetTheme(theme) {
 }
 
 function UpdateTheme(styleTag = document.querySelector('#GameTheme')) {
-	const theme = GetTheme(styleTag);
+	const theme = GetTheme();
 	styleTag.textContent = '';
 	if (theme === 2) {
 		styleTag.append('.Offer:nth-child(2n + 1) { background: rgb(39, 42, 47); }');
