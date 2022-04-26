@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.4
+// @version      1.5
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -180,11 +180,12 @@ async function WaitForTag(query) {
 	return tag;
 }
 
-async function CheckStats() {
+async function CheckStats(delay = 0) {
 	if (checkingStats) {
 		return;
 	}
 	checkingStats = true;
+	await Sleep(delay);
 
 	// Get All Unrecorded Games.
 	const games = await GetGames();
@@ -243,48 +244,59 @@ async function CheckStats() {
 }
 
 async function GetGames() {
-	const pages = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={baseball_games(first:50,team_id:[${teamID}]){paginatorInfo{lastPage}}}`)).text()).data.baseball_games.paginatorInfo.lastPage;
-	const lastGameID = parseInt(localStorage.getItem('Doc_SB_GameID')) || 0;
-	const games = [];
-	for (let i = 1; i <= pages; ++i) {
-		const time = performance.now();
-		try {
-			console.info(`Game Page: ${i}/${pages}`);
-			JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={baseball_games(first:50,page:${i},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){ data{ id date home_revenue spoils open home_score away_score home_team{id name}away_team{id name}home_nation{id nation_name}away_nation{id nation_name}}}}`)).text()).data.baseball_games.data
-				.filter(game => game.open === 0)
-				.forEach(game => {
-					try {
-						const isHost = parseInt(game.home_team.id) === teamID;
-						games.push({
-							gameID: parseInt(game.id),
-							date: new Date(game.date).getTime(),
-							revenue: game.home_revenue,
-							winnings: game.spoils,
-							isHost: isHost,
-							otherTeamID: parseInt(game[`${isHost ? 'away' : 'home'}_team`].id),
-							otherTeam: game[`${isHost ? 'away' : 'home'}_team`].name,
-							otherNationID: parseInt(game[`${isHost ? 'away' : 'home'}_nation`].id),
-							otherNation: game[`${isHost ? 'away' : 'home'}_nation`].nation_name,
-							otherTeamWon: (game.home_score < game.away_score) === isHost
-						});
-					}
-					catch (e) {
-						console.error(e)
-						console.info(game)
-					}
-				});
-			if (games.map(game => game.gameID).includes(lastGameID)) {
-				break;
+	try {
+		const startTime = performance.now();
+		const pages = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={baseball_games(first:50,team_id:[${teamID}]){paginatorInfo{lastPage}}}`)).text()).data.baseball_games.paginatorInfo.lastPage;
+		const endTime = performance.now();
+		await Sleep(Math.min(2000 - endTime + startTime, 0));
+
+		const lastGameID = parseInt(localStorage.getItem('Doc_SB_GameID')) || 0;
+		const games = [];
+		for (let i = 1; i <= pages; ++i) {
+			const startTime = performance.now();
+			try {
+				console.info(`Game Page: ${i}/${pages}`);
+				JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={baseball_games(first:50,page:${i},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){ data{ id date home_revenue spoils open home_score away_score home_team{id name}away_team{id name}home_nation{id nation_name}away_nation{id nation_name}}}}`)).text()).data.baseball_games.data
+					.filter(game => game.open === 0)
+					.forEach(game => {
+						try {
+							const isHost = parseInt(game.home_team.id) === teamID;
+							games.push({
+								gameID: parseInt(game.id),
+								date: new Date(game.date).getTime(),
+								revenue: game.home_revenue,
+								winnings: game.spoils,
+								isHost: isHost,
+								otherTeamID: parseInt(game[`${isHost ? 'away' : 'home'}_team`].id),
+								otherTeam: game[`${isHost ? 'away' : 'home'}_team`].name,
+								otherNationID: parseInt(game[`${isHost ? 'away' : 'home'}_nation`].id),
+								otherNation: game[`${isHost ? 'away' : 'home'}_nation`].nation_name,
+								otherTeamWon: (game.home_score < game.away_score) === isHost
+							});
+						}
+						catch (e) {
+							console.error(e)
+							console.info(game)
+						}
+					});
+				if (games.map(game => game.gameID).includes(lastGameID)) {
+					break;
+				}
 			}
+			catch (e) {
+				console.error(e);
+				--i;
+				await Sleep(5000);
+			}
+			const endTime = performance.now();
+			await Sleep(Math.max(2000 - endTime + startTime, 0));
 		}
-		catch (e) {
-			console.error(e);
-			--i;
-		}
-		await Sleep(Math.max(2000 - performance.now() + time, 0));
+		localStorage.setItem('Doc_SB_GameID', games.map(game => game.gameID).reduce((x, y) => x > y ? x : y, lastGameID));
+		return games.filter(game => game.gameID > lastGameID);
 	}
-	localStorage.setItem('Doc_SB_GameID', games.map(game => game.gameID).reduce((x, y) => x > y ? x : y, 0));
-	return games.filter(game => game.gameID > lastGameID);
+	catch {
+		return [];
+	}
 }
 
 function MoneyFormat(money) {
@@ -361,7 +373,7 @@ async function CheckHostStatus() {
 	else {
 		document.querySelector('#Played').textContent = `${++played}/250`;
 		Sound();
-		CheckStats();
+		CheckStats(2500);
 	}
 }
 
@@ -406,7 +418,7 @@ async function AwayGame() {
 	else {
 		document.querySelector('#Played').textContent = `${++played}/250`;
 		Sound();
-		CheckStats();
+		CheckStats(2500);
 	}
 	document.querySelector('#Checks').textContent = 0;
 	document.querySelector('#Play').disabled = false;
@@ -658,38 +670,39 @@ function Main() {
 				pTag.id = 'Played';
 				const apiKey = localStorage.getItem('Doc_APIKey');
 				pTag.append(`${apiKey ? '?' : '!'}/250`);
-				const ticks = (() => {
-					const date = new Date();
-					return date.getTime() - (((date.getUTCHours() * 60 + date.getUTCMinutes()) * 60 + date.getUTCSeconds()) * 1000 + date.getUTCMilliseconds());
-				})();
 				if (!apiKey) {
 					return;
 				}
 				checkingStats = true;
 				const pages = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,team_id:[${teamID}]){paginatorInfo{lastPage}}}`)).text()).data.baseball_games.paginatorInfo.lastPage;
+				const ticks = (() => {
+					const date = new Date();
+					return date.getTime() - (((date.getUTCHours() * 60 + date.getUTCMinutes()) * 60 + date.getUTCSeconds()) * 1000 + date.getUTCMilliseconds());
+				})();
 				let plays = 0;
-				loop: for (let i = 1; i <= pages; i += 5) {
-					const time = performance.now();
-					let query = '';
-					for (let j = 0; j < Math.min(pages - i, 5); ++j) {
-						query += `${'abcde'[(i % 5) + j - 1]}:baseball_games(first:50,page:${i + j},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){data{date}}`;
-					}
-					const data = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={${query}}`)).text()).data;
-					for (const key in data) {
-						const result = data[key].data
-							.map(x => new Date(x.date).getTime())
-							.reduce((arr, x) => [arr[0] + (x > ticks ? 1 : 0), arr[1] + 1], [0, 0]);
-						plays += result[0];
-						if (result[0] < result[1]) {
-							break loop;
+				console.info(`Pages: ${pages}`);
+				for (let i = 1; i <= pages; i += 5) {
+					const startTime = performance.now();
+					const result = Object.values(JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={${(() => {
+						console.info(`Page: ${i}-${i + Math.min(pages - i, 4)}`);
+						let query = '';
+						for (let j = 0; j < Math.min(pages - i + 1, 5); ++j) {
+							query += `${'abcde'[(i % 5) + j - 1]}:baseball_games(first:50,page:${i + j},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){data{date}}`;
 						}
+						return query;
+					})()}}`)).text()).data).map(endpoint => endpoint.data.map(game => new Date(game.date).getTime()).reduce((arr, time) => [arr[0] + (time > ticks ? 1 : 0), arr[1] + 1], [0, 0])).reduce((x, y) => [x[0] + y[0], x[1] + y[1]], [0, 0]);
+					plays += result[0];
+					if (result[0] < result[1]) {
+						break;
 					}
-					await Sleep(1000 - performance.now() + time);
+					const endTime = performance.now();
+					console.info(`Sleep: ${endTime - startTime}ms`);
+					await Sleep(Math.min(1500 + endTime - startTime, 0));
 				}
 				checkingStats = false;
 				played = plays;
 				pTag.textContent = `${played}/250`;
-				CheckStats();
+				CheckStats(0);
 			}));
 		}));
 		divTag.append(CreateElement('button', buttonTag => {
