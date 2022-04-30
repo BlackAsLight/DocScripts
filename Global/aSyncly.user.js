@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Sync the aSyncly
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.9
+// @version      1.0
 // @description  Saves Settings to the Dossier Page
 // @author       You
 // @match        https://politicsandwar.com/*
@@ -80,7 +80,7 @@ async function Sync(lastChecked) {
 		}
 	})();
 
-	if (json && json[0] < lastChecked) {
+	if (json && json[0] > lastChecked) {
 		console.info('aSyncly: Updating localStorage');
 		UpdateLocalStorage(json);
 		return;
