@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Sync the aSyncly
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.0
+// @version      1.1
 // @description  Saves Settings to the Dossier Page
 // @author       You
 // @match        https://politicsandwar.com/*
@@ -110,7 +110,7 @@ function UpdateLocalStorage(json) {
 	for (const key of keys) {
 		localStorage.removeItem(key);
 	}
-	localStorage.setItem(lastCheckedKey, json[0]);
+	localStorage.setItem(lastCheckedKey, lastChecked);
 }
 
 async function UpdateDossier(hash, token) {
