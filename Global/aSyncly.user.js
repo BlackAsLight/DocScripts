@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Sync the aSyncly
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.1
+// @version      1.2
 // @description  Saves Settings to the Dossier Page
 // @author       You
 // @match        https://politicsandwar.com/*
@@ -55,10 +55,15 @@ function Sleep(ms) {
 	return new Promise(a => setTimeout(() => a(true), ms));
 }
 
-function TryNumber(text) {
+function Parse(text) {
 	const num = parseFloat(text);
 	if (num.toString() === 'NaN') {
-		return text;
+		try {
+			return JSON.parse(text);
+		}
+		catch {
+			return text;
+		}
 	}
 	return num;
 }
@@ -97,26 +102,25 @@ async function Sync(lastChecked) {
 }
 
 function UpdateLocalStorage(json) {
-	const lastChecked = json[0];
-	json = JSON.parse(json[2].replaceAll('!?', '"'));
 	const keys = Object.keys(localStorage).filter(key => key.startsWith('Doc_'));
-	for (const [key, value] of json) {
-		localStorage.setItem(key, TryNumber(value.replaceAll('!!', '"')));
+	Object.entries(json[2]).forEach(([key, value]) => {
+		localStorage.setItem(key, typeof value === 'object' ? JSON.stringify(value) : value);
 		const i = keys.findIndex(k => k === key);
 		if (i > -1) {
 			keys.splice(i, 1);
 		}
-	}
-	for (const key of keys) {
-		localStorage.removeItem(key);
-	}
-	localStorage.setItem(lastCheckedKey, lastChecked);
+	});
+	keys.forEach(key => localStorage.removeItem(key));
+	localStorage.setItem(lastCheckedKey, json[0]);
 }
 
 async function UpdateDossier(hash, token) {
 	const lastChecked = new Date().getTime();
-	const text = JSON.stringify(Object.entries(localStorage).filter(([key, _]) => key.startsWith('Doc_')).sort((x, y) => x[0] > y[0] ? 1 : y[0] < x[0] ? -1 : 0).map(([key, value]) => [key, value.replaceAll('"', '!!')]));
-	const hashedText = await Hash(text);
+	const data = Object.entries(localStorage).filter(([key, _]) => key.startsWith('Doc_')).sort((x, y) => x[0] > y[0] ? 1 : y[0] < x[0] ? -1 : 0).reduce((obj, [key, value]) => {
+		obj[key] = Parse(value);
+		return obj;
+	}, {});
+	const hashedText = await Hash(JSON.stringify(data));
 	if (hashedText === hash) {
 		localStorage.setItem(lastCheckedKey, lastChecked);
 		return;
@@ -125,7 +129,7 @@ async function UpdateDossier(hash, token) {
 		method: 'POST',
 		body: (() => {
 			const formData = new FormData();
-			formData.append('dossier', JSON.stringify([lastChecked, hashedText, text.replaceAll('"', '!?')]));
+			formData.append('dossier', JSON.stringify([lastChecked, hashedText, data]));
 			formData.append('update', 'Update');
 			formData.append('token', token);
 			return formData;
@@ -135,7 +139,7 @@ async function UpdateDossier(hash, token) {
 }
 
 async function Hash(text) {
-	return [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)))].map(bytes => bytes.toString(16)).join('')
+	return [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)))].map(bytes => bytes.toString(16)).join('');
 }
 
 /* Start
