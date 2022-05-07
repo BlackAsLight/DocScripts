@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.8
+// @version      1.9
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -243,6 +243,7 @@ async function CheckStats(delay = 0) {
 					// Team Doesn't Exist in Books.
 					books.push({
 						credit: credit,
+						date: new Date().getTime(),
 						nation: 'PENDING',
 						nationID: game.otherNationID,
 						team: 'PENDING',
