@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.7
+// @version      1.8
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -226,7 +226,7 @@ async function CheckStats(delay = 0) {
 			let books = JSON.parse(localStorage.getItem('Doc_SB_Books')) || [];
 			const pending = JSON.parse(localStorage.getItem('Doc_SB_Pending')) || [];
 			games.forEach(game => {
-				const credit = Math.round((0.3 * (game.revenue + game.winnings) - (game.isHost === game.otherTeamWon ? games.winnings : 0)) * (game.isHost ? 100 : -100));
+				const credit = Math.round((0.3 * (game.revenue + game.winnings) - (game.isHost === game.otherTeamWon ? game.winnings : 0)) * (game.isHost ? 100 : -100));
 				if (credit.toString() === 'NaN') {
 					console.debug(game);
 					return;
