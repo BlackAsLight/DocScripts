@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.6
+// @version      1.7
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -209,7 +209,7 @@ async function CheckStats(delay = 0) {
 					query += `${'abcde'[(i % 5) + j - 1]}:baseball_games(first:50,page:${i + j},team_id:[${teamID}],min_id:${lastGameID + 1},orderBy:{column:DATE,order:ASC}){data{id home_revenue spoils open home_score away_score home_id home_nation_id away_id away_nation_id}}`;
 				}
 				return query;
-			})()}}`)).text()).data).forEach(endpoint => endpoint.data.forEach(game => {
+			})()}}`)).text()).data).forEach(endpoint => endpoint.data.filter(game => game.open === 0).forEach(game => {
 				const isHost = parseInt(game.home_id) === teamID;
 				games.push({
 					gameID: parseInt(game.id),
@@ -228,6 +228,7 @@ async function CheckStats(delay = 0) {
 			games.forEach(game => {
 				const credit = Math.round((0.3 * (game.revenue + game.winnings) - (game.isHost === game.otherTeamWon ? games.winnings : 0)) * (game.isHost ? 100 : -100));
 				if (credit.toString() === 'NaN') {
+					console.debug(game);
 					return;
 				}
 				console.debug(`Team: ${game.otherTeamID} | Tip: ${FormatMoney(0.3 * (game.revenue + game.winnings), 2)} | Credit: ${FormatMoney(credit / 100, 2)}`);
@@ -357,7 +358,7 @@ async function CheckStats(delay = 0) {
 		await Sleep(Math.max(1500 + endTime - startTime, 0));
 	}
 
-	checkingStatus = false;
+	checkingStats = false;
 }
 
 function FormatMoney(money, digits = 0) {
