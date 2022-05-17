@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Doc: Sync the aSyncly
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.2
+// @version      1.3
 // @description  Saves Settings to the Dossier Page
-// @author       You
+// @author       BlackAsLight
 // @match        https://politicsandwar.com/*
 // @exclude      https://politicsandwar.com/human/
 // @icon         https://avatars.githubusercontent.com/u/44320105
@@ -25,12 +25,6 @@ document.body.append(CreateElement('div', async divTag => {
 
 /* Migration
 -------------------------*/
-if (localStorage.getItem('Doc_aSyncly_LastChecked')) {
-	localStorage.removeItem('Doc_aSyncly_LastChecked');
-}
-if (localStorage.getItem('Doc_aSyncly_Hash')) {
-	localStorage.removeItem('Doc_aSyncly_Hash');
-}
 if (localStorage.getItem('Doc_Commendations')) {
 	localStorage.removeItem('Doc_Commendations');
 }
@@ -56,8 +50,8 @@ function Sleep(ms) {
 }
 
 function Parse(text) {
-	const num = parseFloat(text);
-	if (num.toString() === 'NaN') {
+	const num = text - 0;
+	if (isNaN(num)) {
 		try {
 			return JSON.parse(text);
 		}
