@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      1.9
+// @version      2.0
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -282,8 +282,8 @@ async function CheckStats(delay = 0) {
 			localStorage.setItem('Doc_SB_GameID', games.map(game => game.gameID).reduce((x, y) => x > y ? x : y, lastGameID));
 			UpdateTable();
 		}
-		catch (e) {
-			console.error(e);
+		catch {
+			console.error('Failed to get Games. Trying again in 5s...');
 			console.info('Retrying in 5s');
 			i -= 5;
 			await Sleep(5000);
@@ -735,30 +735,39 @@ function Main() {
 					return;
 				}
 				checkingStats = true;
-				const pages = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,team_id:[${teamID}]){paginatorInfo{lastPage}}}`)).text()).data.baseball_games.paginatorInfo.lastPage;
-				const ticks = (() => {
-					const date = new Date();
-					return date.getTime() - (((date.getUTCHours() * 60 + date.getUTCMinutes()) * 60 + date.getUTCSeconds()) * 1000 + date.getUTCMilliseconds());
-				})();
 				let plays = 0;
-				console.info(`Pages: ${pages}`);
-				for (let i = 1; i <= pages; i += 5) {
-					const startTime = performance.now();
-					const result = Object.values(JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={${(() => {
-						console.info(`Page: ${i}-${i + Math.min(pages - i, 4)}`);
-						let query = '';
-						for (let j = 0; j < Math.min(pages - i + 1, 5); ++j) {
-							query += `${'abcde'[(i % 5) + j - 1]}:baseball_games(first:50,page:${i + j},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){data{date}}`;
+				while (true) {
+					try {
+						const pages = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={baseball_games(first:50,team_id:[${teamID}]){paginatorInfo{lastPage}}}`)).text()).data.baseball_games.paginatorInfo.lastPage;
+						const ticks = (() => {
+							const date = new Date();
+							return date.getTime() - (((date.getUTCHours() * 60 + date.getUTCMinutes()) * 60 + date.getUTCSeconds()) * 1000 + date.getUTCMilliseconds());
+						})();
+						console.info(`Pages: ${pages}`);
+						for (let i = 1; i <= pages; i += 5) {
+							const startTime = performance.now();
+							const result = Object.values(JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${apiKey}&query={${(() => {
+								console.info(`Page: ${i}-${i + Math.min(pages - i, 4)}`);
+								let query = '';
+								for (let j = 0; j < Math.min(pages - i + 1, 5); ++j) {
+									query += `${'abcde'[(i % 5) + j - 1]}:baseball_games(first:50,page:${i + j},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){data{date}}`;
+								}
+								return query;
+							})()}}`)).text()).data).map(endpoint => endpoint.data.map(game => new Date(game.date).getTime()).reduce((arr, time) => [arr[0] + (time > ticks ? 1 : 0), arr[1] + 1], [0, 0])).reduce((x, y) => [x[0] + y[0], x[1] + y[1]], [0, 0]);
+							plays += result[0];
+							if (result[0] < result[1]) {
+								break;
+							}
+							const endTime = performance.now();
+							console.info(`Sleep: ${endTime - startTime}ms`);
+							await Sleep(Math.max(1500 + endTime - startTime, 0));
 						}
-						return query;
-					})()}}`)).text()).data).map(endpoint => endpoint.data.map(game => new Date(game.date).getTime()).reduce((arr, time) => [arr[0] + (time > ticks ? 1 : 0), arr[1] + 1], [0, 0])).reduce((x, y) => [x[0] + y[0], x[1] + y[1]], [0, 0]);
-					plays += result[0];
-					if (result[0] < result[1]) {
 						break;
 					}
-					const endTime = performance.now();
-					console.info(`Sleep: ${endTime - startTime}ms`);
-					await Sleep(Math.max(1500 + endTime - startTime, 0));
+					catch {
+						console.error('Failed to calculate games. Trying again in 5s...');
+						await Sleep(5000);
+					}
 				}
 				checkingStats = false;
 				played = plays;
