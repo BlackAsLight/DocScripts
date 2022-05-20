@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Doc: Send Message
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.2
+// @version      0.3
 // @description  Easily Mass Message Players By Nation ID or Leader Name
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/inbox/message/
 // @match        https://politicsandwar.com/inbox/message/receiver=*
+// @match        https://politicsandwar.com/inbox/message/id=*
 // @icon         https://avatars.githubusercontent.com/u/44320105
 // @grant        none
 // ==/UserScript==
@@ -194,9 +195,7 @@ async function WaitForTag(doc, query) {
 	return tag;
 }
 
-/* Start
--------------------------*/
-async function Main() {
+async function NewMessage() {
 	CreateElement('div', async divTag => {
 		divTag.id = 'Message';
 
@@ -261,7 +260,7 @@ async function Main() {
 
 	await WaitForTag(document, '#to');
 	if (location.href.includes('receiver=')) {
-		Sleep(1500).then(() => WriteValue(location.href.slice(location.href.indexOf('/message/') + 9).split('&').filter(x => x.startsWith('receiver='))[0].split('=')[1], document.querySelector('#to')));
+		Sleep(1500).then(() => WriteValue(location.href.slice(location.href.indexOf('/message/') + 9).split('&').filter(x => x.startsWith('receiver='))[0].split('=')[1].replaceAll('+', ' '), document.querySelector('#to')));
 		magic = false;
 	}
 	else {
@@ -275,6 +274,18 @@ async function Main() {
 		await WritePlaceHolder(text, inputTag);
 		await Sleep(5000);
 	}
+}
+
+/* Start
+-------------------------*/
+function Main() {
+	if (location.href.includes('id=')) {
+		const divTag = (document.querySelector('.blue-msg') || document.querySelector('.red-msg')).parentElement;
+		divTag.style.removeProperty('height');
+		divTag.style.setProperty('max-height', '50vh');
+		return;
+	}
+	NewMessage();
 }
 
 Main();
