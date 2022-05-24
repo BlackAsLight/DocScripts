@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.1
+// @version      2.2
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -32,7 +32,7 @@ async function Migration() {
 		for (const nation of nations) {
 			(books.find(book => book.nationID === parseInt(nation.id)) || {}).leaderName = nation.leader_name;
 		}
-		localStorage.setItem('Doc_SB_Books', JSON.stringify(books));
+		localStorage.setItem('Doc_SB_Books', JSON.stringify(books.filter(book => book.leaderName)));
 	}
 }
 
