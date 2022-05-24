@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.0
+// @version      2.1
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -23,20 +23,18 @@ document.body.append(CreateElement('div', divTag => {
 
 /* Migration
 -------------------------*/
-(() => {
-	const books = (JSON.parse(localStorage.getItem('Doc_SB_Books')) || []).map(book => {
-		if (book.rating === null) {
-			book.rating = -1;
+async function Migration() {
+	const nationIDs = (JSON.parse(localStorage.getItem('Doc_SB_Books')) || []).filter(book => book.leaderName === undefined).map(book => book.nationID);
+	while (nationIDs.length) {
+		const subNationIDs = nationIDs.splice(0, 500);
+		const nations = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={nations(id:[${subNationIDs.join(',')}]){data{id leader_name}}}`)).text()).data.nations.data;
+		const books = JSON.parse(localStorage.getItem('Doc_SB_Books'));
+		for (const nation of nations) {
+			(books.find(book => book.nationID === parseInt(nation.id)) || {}).leaderName = nation.leader_name;
 		}
-		return book;
-	});
-	if (books.length) {
 		localStorage.setItem('Doc_SB_Books', JSON.stringify(books));
 	}
-	else {
-		localStorage.removeItem('Doc_SB_Books');
-	}
-})();
+}
 
 /* Global Variables
 -------------------------*/
@@ -244,6 +242,7 @@ async function CheckStats(delay = 0) {
 					books.push({
 						credit: credit,
 						date: new Date().getTime(),
+						leaderName: 'PENDING',
 						nation: 'PENDING',
 						nationID: game.otherNationID,
 						team: 'PENDING',
@@ -304,13 +303,15 @@ async function CheckStats(delay = 0) {
 
 		// Fetch Data
 		try {
-			const data = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={nations(id:[${group.map(x => x.nationID)}]){data{id nation_name}}baseball_teams(id:[${group.map(x => x.teamID)}]){data{id name rating}}}`)).text()).data;
+			const data = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={nations(id:[${group.map(x => x.nationID)}]){data{id leader_name nation_name}}baseball_teams(id:[${group.map(x => x.teamID)}]){data{id name rating}}}`)).text()).data;
 
 			// Update Books
 			data.nations.data.forEach(nation => {
 				try {
 					nation.id = parseInt(nation.id)
-					books.find(book => book.nationID === nation.id).nation = nation.nation_name;
+					const book = books.find(book => book.nationID === nation.id);
+					book.nation = nation.nation_name;
+					book.leaderName = nation.leader_name;
 				}
 				catch (e) {
 					console.error(e);
@@ -535,7 +536,7 @@ function UpdateTable() {
 			pTag.classList.add(book.credit > 0 ? 'Red' : 'Green');
 			pTag.classList.remove(book.credit < 0 ? 'Red' : 'Green');
 		}
-		const link = CreateOfferLink(book.nation, book.credit / 100);
+		const link = CreateOfferLink(book.leaderName, book.credit / 100);
 		const aTag = divTag.querySelector('.Link');
 		if (link) {
 			if (!aTag.getAttribute('href')) {
@@ -588,7 +589,7 @@ function CreateRow(book) {
 			divTag.append(CreateElement('a', aTag => {
 				aTag.classList.add('Link');
 				aTag.append('Send Offer');
-				const link = CreateOfferLink(book.nation, book.credit / 100);
+				const link = CreateOfferLink(book.leaderName, book.credit / 100);
 				if (link) {
 					aTag.href = link;
 				}
@@ -655,8 +656,8 @@ function ToggleInfo(teamID) {
 	}
 }
 
-function CreateOfferLink(nationName, money) {
-	return Math.floor(Math.abs(money)) ? `https://politicsandwar.com/nation/trade/create/?nation=${nationName.replaceAll(' ', '+')}&resource=food&p=${Math.min(Math.floor(Math.abs(money)), 50000000)}&q=1&t=${money > 0 ? 'b' : 's'}` : null;
+function CreateOfferLink(leaderName, money) {
+	return Math.floor(Math.abs(money)) ? `https://politicsandwar.com/nation/trade/create/?leadername=${leaderName.replaceAll(' ', '+')}&resource=food&p=${Math.min(Math.floor(Math.abs(money)), 50000000)}&q=1&t=${money > 0 ? 'b' : 's'}` : null;
 }
 
 /* Notifications
@@ -709,7 +710,7 @@ async function RemoveNotify(pTag, ms) {
 
 /* Start
 -------------------------*/
-Main();
+Migration().then(() => Main());
 function Main() {
 	NotifySection();
 	const divTag = CreateElement('div', divTag => {
