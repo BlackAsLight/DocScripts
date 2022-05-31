@@ -56,7 +56,7 @@ function RandomText(length) {
 }
 
 async function IncreasePlayer(id, type, playerID, verify, buttonId) {
-	[...document.querySelectorAll('.Up0'), ...document.querySelectorAll('.Up1')].forEach(buttonTag => {
+	[...document.querySelectorAll('.Up0, .Up1')].forEach(buttonTag => {
 		buttonTag.disabled = true;
 	});
 	document.querySelector(`#Up${buttonId}_${id}`).style.setProperty('display', 'none');
@@ -89,22 +89,22 @@ async function IncreasePlayer(id, type, playerID, verify, buttonId) {
 			}
 			document.querySelector(`#Text_${id}`).textContent = level.toFixed(2);
 			if (buttonId === 0) {
-           		     money += 20000;
-          		} else if (buttonId === 1) {
-            		    money += 2000;
-            		}
+						money += 20000;
+					} else if (buttonId === 1) {
+						money += 2000;
+					}
 		}
 	}
 	catch {
 		location.reload();
 	}
-	[...document.querySelectorAll('.Up0'), ...document.querySelectorAll('.Up1')].forEach(buttonTag => {
+	[...document.querySelectorAll('.Up0, .Up1')].forEach(buttonTag => {
 		buttonTag.disabled = false;
 	});
 	document.querySelector(`#Up0_${id}`).style.removeProperty('display');
-    document.querySelector(`#Up1_${id}`).style.removeProperty('display');
+	document.querySelector(`#Up1_${id}`).style.removeProperty('display');
 	document.querySelector(`#Stop0_${id}`).style.removeProperty('display');
-    document.querySelector(`#Stop1_${id}`).style.removeProperty('display');
+	document.querySelector(`#Stop1_${id}`).style.removeProperty('display');
 	console.log(`Money Spent: $${money.toLocaleString()} | Average Time: ${(total / money * 2000).toFixed(0)}ms`);
 }
 
@@ -117,7 +117,7 @@ function Main() {
 		.filter(formTag => formTag.action.endsWith('#roster'))
 		.forEach(formTag => {
 			const id = RandomText(10);
-            formTag.parentElement.appendChild(CreateElement('button', buttonTag => {
+			formTag.parentElement.appendChild(CreateElement('button', buttonTag => {
 				buttonTag.id = `Up0_${id}`;
 				buttonTag.classList.add('btn');
 				buttonTag.classList.add('Up0');
@@ -126,7 +126,7 @@ function Main() {
 					IncreasePlayer(id, formTag.children[0].name, formTag.children[2].value, formTag.children[3].value, 0);
 				};
 			}));
-        	formTag.parentElement.appendChild(CreateElement('button', buttonTag => {
+			formTag.parentElement.appendChild(CreateElement('button', buttonTag => {
 				buttonTag.id = `Stop0_${id}`;
 				buttonTag.classList.add('btn');
 				buttonTag.classList.add('Stop');
