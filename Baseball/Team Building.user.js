@@ -88,7 +88,11 @@ async function IncreasePlayer(id, type, playerID, verify, buttonId) {
 				Sound();
 			}
 			document.querySelector(`#Text_${id}`).textContent = level.toFixed(2);
-			money += 2000;
+			if (buttonId === 0) {
+           		     money += 20000;
+          		} else if (buttonId === 1) {
+            		    money += 2000
+            		}
 		}
 	}
 	catch {
