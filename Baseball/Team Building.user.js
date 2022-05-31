@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Team Building
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.7
+// @version      0.8
 // @description  Increase Player Stats with less Clicks.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/team/id=*
