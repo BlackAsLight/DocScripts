@@ -27,7 +27,8 @@ let upping = false;
 /* Styling
 -------------------------*/
 document.head.append(CreateElement('style', styleTag => {
-	styleTag.append('.Up { background-color: #2648DA; color: #FFFFFF; font-size: inherit; padding: 0.5em; }');
+    styleTag.append('.Up0 { background-color: #FF0000; color: #FFFFFF; font-size: inherit; padding: 0.5em; }');
+	styleTag.append('.Up1 { background-color: #2648DA; color: #FFFFFF; font-size: inherit; padding: 0.5em; }');
 	styleTag.append('.Stop { background-color: #D9534F; color: #FFFFFF; display: none; font-size: inherit; padding: 0.5em; }');
 	styleTag.append('.Text { display: inline; margin: 0; padding: 0.25em; }');
 	styleTag.append('.Up:hover, .Stop:hover { color: #FFFFFF; }')
@@ -54,12 +55,12 @@ function RandomText(length) {
 	return text;
 }
 
-async function IncreasePlayer(id, type, playerID, verify) {
-	[...document.querySelectorAll('.Up')].forEach(buttonTag => {
+async function IncreasePlayer(id, type, playerID, verify, buttonId) {
+	[...document.querySelectorAll('.Up0'), ...document.querySelectorAll('.Up1')].forEach(buttonTag => {
 		buttonTag.disabled = true;
 	});
-	document.querySelector(`#Up_${id}`).style.setProperty('display', 'none');
-	document.querySelector(`#Stop_${id}`).style.setProperty('display', 'inline');
+	document.querySelector(`#Up${buttonId}_${id}`).style.setProperty('display', 'none');
+	document.querySelector(`#Stop${buttonId}_${id}`).style.setProperty('display', 'inline');
 	upping = true;
 	let money = 0;
 	let total = 0;
@@ -81,7 +82,7 @@ async function IncreasePlayer(id, type, playerID, verify) {
 				.filter(inputTag => inputTag.value == playerID)
 				.slice(1)
 				.map(inputTag => inputTag.parentElement)
-				.find(formTag => formTag.children[1].name === type).textContent.trim());
+				.find(formTag => formTag.children[buttonId].name === type).textContent.trim());
 			if (level === 100) {
 				upping = false;
 				Sound();
@@ -93,11 +94,13 @@ async function IncreasePlayer(id, type, playerID, verify) {
 	catch {
 		location.reload();
 	}
-	[...document.querySelectorAll('.Up')].forEach(buttonTag => {
+	[...document.querySelectorAll('.Up0'), ...document.querySelectorAll('.Up1')].forEach(buttonTag => {
 		buttonTag.disabled = false;
 	});
-	document.querySelector(`#Up_${id}`).style.removeProperty('display');
-	document.querySelector(`#Stop_${id}`).style.removeProperty('display');
+	document.querySelector(`#Up0_${id}`).style.removeProperty('display');
+    document.querySelector(`#Up1_${id}`).style.removeProperty('display');
+	document.querySelector(`#Stop0_${id}`).style.removeProperty('display');
+    document.querySelector(`#Stop1_${id}`).style.removeProperty('display');
 	console.log(`Money Spent: $${money.toLocaleString()} | Average Time: ${(total / money * 2000).toFixed(0)}ms`);
 }
 
@@ -110,17 +113,35 @@ function Main() {
 		.filter(formTag => formTag.action.endsWith('#roster'))
 		.forEach(formTag => {
 			const id = RandomText(10);
-			formTag.parentElement.appendChild(CreateElement('button', buttonTag => {
-				buttonTag.id = `Up_${id}`;
+            formTag.parentElement.appendChild(CreateElement('button', buttonTag => {
+				buttonTag.id = `Up0_${id}`;
 				buttonTag.classList.add('btn');
-				buttonTag.classList.add('Up');
+				buttonTag.classList.add('Up0');
 				buttonTag.append('+');
 				buttonTag.onclick = () => {
-					IncreasePlayer(id, formTag.children[1].name, formTag.children[2].value, formTag.children[3].value);
+					IncreasePlayer(id, formTag.children[0].name, formTag.children[2].value, formTag.children[3].value, 0);
+				};
+			}));
+        	formTag.parentElement.appendChild(CreateElement('button', buttonTag => {
+				buttonTag.id = `Stop0_${id}`;
+				buttonTag.classList.add('btn');
+				buttonTag.classList.add('Stop');
+				buttonTag.append('x');
+				buttonTag.onclick = () => {
+					upping = false;
 				};
 			}));
 			formTag.parentElement.appendChild(CreateElement('button', buttonTag => {
-				buttonTag.id = `Stop_${id}`;
+				buttonTag.id = `Up1_${id}`;
+				buttonTag.classList.add('btn');
+				buttonTag.classList.add('Up1');
+				buttonTag.append('+');
+				buttonTag.onclick = () => {
+					IncreasePlayer(id, formTag.children[1].name, formTag.children[2].value, formTag.children[3].value, 1);
+				};
+			}));
+			formTag.parentElement.appendChild(CreateElement('button', buttonTag => {
+				buttonTag.id = `Stop1_${id}`;
 				buttonTag.classList.add('btn');
 				buttonTag.classList.add('Stop');
 				buttonTag.append('x');
