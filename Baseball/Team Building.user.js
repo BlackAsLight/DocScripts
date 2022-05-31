@@ -91,7 +91,7 @@ async function IncreasePlayer(id, type, playerID, verify, buttonId) {
 			if (buttonId === 0) {
            		     money += 20000;
           		} else if (buttonId === 1) {
-            		    money += 2000
+            		    money += 2000;
             		}
 		}
 	}
