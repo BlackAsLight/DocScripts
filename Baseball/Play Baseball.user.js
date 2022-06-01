@@ -833,14 +833,14 @@ function Main() {
 		divTag.id = 'Profit';
 		divTag.classList.add('col-sm-6');
 		divTag.append(CreateElement('h4', h4Tag => {
-			h3Tag.append('Income today after tips');
+			h4Tag.append('Income today after tips');
 		}));
 		divTag.append(CreateElement('p', pTag => {
 			pTag.id = 'ProfitValueAfterTips';
 			pTag.append("?");
 		}));
 		divTag.append(CreateElement('h4', h4Tag => {
-			h3Tag.append('Income today before tips');
+			h4Tag.append('Income today before tips');
 		}));
 		divTag.append(CreateElement('p', pTag => {
 			pTag.id = 'ProfitValueBeforeTips';
