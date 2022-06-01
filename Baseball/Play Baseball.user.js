@@ -778,10 +778,10 @@ function Main() {
 							})()}}`)).text()).data)
 							result.map(endpoint => endpoint.data.map(game => {
 								if (new Date(game.date).getTime() < ticks || game.open !== 0) {
-									return
+									return;
 								}
 								const isHost = parseInt(game.home_id) === teamID;
-								const otherTeamWon = (game.home_score < game.away_score) === isHost
+								const otherTeamWon = (game.home_score < game.away_score) === isHost;
 								let revenue = 0;
 								let tips = Math.round((0.3 * (game.home_revenue + game.spoils) - (isHost === otherTeamWon ? game.spoils : 0)) * (isHost ? 1 : -1));
 								if (isHost) {
