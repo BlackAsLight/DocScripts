@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.2
+// @version      2.3
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -53,6 +53,8 @@ let pauseCheckingStatus = false;
 let userCancelled = false;
 let checkingStats = false;
 let played;
+let profit = 0;
+let profitAfterTips = 0;
 
 /* User Configuration Settings
 -------------------------*/
@@ -150,6 +152,8 @@ document.head.append(CreateElement('style', styleTag => {
 	styleTag.append('.NoLink { text-decoration: line-through; }');
 	styleTag.append('.Hide { display: none; }');
 	styleTag.append('.Italic { font-style: italic; }');
+	// Profit
+	styleTag.append('#Profit { display: flex; flex-direction: column; text-align: center; padding: 1em; width: 100%; }');
 	// Notification Section
 	styleTag.append('#notify { bottom: 0.75em; font-size: 12px; left: 0; position: fixed; }');
 	styleTag.append('.notify { background-color: #FF4D6A; border-radius: 0.5em; color: #F2F2F2; margin: 1em; padding: 0.75em; transition: 1s; }');
@@ -220,11 +224,23 @@ async function CheckStats(delay = 0) {
 				});
 			}));
 
-			// Update Books
+			// Update Books and Profit
 			let books = JSON.parse(localStorage.getItem('Doc_SB_Books')) || [];
 			const pending = JSON.parse(localStorage.getItem('Doc_SB_Pending')) || [];
 			games.forEach(game => {
 				const credit = Math.round((0.3 * (game.revenue + game.winnings) - (game.isHost === game.otherTeamWon ? game.winnings : 0)) * (game.isHost ? 100 : -100));
+				const tips = Math.round((0.3 * (game.revenue + game.winnings) - (game.isHost === game.otherTeamWon ? game.winnings : 0)) * (game.isHost ? 1 : -1));
+				let revenue = 0;
+				if (game.isHost) {
+					revenue += game.revenue;
+				}
+				if (!game.otherTeamWon) {
+					revenue += game.winnings;
+				}
+				profit += revenue;
+				profitAfterTips += (revenue - tips);
+				updateProfit();
+
 				if (credit.toString() === 'NaN') {
 					console.debug(game);
 					return;
@@ -660,6 +676,11 @@ function CreateOfferLink(leaderName, money) {
 	return Math.floor(Math.abs(money)) ? `https://politicsandwar.com/nation/trade/create/?leadername=${leaderName.replaceAll(' ', '+')}&resource=food&p=${Math.min(Math.floor(Math.abs(money)), 50000000)}&q=1&t=${money > 0 ? 'b' : 's'}` : null;
 }
 
+function updateProfit() {
+	document.getElementById('ProfitValueAfterTips').textContent = `${FormatMoney(profitAfterTips)}`;
+	document.getElementById('ProfitValueBeforeTips').textContent = `${FormatMoney(profit)}`;
+}
+
 /* Notifications
 -------------------------*/
 function NotifySection() {
@@ -751,12 +772,31 @@ function Main() {
 								console.info(`Page: ${i}-${i + Math.min(pages - i, 4)}`);
 								let query = '';
 								for (let j = 0; j < Math.min(pages - i + 1, 5); ++j) {
-									query += `${'abcde'[(i % 5) + j - 1]}:baseball_games(first:50,page:${i + j},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){data{date}}`;
+									query += `${'abcde'[(i % 5) + j - 1]}:baseball_games(first:50,page:${i + j},team_id:[${teamID}],orderBy:{column:DATE,order:DESC}){data{date home_revenue spoils home_score away_score home_id open}}`;
 								}
 								return query;
-							})()}}`)).text()).data).map(endpoint => endpoint.data.map(game => new Date(game.date).getTime()).reduce((arr, time) => [arr[0] + (time > ticks ? 1 : 0), arr[1] + 1], [0, 0])).reduce((x, y) => [x[0] + y[0], x[1] + y[1]], [0, 0]);
-							plays += result[0];
-							if (result[0] < result[1]) {
+							})()}}`)).text()).data)
+							result.forEach(endpoint => endpoint.data.forEach(game => {
+								if (new Date(game.date).getTime() < ticks || game.open !== 0) {
+									return;
+								}
+								const isHost = parseInt(game.home_id) === teamID;
+								const otherTeamWon = (game.home_score < game.away_score) === isHost;
+								let revenue = 0;
+								let tips = Math.round((0.3 * (game.home_revenue + game.spoils) - (isHost === otherTeamWon ? game.spoils : 0)) * (isHost ? 1 : -1));
+								if (isHost) {
+									revenue += game.home_revenue;
+								}
+								if (!otherTeamWon) {
+									revenue += game.spoils;
+								}
+
+								profit += revenue;
+								profitAfterTips += (revenue - tips);
+							}))
+							const resultEnd = result.map(endpoint => endpoint.data.map(game => new Date(game.date).getTime()).reduce((arr, time) => [arr[0] + (time > ticks ? 1 : 0), arr[1] + 1], [0, 0])).reduce((x, y) => [x[0] + y[0], x[1] + y[1]], [0, 0]);
+							plays += resultEnd[0];
+							if (resultEnd[0] < resultEnd[1]) {
 								break;
 							}
 							const endTime = performance.now();
@@ -770,6 +810,7 @@ function Main() {
 						await Sleep(5000);
 					}
 				}
+				updateProfit();
 				checkingStats = false;
 				played = plays;
 				pTag.textContent = `${played}/250`;
@@ -788,6 +829,25 @@ function Main() {
 			};
 		}));
 	});
+	const profitTag = CreateElement('div', divTag => {
+		divTag.id = 'Profit';
+		divTag.classList.add('col-sm-6');
+		divTag.append(CreateElement('h4', h4Tag => {
+			h4Tag.append('Income today after tips');
+		}));
+		divTag.append(CreateElement('p', pTag => {
+			pTag.id = 'ProfitValueAfterTips';
+			pTag.append("?");
+		}));
+		divTag.append(CreateElement('h4', h4Tag => {
+			h4Tag.append('Income today before tips');
+		}));
+		divTag.append(CreateElement('p', pTag => {
+			pTag.id = 'ProfitValueBeforeTips';
+			pTag.append("?");
+		}));
+	});
+
 	// Would only throw error on away page when there are no games currently available.
 	try {
 		const formTag = document.querySelector('input[name="token"]').parentElement;
@@ -795,6 +855,7 @@ function Main() {
 			formTag.previousElementSibling.remove();
 		}
 		formTag.parentElement.insertBefore(divTag, formTag);
+		formTag.parentElement.insertBefore(profitTag, divTag.nextSibling);
 		formTag.remove();
 	}
 	catch {
@@ -802,6 +863,7 @@ function Main() {
 		divTags[0].previousElementSibling.remove();
 		divTags[0].previousElementSibling.remove();
 		divTags[0].parentElement.insertBefore(divTag, divTags[0]);
+		divTags[0].parentElement.insertBefore(profitTag, divTag.nextSibling);
 		if ([...divTags].find(x => x.textContent.startsWith('You Are Hosting A Game'))) {
 			document.querySelector('#Play').disabled = true;
 		}
