@@ -776,7 +776,7 @@ function Main() {
 								}
 								return query;
 							})()}}`)).text()).data)
-							result.map(endpoint => endpoint.data.map(game => {
+							result.forEach(endpoint => endpoint.data.forEach(game => {
 								if (new Date(game.date).getTime() < ticks || game.open !== 0) {
 									return;
 								}
@@ -832,14 +832,14 @@ function Main() {
 	const profitTag = CreateElement('div', divTag => {
 		divTag.id = 'Profit';
 		divTag.classList.add('col-sm-6');
-		divTag.append(CreateElement('h4', h3Tag => {
+		divTag.append(CreateElement('h4', h4Tag => {
 			h3Tag.append('Income today after tips');
 		}));
 		divTag.append(CreateElement('p', pTag => {
 			pTag.id = 'ProfitValueAfterTips';
 			pTag.append("?");
 		}));
-		divTag.append(CreateElement('h4', h3Tag => {
+		divTag.append(CreateElement('h4', h4Tag => {
 			h3Tag.append('Income today before tips');
 		}));
 		divTag.append(CreateElement('p', pTag => {
@@ -863,6 +863,7 @@ function Main() {
 		divTags[0].previousElementSibling.remove();
 		divTags[0].previousElementSibling.remove();
 		divTags[0].parentElement.insertBefore(divTag, divTags[0]);
+		divTags[0].parentElement.insertBefore(profitTag, divTag.nextSibling);
 		if ([...divTags].find(x => x.textContent.startsWith('You Are Hosting A Game'))) {
 			document.querySelector('#Play').disabled = true;
 		}
