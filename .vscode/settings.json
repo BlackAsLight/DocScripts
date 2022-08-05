@@ -29,5 +29,6 @@
 		"tradedelid",
 		"vmode",
 		"xmlhttp"
-	]
+	],
+	"javascript.format.semicolons": "insert"
 }
