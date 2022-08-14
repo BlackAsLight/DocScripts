@@ -1,8 +1,8 @@
 import { readLines } from "https://deno.land/std@0.151.0/io/mod.ts"
 
-await Deno.stat('./public/scripts/')
-	.then(() => Deno.remove('./public/scripts/', { recursive: true }))
-	.finally(() => Deno.mkdir('./public/scripts/', { recursive: true }))
+await Deno.stat('./docs/scripts/')
+	.then(() => Deno.remove('./docs/scripts/', { recursive: true }))
+	.finally(() => Deno.mkdir('./docs/scripts/', { recursive: true }))
 
 const dirEntries = Deno.readDir('./src/')
 for await (const dirEntry of dirEntries) {
@@ -27,18 +27,18 @@ for await (const dirEntry of dirEntries) {
 
 	console.log('\n' + dirEntry.name + '\n')
 	const name = dirEntry.name.slice(0, dirEntry.name.lastIndexOf('.')).replaceAll(' ', '')
-	if (!(await cmd(`deno bundle ./src/${dirEntry.name} ./public/scripts/${name}.js`).status()).success)
+	if (!(await cmd(`deno bundle ./src/${dirEntry.name} ./docs/scripts/${name}.js`).status()).success)
 		continue
-	if (!(await cmd(`esbuild ./public/scripts/${name}.js --bundle --minify --outfile=./public/scripts/${name}.min.js`).status()).success)
+	if (!(await cmd(`esbuild ./docs/scripts/${name}.js --bundle --minify --outfile=./docs/scripts/${name}.min.js`).status()).success)
 		continue
 
-	const file = await Deno.create(`./public/scripts/${name}.user.js`)
+	const file = await Deno.create(`./docs/scripts/${name}.user.js`)
 	await file.write(Uint8Array.from(lines.join('\n').split('').map(char => char.charCodeAt(0))))
-	for await (const line of readLines(await Deno.open(`./public/scripts/${name}.min.js`)))
+	for await (const line of readLines(await Deno.open(`./docs/scripts/${name}.min.js`)))
 		await file.write(Uint8Array.from((line + '\n').split('').map(char => char.charCodeAt(0))))
 
-	await Deno.remove(`./public/scripts/${name}.js`)
-	await Deno.remove(`./public/scripts/${name}.min.js`)
+	await Deno.remove(`./docs/scripts/${name}.js`)
+	await Deno.remove(`./docs/scripts/${name}.min.js`)
 }
 
 function cmd(command: string) {
