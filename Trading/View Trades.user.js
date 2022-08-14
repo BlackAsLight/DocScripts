@@ -673,13 +673,6 @@ function GetQuantity(divTag) {
 	return parseInt(divTag.querySelector('.Quantity').textContent.trim().replaceAll(',', ''));
 }
 
-// Won't be needed until Live Update is implemented
-function SetQuantity(divTag, quantity) {
-	divTag = divTag.querySelector('.Quantity');
-	divTag.lastChild.remove();
-	divTag.append(FormatNumber(quantity));
-}
-
 function GetPrice(divTag) {
 	return parseInt(divTag.querySelector('.Price').textContent.slice(1).split('/')[ 0 ].replaceAll(',', ''));
 }

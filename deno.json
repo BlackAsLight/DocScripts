@@ -1,0 +1,13 @@
+{
+	"tasks": {
+		"build": "deno run --allow-all main.ts"
+	},
+	"compilerOptions": {
+		"lib": [
+			"ESNext",
+			"dom",
+			"deno.ns"
+		],
+		"jsxFactory": "x"
+	}
+}
