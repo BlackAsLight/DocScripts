@@ -6,36 +6,193 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>DocScripts</title>
+	<link rel="stylesheet" href="css/main.css">
+	<script async src="https://kit.fontawesome.com/435c530d1e.js" crossorigin="anonymous"></script>
+	<script defer src="js/main.js" type="module"></script>
 </head>
 
 <body>
 	<header>
 		<h1>DocScripts</h1>
-		<p>Some text about what DocScripts is.</p>
+		<hr>
 		<nav>
 			<a href="#scripts">Scripts</a> | <a href="#installation">Installation</a> | <a href="#updates">Updates</a>
 		</nav>
+		<p>DocScripts is a repo that offers Quality of Life scripts for a browser game called <a href="https://politicsandwar.com/" target="_blank">Politics and War</a>. These scripts do a wide range of things from small (hiding people's nation and alliance descriptions) to large (Changing the entire UI of pages.). DocScripts is available on all major platforms.</p>
 	</header>
 	<main>
 		<article id="scripts">
 			<h2>Scripts</h2>
+			<hr>
 			<nav>
 				<a href="#createTrade">Create Trade</a>
 			</nav>
 			<section id="createTrade">
-				<h3><a href="./scripts/CreateTrade.user.js" target="_blank">Create Trade</a></h3>
-				<p>Some text about what the Create Trade script does</p>
+				<h3>Create Trade <a href="./scripts/CreateTrade.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+				<hr>
+				<h4>Pages:</h4>
+				<ul>
+					<li>https://politicsandwar.com/nation/trade/create/*</li>
+					<li>https://politicsandwar.com/index.php?id=27*</li>
+				</ul>
+				<h4>Descriptions</h4>
+				<p>This script is designed to work in tandem with the <a href="viewTrades">View Trades</a> script as many of what this script has to offer wouldn't work without it. What this script does do is:
+				<ul>
+					<li>Automatically scroll your page so the form is at the centre of it</li>
+					<li>Fill in the Quantity and Price of the form <strong>if</strong> said numbers are provided in the
+						URL.</li>
+					<li>Removes the corresponding Sell/Buy button from the form <strong>if</strong> one was specified in
+						the url. When one is removed, it will also skip the confirmation popup.</li>
+					<li>Will automatically return you to the create offer page if the Quantity, specified in the URL,
+						was greater than 1,000,000 tons, and wasn't different when you click the Sell/Buy button. The
+						Sell/Buy button will be disabled for 5s to not run into an error message.</li>
+					<li>Will automatically return you to the market page upon successfully creating your offer.</li>
+				</ul>
+				</p>
 			</section>
 		</article>
 		<article id="installation">
 			<h2>Installation</h2>
+			<hr>
+			<nav><a href="#desktop">Desktop/Laptop</a> | <a href="#mobile">Mobile</a></nav>
+			<p>
+				Before you can install these scripts you'll need to download the necessary tools to run them. The tools required varies between browser and platform, so read the one that applies to you below.<br>Once that's done, simply scroll up and click on the <i class="fa-solid fa-file-arrow-down"></i> install icon.
+			<ul>
+				<li>TamperMonkey or MeddleMonkey: Should then take over and prompt you with an installation button.</li>
+				<li>
+					UserScripts:
+					<ul>
+						<li>MacOS: Select the UserScript icon <code>&lt;/&gt;</code> and you should see a message that says "UserScript Detected: Tap to install". Tap it then scroll down and click install</li>
+						<li>iOS: Select the puzzle icon and then UserScripts from the menu. When the page opens you should see a message that says "UserScript Detected: Tap to install". Tap it then scroll down and click install.</li>
+					</ul>
+				</li>
+			</ul>
+			</p>
+			<section id="desktop">
+				<h3>Desktop/Laptop</h3>
+				<hr>
+				<h4>Chrome, Microsoft Edge, Firefox, Opera Next, Dolphin Browser, and UC Browser</h4>
+				<p>These users will need to install <a href="https://www.tampermonkey.net/" target="_blank">TamperMonkey</a>, or alike, on their browser, through however extensions are installed on said browser. If you can't figure it out or don't know how to then I'd recommend YouTubing it as, I'd imagine, it's different for each one of these browsers.</p>
+				<h4>Safari</h4>
+				<p>Safari users can download <a href="https://www.tampermonkey.net/" target="_blank">TamperMonkey</a> from the App Store, but it isn't free like it is for other browsers, so a free alternative for Safari users is <a href="https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12" target="_blank">MeddleMonkey</a> or <a href="https://apps.apple.com/au/app/userscripts/id1463298887" target="_blank">UserScripts</a>. At the moment it's recommended you use <a href="https://apps.apple.com/au/app/meddlemonkey/id1539631953?mt=12" target="_blank">MeddleMonkey</a> unless you also plan to install these scripts on your iOS device as well. In that case its recommended that you use <a href="https://apps.apple.com/au/app/userscripts/id1463298887" target="_blank">UserScripts</a> as you'll be able to sync scripts and their versions across devices easily.</p>
+				<h5>MeddleMonkey</h5>
+				<p>
+					Once installed, make sure you:
+				<ol>
+					<li>Open Safari.</li>
+					<li>Click Safari in the top left on the menu bar.</li>
+					<li>Click Preferences which will appear in the drop down menu.</li>
+					<li>Click Extensions in the new window that appeared,</li>
+					<li>And tick the checkbox (if not already ticked) for the MeddleMonkey extension. MeddleMonkey should now be installed and activated on your Safari browser.</li>
+				</ol>
+				</p>
+				<h5>UserScripts</h5>
+				<p>
+					Once installed, make sure you:
+				<ol>
+					<li>Open the UserScripts app.</li>
+					<li>Click on Open Safari Preferences,</li>
+					<li>And tick the checkbox (if not already ticked) for the UserScripts extension.</li>
+					<li>Then click the Change button and set its location to a new folder called something like "UserScripts" somewhere in your iCloud Drive. UserScripts should now be installed and activated on your Safari browser.</li>
+				</ol>
+				</p>
+			</section>
+			<section id="mobile">
+				<h3>Mobile</h3>
+				<hr>
+				<h4>Android</h4>
+				<p>
+					Android users will need to download the an app called <a href="https://play.google.com/store/apps/details?id=com.kiwibrowser.browser" target="_blank">Kiwi Browser</a>, which is available on the play store. Once the app is installed, open it and:
+				<ol>
+					<li>Search Chrome Extensions with whatever the default search engine is or your search engine of choice.</li>
+					<li>Select the Chrome Web Store option.</li>
+					<li>Search for TamperMonkey and select it from the list.</li>
+					<li>Hit the Add to Chrome button TamperMonkey should now be installed on the Kiwi Browser.</li>
+				</ol>
+				</p>
+				<h4>iOS</h4>
+				<p>
+					iOS users will need to use the Safari browser for their iPhone or iPad and be on iOS 15 or later. What you'll want to do is:
+				<ol>
+					<li>Go into the App Store and search for UserScripts.</li>
+					<li>Download the app called UserScripts.</li>
+					<li>Once installed, open the UserScripts App and click "Set UserScripts Directory". Set it somewhere in your iCloud Drive so if you're using a Mac they can easily sync across.</li>
+					<li>Then exit the UserScripts App and go to the Settings App.</li>
+					<li>Select Safari.</li>
+					<li>Click Extensions.</li>
+					<li>The UserScripts app should be displayed there, and by default it should say that it's off.</li>
+					<li>Select it and toggle it on. Now when you go to the Safari app, you should see a puzzle icon on the address bar, and when clicked on, you should see the UserScripts option listed there. Clicking it will open a new page that lets you control the installed scripts and enable/disable them by clicking on them. This bit does unfortunately seem to be buggy at the time of writing this in that it sometimes just has a loading page forever.</li>
+				</ol>
+				<blockquote>It's recommended that, if you have a Mac, you install UserScripts on it as well and go about installing the scripts there and having them sync over to here. To make sure that they sync go into the Files App and make sure that they are indeed downloaded to your iOS device.</blockquote>
+				</p>
+			</section>
 		</article>
 		<article id="updates">
 			<h2>Updates</h2>
+			<hr>
+			<nav><a href="#tamperMonkey">TamperMonkey</a> | <a href="#meddleMonkey">MeddleMonkey</a> | <a href="#userScripts">UserScripts</a></nav>
+			<section id="tamperMonkey">
+				<h3>TamperMonkey</h3>
+				<p>
+					TamperMonkey has the ability to check for updates and install them automatically. This feature is enabled by default. If you make any changes to the script in TamperMonkey yourself, or even just do <code>Ctrl + S</code>, then it will stop checking for updates until otherwise told to resume.<br>If you'd like to enable/disable it's auto updating then:
+				<ol>
+					<li>Click on the TamperMonkey icon,</li>
+					<li>And select its Dashboard button.</li>
+					<li>Select the script you'd like to enable/disable so it's source code is displayed on screen.</li>
+					<li>Select the Settings tab for said script. It's located on the left side, not the one located on the right side.</li>
+					<li>Un/Tick the Check for Updates checkbox and hit the save button.</li>
+				</ol>
+				</p>
+			</section>
+			<section id="meddleMonkey">
+				<h3>MeddleMonkey</h3>
+				<p>
+					MeddleMonkey has the ability to check for updates and install them automatically. This feature is enabled by default. If you make any changes to the script in MeddleMonkey yourself and hit the save button, it will lose its connection to this GitHub repository and no longer offer a Check for Updates option.<br>If you'd like to enable/disable MeddleMonkey checking for updates automatically then:
+				<ol>
+					<li>Select the MeddleMonkey icon located at the top of the browser to the left of the address bar,</li>
+					<li>And select Manage Scripts.</li>
+					<li>Click on the Settings button located on the sidebar.</li>
+					<li>Un/Tick the "Automatically check scripts for updates every day" checkbox.</li>
+				</ol>
+				</p>
+			</section>
+			<section id="userScripts">
+				<h3>UserScripts</h3>
+				<p>
+					UserScripts does not have the ability to check for updates automatically, so you'll have to check for them manually. Simply download the news and put them in your iCloud Drive where the others are stored. If on iOS make sure the files are downloaded from iCloud Drive onto your phone in the Files app.
+				<h4>iOS:</h4>
+				<ol>
+					<li>Select the puzzle icon,</li>
+					<li>And select the UserScripts button to display its page.</li>
+					<li>Click the cloud icon button,</li>
+					<li>And click the Check Again button for updates.</li>
+				</ol>
+				<h4>MacOS:</h4>
+				<ol>
+					<li>Select the UserScripts icon.</li>
+					<li>Click the cloud icon button,</li>
+					<li>And click the Check Again button for updates.</li>
+				</ol>
+				</p>
+			</section>
 		</article>
 	</main>
+	<div class="spacer"></div>
 	<footer>
-		Contact Info
+		&copy; 2022 BlackAsLight
+		<div>
+			<div>
+				<h3>Concat Info</h3>
+				Discord: Doctor#4293
+				<br> GitHub: <a href='https://github.com/BlackAsLight' target='_blank'>BlackAsLight</a>
+				<br> Nation: <a href='https://politicsandwar.com/nation/id=19818' target='_blank'>Native Australians</a>
+			</div>
+			<div>
+				<h3>Other</h3>
+				Source Code: <a href='https://github.com/BlackAsLight/DocScripts' target='_blank'>DocScripts</a>
+				<br>License: <a href='https://github.com/BlackAsLight/DocScripts/blob/main/LICENSE' target='_blank'>MIT</a>
+			</div>
+		</div>
 	</footer>
 </body>
 

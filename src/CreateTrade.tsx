@@ -5,7 +5,7 @@
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
-// @match        https://politicsandwar.com/index.php?id=27*
+// @include      https://politicsandwar.com/index.php?id=27*
 // @icon         https://avatars.githubusercontent.com/u/44320105
 // @grant        none
 // ==/UserScript==
@@ -47,7 +47,7 @@ if (document.querySelector('.alert-success')) {
 		}
 	}
 }
-else {
+else if (document.querySelector('#createTrade')) {
 	localStorage.removeItem(recursiveKey)
 	document.querySelector('#createTrade')?.scrollIntoView({
 		behavior: 'smooth',
@@ -91,8 +91,10 @@ else {
 		}
 		if (q && (q as number) >= 1_000_000)
 			tag.addEventListener('click', () => {
-				if (Math.min(q as number, 1_000_000) !== parseInt((document.querySelector('#amount') as HTMLInputElement).getAttribute('value') ?? ''))
+				if (Math.min(q as number, 1_000_000) !== parseInt((document.querySelector('#amount') as HTMLInputElement).getAttribute('value') ?? '')) {
+					localStorage.setItem(ticksKey, `${new Date().getTime()}`)
 					localStorage.setItem(recursiveKey, '0')
+				}
 			})
 	}
 

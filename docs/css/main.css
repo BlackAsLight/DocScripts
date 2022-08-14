@@ -1,0 +1,80 @@
+@import "https://unpkg.com/open-props";
+
+:root {
+	--background: var(--gray-9);
+	--light-background: var(--gray-8);
+	--color: var(--gray-0);
+	--border: var(--gray-3);
+	--highlight: var(--green-4);
+}
+
+html {
+	margin: 0;
+}
+
+body {
+	background-color: var(--background);
+	color: var(--color);
+	display: flex;
+	flex-direction: column;
+	font-family: var(--font-sans);
+	font-size: var(--font-size-1);
+	font-weight: var(--font-weight-4);
+	margin: 0;
+	min-height: 100vh;
+	padding: var(--size-3) var(--size-6);
+}
+
+header {
+	background-color: var(--light-background);
+	border-color: var(--border);
+	border-width: var(--border-size-1);
+	border-style: none solid;
+	padding-inline: var(--size-3);
+}
+
+header>nav {
+	text-align: center;
+}
+
+.spacer {
+	flex-grow: 1;
+	height: var(--size-3);
+}
+
+footer {
+	background-color: var(--light-background);
+	border-color: var(--border);
+	border-style: none solid;
+	border-width: var(--border-size-1);
+	font-size: var(--font-size-0);
+	padding: var(--size-3);
+	text-align: center;
+}
+
+footer>div {
+	display: grid;
+	grid-template-columns: auto auto;
+}
+
+section>h3 {
+	padding-inline-start: var(--size-3);
+}
+
+hr {
+	color: var(--border);
+}
+
+a {
+	color: var(--highlight);
+}
+
+blockquote {
+	background-color: var(--light-background);
+	border-color: var(--border);
+	border-style: solid;
+	border-width: var(--border-size-1);
+	color: var(--border);
+	margin: 0;
+	padding: var(--size-3);
+}

@@ -1,5 +1,20 @@
 import { readLines } from "https://deno.land/std@0.151.0/io/mod.ts"
 
+function cmd(command: string) {
+	console.log(`Command: ${command}`)
+	return Deno.run({ cmd: command.split(' ') })
+}
+
+/* Create ./docs/js/main.js
+-------------------------*/
+await Deno.stat('./docs/js/')
+	.then(() => Deno.remove('./docs/js/', { recursive: true }))
+	.finally(() => Deno.mkdir('./docs/js/', { recursive: true }))
+
+await cmd('deno bundle ./ts/main.tsx ./docs/js/main.js').status()
+
+/* Compile ./src/ into ./docs/scripts/
+-------------------------*/
 await Deno.stat('./docs/scripts/')
 	.then(() => Deno.remove('./docs/scripts/', { recursive: true }))
 	.finally(() => Deno.mkdir('./docs/scripts/', { recursive: true }))
@@ -39,9 +54,4 @@ for await (const dirEntry of dirEntries) {
 
 	await Deno.remove(`./docs/scripts/${name}.js`)
 	await Deno.remove(`./docs/scripts/${name}.min.js`)
-}
-
-function cmd(command: string) {
-	console.log(`Command: ${command}`)
-	return Deno.run({ cmd: command.split(' ') })
 }
