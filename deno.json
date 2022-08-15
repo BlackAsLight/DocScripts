@@ -9,5 +9,12 @@
 			"deno.ns"
 		],
 		"jsxFactory": "x"
+	},
+	"fmt": {
+		"options": {
+			"indentWidth": 4,
+			"singleQuote": true,
+			"useTabs": true
+		}
 	}
 }
