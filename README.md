@@ -4,7 +4,7 @@ This is a GitHub repository of a bunch of scripts made by Doctor for a game call
 
 ## DO NOT
 
-...ask me how to do this or that unless you have read, followed, and *failed* the [installation](https://github.com/BlackAsLight/DocScripts/wiki/Installation) instructions found on the wiki.
+...ask me how to do this or that unless you have read, followed, and *failed* the [installation](https://docscripts.stagintin.com/#installation) instructions found on the website.
 
 ## Installation && Updates
 
