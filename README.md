@@ -8,7 +8,7 @@ This is a GitHub repository of a bunch of scripts made by Doctor for a game call
 
 ## Installation && Updates
 
-Head to the [Wiki](https://github.com/BlackAsLight/DocScripts/wiki) for instructions on how to install/update these scripts.
+Head to the [website]([https://github.com/BlackAsLight/DocScripts/wiki](https://docscripts.stagintin.com/) for instructions on how to install/update these scripts.
 
 ## Server
 
