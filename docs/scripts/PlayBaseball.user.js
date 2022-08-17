@@ -519,7 +519,7 @@ async function GetDoc(options) {
 				iframeTag.onunload = () => {
 					iframeTag.style.setProperty('display', 'none');
 				};
-				iframeTag.onload = async () => {
+				iframeTag.onload = () => {
 					iframeTag.style.setProperty('display', 'inline');
 					if (iframeTag.contentWindow.location.href !== 'https://politicsandwar.com/human/' || iframeTag.contentDocument.querySelector('.alert-success')) {
 						iframeTag.remove();
@@ -783,7 +783,7 @@ function Main() {
 								const isHost = parseInt(game.home_id) === teamID;
 								const otherTeamWon = (game.home_score < game.away_score) === isHost;
 								let revenue = 0;
-								let tips = Math.round((0.3 * (game.home_revenue + game.spoils) - (isHost === otherTeamWon ? game.spoils : 0)) * (isHost ? 1 : -1));
+								const tips = Math.round((0.3 * (game.home_revenue + game.spoils) - (isHost === otherTeamWon ? game.spoils : 0)) * (isHost ? 1 : -1));
 								if (isHost) {
 									revenue += game.home_revenue;
 								}

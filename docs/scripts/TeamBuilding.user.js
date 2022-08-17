@@ -70,7 +70,7 @@ async function IncreasePlayer(id, type, playerID, verify, buttonId) {
 			const doc = new DOMParser().parseFromString(await (await fetch(location.href, {
 				method: 'POST',
 				body: (() => {
-					let formData = new FormData();
+					const formData = new FormData();
 					formData.append(type, '+');
 					formData.append('playerid', playerID);
 					formData.append('verify', verify);

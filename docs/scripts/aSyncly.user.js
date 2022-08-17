@@ -138,10 +138,10 @@ async function Hash(text) {
 
 /* Start
 -------------------------*/
-window.addEventListener('beforeunload', () => updating || undefined);
-window.addEventListener('unload', () => updating || undefined);
+globalThis.window.addEventListener('beforeunload', () => updating || undefined);
+globalThis.window.addEventListener('unload', () => updating || undefined);
 Main();
-async function Main() {
+function Main() {
 	// Don't run between 23:55 and 00:05 | inclusive/exclusive.
 	const date = new Date();
 	if ((date.getUTCHours() === 23 && date.getUTCMinutes() >= 55) || (date.getUTCHours() === 0 && date.getUTCMinutes() < 5)) {
