@@ -18,12 +18,12 @@ await cmd('deno bundle ./ts/main.tsx ./docs/js/main.js').status()
 
 /* Compile ./src/ into ./docs/scripts/
 -------------------------*/
-try {
-	await Deno.remove('./docs/scripts/', { recursive: true })
-}
-finally {
-	await Deno.mkdir('./docs/scripts/', { recursive: true })
-}
+// try {
+// 	await Deno.remove('./docs/scripts/', { recursive: true })
+// }
+// finally {
+// 	await Deno.mkdir('./docs/scripts/', { recursive: true })
+// }
 
 const dirEntries = Deno.readDir('./src/')
 for await (const dirEntry of dirEntries) {

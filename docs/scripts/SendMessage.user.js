@@ -160,7 +160,7 @@ async function GetPlaceHolder() {
 }
 
 async function DeletePlaceHolder(inputTag) {
-	let text = inputTag.placeholder.split('');
+	const text = inputTag.placeholder.split('');
 	while (text.length) {
 		text.pop();
 		inputTag.placeholder = text.join('');

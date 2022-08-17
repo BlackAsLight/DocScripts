@@ -35,7 +35,7 @@ const observer = new MutationObserver((list) => {
 				// Then check if we've hit the max for today...
 				if (document.getElementById('rewarded_ads_watched_today').textContent == '25') {
 					// If so then go to our Nation page.
-					location = document.getElementsByClassName('sidebar')[1].getElementsByTagName('a')[0].href;
+					location.href = document.getElementsByClassName('sidebar')[1].getElementsByTagName('a')[0].href;
 				}
 				else {
 					// If not then click button.
@@ -88,7 +88,7 @@ setTimeout(() => {
 	// Check if we've hit the max for today...
 	if (document.getElementById('rewarded_ads_watched_today').textContent == '25') {
 		// If so then go to our Nation page.
-		location = document.getElementsByClassName('sidebar')[1].getElementsByTagName('a')[0].href;
+		location.href = document.getElementsByClassName('sidebar')[1].getElementsByTagName('a')[0].href;
 	}
 	else {
 		// If not then if button is displayed...

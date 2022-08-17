@@ -26,8 +26,33 @@
 			<hr>
 			<div>
 				<nav>
-					<a href="#createTrade">Create Trade</a>
+					<a href="#aSyncly">aSyncly</a> | <a href="#createTrade">Create Trade</a> | <a href="#hideAllianceDescriptions">Hide Alliance Descriptions</a> | <a href="#hideNationDescriptions">Hide Nation Descriptions</a> | <a href="#human">Human</a> | <a href="#keno">Keno</a> | <a href="#playBaseball">Play Baseball</a> | <a href="#rewardAds">Reward-Ads</a> | <a href="#sendMessage">Send Message</a> | <a href="#teamBuilding">Team Building</a> | <a href="#viewTrades">View Trades</a>
 				</nav>
+				<!--
+				<section id="">
+					<h3><a href="./scripts/" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+					<hr>
+					<h4>Pages:</h4>
+					<ul>
+						<li></li>
+					</ul>
+					<h4>Descriptions</h4>
+					<p></p>
+				</section>
+				 -->
+				<section id="aSyncly">
+					<h3>aSyncly <a href="./scripts/aSyncly.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+					<hr>
+					<h4>Pages:</h4>
+					<ul>
+						<li>https://politicsandwar.com/*</li>
+						<li>Excluding: https://politicsandwar.com/human/</li>
+					</ul>
+					<h4>Descriptions</h4>
+					<p>This script allows you to sync your config settings for other various scripts of this repository across multiple browsers by way of the <a href="https://politicsandwar.com/nation/dossier/" target="_blank">Dossier Page</a>. It runs in the background checking for updates at least every 5mins. If there is 500+ player online then it will push it's checking for updates to at least every 30mins. If the player count goes to 800+ then it won't check at all for updates.
+					<blockquote>Please Be Warned: Config settings may be lost or altered if scripts between browsers update out of sync.</blockquote>
+					</p>
+				</section>
 				<section id="createTrade">
 					<h3>Create Trade <a href="./scripts/CreateTrade.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
 					<hr>
@@ -37,7 +62,7 @@
 						<li>https://politicsandwar.com/index.php?id=27*</li>
 					</ul>
 					<h4>Descriptions</h4>
-					<p>This script is designed to work in tandem with the <a href="viewTrades">View Trades</a> script as many of what this script has to offer wouldn't work without it. What this script does do is:</p>
+					<p>This script is designed to work in tandem with the <a href="#viewTrades">View Trades</a> script as many of what this script has to offer wouldn't work without it. What this script does do is:</p>
 					<ul>
 						<li>Automatically scroll your page so the form is at the centre of it</li>
 						<li>Fill in the Quantity and Price of the form <strong>if</strong> said numbers are provided in the
@@ -48,6 +73,179 @@
 							was greater than 1,000,000 tons, and wasn't different when you click the Sell/Buy button. The
 							Sell/Buy button will be disabled for 5s to not run into an error message.</li>
 						<li>Will automatically return you to the market page upon successfully creating your offer.</li>
+					</ul>
+				</section>
+				<section id="#hideAllianceDescriptions">
+					<h3>Hide ALliance Descriptions <a href="./scripts/HideAllianceDescriptions.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+					<hr>
+					<h4>Pages:</h4>
+					<ul>
+						<li>https://politicsandwar.com/alliance/id=*</li>
+					</ul>
+					<h4>Descriptions</h4>
+					<p>This script runs on all Alliance's home page and will hide the Alliance's custom description set by their government. It will provide buttons at the top and bottom of the description to display and hide the Alliance's description. The Alliance's description will be displayed by default.</p>
+				</section>
+				<section id="hideNationDescriptions">
+					<h3>Hide Nation Descriptions <a href="./scripts/HideNationDescriptions.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+					<hr>
+					<h4>Pages:</h4>
+					<ul>
+						<li>https://politicsandwar.com/nation/id=*</li>
+					</ul>
+					<h4>Descriptions</h4>
+					<p>This script runs on all Nation's home page and will hide the Nation's custom description set by the Player. It will provide buttons at the top and bottom of the description to display and hide the Nation's description. The Nation's description will be hidden by default.</p>
+				</section>
+				<section id="human">
+					<h3>Human <a href="./scripts/Human.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+					<hr>
+					<h4>Pages:</h4>
+					<ul>
+						<li>https://politicsandwar.com/human/</li>
+					</ul>
+					<h4>Descriptions</h4>
+					<p>This script simply plays a tone whenever the page loads.</p>
+				</section>
+				<section id="keno">
+					<h3>Keno <a href="./scripts/Keno.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+					<hr>
+					<h4>Pages:</h4>
+					<ul>
+						<li>https://politicsandwar.com/casino/keno/*</li>
+					</ul>
+					<h4>Descriptions</h4>
+					<p>Play a game where the odds are greatly stacked against you. Take the great risk in losing millions all for the tiny chance of making billions.<br>This script will automatically keep a total of how many times each number from 1 - 80 appeared in your games. It will also display the 10 most or 10 least hit numbers in all your games recorded. This script can also auto select the numbers based off one of things. The option to configure it is located at the bottom of the sidebar.</p>
+				</section>
+				<section id="playBaseball">
+					<h3>Play Baseball <a href="./scripts/PlayBaseball.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+					<hr>
+					<h4>Pages:</h4>
+					<ul>
+						<li>https://politicsandwar.com/obl/host/*</li>
+						<li>https://politicsandwar.com/obl/play/*</li>
+					</ul>
+					<h4>Descriptions</h4>
+					<ul>
+						<li>At the bottom of the sidebar, you'll be able to:</li>
+						<ul>
+							<li>Toggle off notifications that display the total amount of money generated by the game and the amount of tip still owing/owed.</li>
+							<li>Toggle off the beep sound when a game has successfully been played.</li>
+							<li>Toggle on the built in captcha page. Which will display the Are You Human page inside the actual game page whenever it detects a redirect happened.</li>
+							<ul>
+								<li>This feature might break around turn updates.</li>
+							</ul>
+						</ul>
+						<li>Replaces the default Host Home Game and Play Away Game, on their respective pages, with two new buttons, Host/Away Game and Cancel Game, which all function without a page refresh</li>
+						<ul>
+							<li>Clicking the Host Game button will start hosting a game. The script will check in the background for if that game has been fulfilled, and at which point will re-enable the button for you to click again.</li>
+							<li>Clicking the Away Game button will make the script start looking for a game to play. Once it's found **one** it will attempt to play it, if successful, it will re-enable the button for you to click again. This script basically makes the Away Games work just like the Home Games.</li>
+							<li>Clicking the Cancel Game button will cancel hosting a game or looking for a game to play, on their respective pages.</li>
+							<li>A beep sound is played whenever a game successfully executes. If you click Cancel Game then no beep sound will be played.</li>
+						</ul>
+						<li>When the page loads and after every game played, the script attempt to check for unrecorded games and calculate any tips owing/owed by either party.</li>
+						<ul>
+							<li>Tips are calculated at 30% of ticket sales **and** winnings combined. Meaning it doesn't matter who wins the games, the pay is always 70:30.</li>
+							<ul>
+								<li>After the initial calculation of the 30% tip, additional math is applied to figure out how much of what is owed/owing is still left to receive.</li>
+							</ul>
+							<li>The debt owed/owing is displayed on screen along with the their team name, nation name and link to nation. Plus an Info button.</li>
+							<ul>
+								<li>If the debt is displayed in red, then you owe said much to that player.</li>
+								<li>If the debt is displayed in green, then that player owes said much to you.</li>
+								<li>Tipping is not enforced by me whatsoever, but you might end up getting embargoed if you refuse to tip the opposing team.</li>
+							</ul>
+						</ul>
+						<li>Clicking the Info button will provide you with two more buttons on screen, a send offer button, and an adjust button.</li>
+						<ul>
+							<li>The Send Offer button is designed to work in tandem with the [Create Trade](https://github.com/BlackAsLight/DocScripts/blob/main/Trading/Create%20Trade.user.js) script as it will automatically fill out the forum for you, set to the correct person and displaying the correct button.</li>
+							<li>The Adjust button lets you change the amount of debt it says you owe. This only changes on your records and not theirs. It's intended to be used to update the amount once the tip has been accepted by either party.</li>
+							<ul>
+								<li>If no game has been played for 7 days between both parties the debt is just written off and deleted from the books automatically.</li>
+								<li>Setting the amount of zero will cause the debt to be removed from the books, while setting it blank or an invalid number will cause nothing to change.</li>
+							</ul>
+						</ul>
+					</ul>
+					<blockquote>It is **not recommended** to view the market pages while running this script, or you might find it a bit hard to accept or create trade offers. This also goes for any other similar page.</blockquote>
+				</section>
+				<section id="rewardAds">
+					<h3>Reward-Ads <a href="./scripts/RewardAds.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+					<hr>
+					<h4>Pages:</h4>
+					<ul>
+						<li>https://politicsandwar.com/rewarded-ads/</li>
+					</ul>
+					<h4>Descriptions</h4>
+					<p>This script clicks the button so you don't have to. When you reach the maximum of 25 ads, it forwards you to your Nation page. It will work in it's own tab, but a window is suggested as the browser seems to pause or slow down JavaScript when inactive.</p>
+					<h5>Aggressive Mode</h5>
+					<p>At the bottom of the left sidebar you'll find a checkbox to toggle AggressiveMode on and off. If on, the script will keep it's own timer and force the button to reappear when it says 3 mins is up. If left off, it will just wait for the game to make the button reappear. The game's timer can count slow at times making what should only take a max of an hour and 15 mins much longer.</p>
+				</section>
+				<section id="sendMessage">
+					<h3>Send Message <a href="./scripts/SendMessage.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+					<hr>
+					<h4>Pages:</h4>
+					<ul>
+						<li>https://politicsandwar.com/inbox/message/</li>
+						<li>https://politicsandwar.com/inbox/message/receiver=*</li>
+						<li>https://politicsandwar.com/inbox/message/id=*</li>
+					</ul>
+					<h4>Descriptions</h4>
+					<p>This script allows you to easily and seamlessly message people by their Nation ID or Leader Name. It is not restraint by the default 21 people, in fact, it does not have a maximum number of people it can accept. It will filter out any duplicates provided in the "To" field upon hitting the Send button.<br>This script does require you to provide it your API Key which can be found at the bottom of the <a href="https://politicsandwar.com/account/#7" target="_blank">Account's Page</a>. To provide it with the key, when the script is installed, go to the <a href="https://politicsandwar.com/inbox/message/" target="_blank">New Message Page</a> and at the bottom of the sidebar you'll see a button that says "Insert API Key".</p>
+				</section>
+				<section id="teamBuilding">
+					<h3>Team Building <a href="./scripts/TeamBuilding.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+					<hr>
+					<h4>Pages:</h4>
+					<ul>
+						<li>https://politicsandwar.com/obl/team/id=*</li>
+					</ul>
+					<h4>Descriptions</h4>
+					<p>This script will replace the default Red and Blue buttons that allow you to up players stats, and instead provide a new blue button. Clicking this button will cause this button to turn red, and all the other buttons get disabled. It will then start to up the players stats until it reaches the max, 100, or you click the red button telling it to stop. If it reaches 100 then a sound will play letting you know.</p>
+				</section>
+				<section id="viewTrades">
+					<h3>View Trade <a href="./scripts/ViewTrades.user.js" target="_blank"><i class="fa-solid fa-file-arrow-down"></i></a></h3>
+					<hr>
+					<h4>Pages:</h4>
+					<ul>
+						<li>https://politicsandwar.com/index.php?id=26*</li>
+						<li>https://politicsandwar.com/index.php?id=90*</li>
+						<li>https://politicsandwar.com/nation/trade/*</li>
+						<li>Excluding: https://politicsandwar.com/nation/trade/create/*</li>
+					</ul>
+					<h4>Descriptions</h4>
+					<p>This script is designed to work in tandem with the <a href="#createTrade">Create Trade</a> script as some of what this script has to offer wouldn't work without it. This script does a lot. On the bottom of the sidebar you'll find some config settings for this script. These settings allow you to change how some aspects of the script work and are:</p>
+					<ul>
+						<li>Infinite Scroll Toggle: When toggled on this script will load all offers, given the specific search filters, instead of the default 50, or whatever the link you used specified. By default this is toggled off.</li>
+						<li>Zero Accountability Toggle: When toggled on this script will affect the quantities in the links of the Outbid, Match, and TopUp buttons, so that they don't take into account your other current offers loaded on the page. By default this is toggled off.</li>
+						<li>Max Resource Button: When clicked, you'll be prompted with a box to enter a number in. This number will set a maximum quantity in the links of the Outbid, Match, and TopUp buttons. Providing an invalid number will result in nothing changing, while setting the number to zero or less will result in it being saved as zero. When set to zero, this feature will be disabled and there will be no maximum quantity in the specified links. By default this number is set to zero.</li>
+						<li>Min Resource Button: When clicked, you'll be prompted with a box to enter a number in. This number will set a minimum quantity that you do not want to accidentally sell. It will essentially reduce how much the script reads from your resource bar for when calculating the quantity in the Outbid, Match and TopUp buttons, and the trade offer boxes. Providing an invalid number will result in nothing changing, while setting the number to zero or less will result in it being saved as zero. You can also specify a minimum amount for Money by going to your personal trades page or by setting the search fields to "Any Resource". By default this number is set to zero.
+							<blockquote>Note: The Max Resource Button and Min Resource Button are not opposites. The Max Resource Button only affects the quantities in the links for Outbid, Match, and TopUp buttons, setting a ceiling to any one given link. Meaning creating any offers will be at max that quantity. The Min Resource Button affects these quantities in these links as well, but by reducing what the script sees you have in your resource bar.. Meaning it affects all offers, and not only any given one. The Min Resource Button also affects the quantities calculated and listed in the trade offer boxes. The Zero Accountability Toggle will cause the Min Resource Button to be ignored when calculating the quantities for the Outbid, Match and ToUp buttons, causing the Min Resource Button to only have an affect on the trade offer boxes.</blockquote>
+						</li>
+						<li>Market View Options: Allows you to choose between three options, Buy, Sell, and Both. This choice will affect the Market Links injected at the top of the page and the Resource Menu for users with small screens. The choice will set these specific links so when clicked, you'll view what side of the market you like most. By default this is set to Both.</li>
+					</ul>
+					<p>The script also does other stuff besides give you options on the sidebar, which you've probably gathered from reading above as it talked about buttons and links that you've never heard of before. At the very top of the page you'll find:</p>
+					<ul>
+						<li>When you accept a trade, you might find a Re-Sell/Buy for Profit button on the successful accepted trade message. Clicking this button will cause the script to remember this trade and adjust all the opposing trade offer boxes so the quantities in them only sell the desired amount. This button is meant to be clicked after accepting a mistrade, so you can easily re-gain what you lost plus profit. When you accept an opposing offer, the script will automatically subtract that amount and calculate how much profit you just made. If this quantity is greater than the remembered quantity then a Re-Sell/Buy for Profit button will also be displayed but only for the remaining quantity.</li>
+						<li>Market Links are a bunch of pre-filtered links to every resource market, your personal trades page, and your activity page since your personal trades page sorts your accepted offers by date created and not date accepted. Market Links also changes the links on the Resource Menu for users with small screens. The activity link is set to a 1000 instead of the default 50 that you'd normally experience when loading that page. Links that end with an asterisk indicate that the script is remembering trades for that resource.</li>
+						<li>The trades that the script remembers when clicking said Re-Sell/Buy for Profit button will appear under the Market Links and will list what it remembers. There is a Forget button, which causes the script to forget about that trade, and a Forget All button which will only appear if it's remembering at multiple prices.</li>
+					</ul>
+					<p>The script also does a few things when the page loads, like:</p>
+					<ul>
+						<li>Mistrade Detection: When viewing both sides of the global market, the script will check to see if any mistrades exist on the page. If it detects one, then it will auto scroll you to it, place a red outline around the offer and temporary switch your game's theme from light to dark or dark to light. It will also adjust the quantity in the smaller offer so you don't risk over extending and buying too much.
+							<blockquote>A mistrade is when somebody creates an offer on the market where they're selling resources for less than the current best buy offer, or vice versa.<br>E.g. You have an offer on the market buying food for $10/Ton. I then create an offer on the market selling food for $7/Ton. I've just created a mistrade as some third party can come, buy my food, and sell it to you for a $3/Ton.<br>A mistrade is when there is money that can be instantly made.</blockquote>
+						</li>
+						<li>Auto Scroll: The script will auto scroll you to the top offer when looking at either Buy or Sell markets, or the very center when looking at Both markets. When looking at Both markets, it will also inject a red break block where the Buy and Sell offers switch stating the profit gap between them. If you've accepted a trade successfully, it will first scroll to that message and wait 3s before continuing down. When it scrolls, it will make the element it's scrolling to the center of the page.</li>
+					</ul>
+					<p>Finally the script changing the table itself. The script technically deletes the table and makes it's own, but the details you need to worry about are:</p>
+					<ul>
+						<li>Firstly, users with small screens may find things in different places. The new table is designed to change as screens get smaller so you no longer have to deal with overflow from the old table.</li>
+						<li>The Date of the offer created as had it's format changed to `hh:mm DD/MMM/YYYY`.</li>
+						<li>On public trade offers created by other people, you'll find an Outbid and Match button. These buttons leads to the create trade offer page with unique links for the Create Trade Script to take over. The Outbid button will have it's price set to $1 better than that current offer, while the Match button will have the exact same price. Clicking these buttons will allow you to easily create a new offer at the desired price of the same type. Type being selling or buying. The quantities in these buttons will be calculated to the max you can afford to buy or sell without creating an error. If Zero Accountability is toggled off then the quantity will take into account other offers that exist on the page, and will remove any min amount, when calculating, set with the Min Resource Button. If the quantity calculated is zero or less then the button will be disabled and a line will be stuck through it indicating such. If a max amount is set by the Max Resource Button, then the quantity will cap off at that amount if it calculated a higher value.</li>
+						<li>On your personal trade offers, you'll find a TopUp button. This button is essentially just like the Match button for public offers created by other people, but for your own offers.
+							<blockquote>Note: Opting to use the Outbid, Match, and TopUp buttons when creating offers instead of the normal method, will provide basic protection against making mistrades. As you won't need to remember what price to set it to, whether to click buy or sell, or forget to change the resource from the default, Food. Once clicked, you only need to decide whether the quantity listed is the one you want to go with, or if you want something less.</blockquote>
+						</li>
+						<li>On Accepted offers and Embargo offers, you'll find a Duplicate button. This button will also lead to the create trade offer page with a unique link. However, this button will be set to match that exact offers price, resource, quantity, and type. It won't take into account whether you can actually duplicate that offer.</li>
+						<li>In the trade offer box, that you see on unaccepted offers created by other people, the quantity will be changed from the game default, of the offers amount, and lowered if you can't afford to buy or sell all of that offer. Meaning you don't need to do maths to know how much you can actually afford. When the script calculates this quantity, it does take into account any min amount set by the Min Resource Button. If the script is remembering trades for said resource and side of the market then said quantity may be lowered further, possibly down to zero, so you prioritise re-gaining from the mistrade.</li>
+						<li>The Delete buttons on your offers or offers sent personally to you no longer require a refresh. Instead when clicked, the script will proceed to delete the offer in the background and once complete, remove the offer from your screen. Outbid, Match, and TopUp buttons will have their links updated and the quantities in the trade offers boxes will be recalculated.</li>
+						<li>The sell buttons on offers will appear green, while the buy offers will appear blue. These colours match the ones of the create trade page.</li>
 					</ul>
 				</section>
 			</div>
