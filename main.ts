@@ -7,17 +7,23 @@ function cmd(command: string) {
 
 /* Create ./docs/js/main.js
 -------------------------*/
-await Deno.stat('./docs/js/')
-	.then(() => Deno.remove('./docs/js/', { recursive: true }))
-	.finally(() => Deno.mkdir('./docs/js/', { recursive: true }))
+try {
+	await Deno.remove('./docs/js/', { recursive: true })
+}
+finally {
+	await Deno.mkdir('./docs/js/', { recursive: true })
+}
 
 await cmd('deno bundle ./ts/main.tsx ./docs/js/main.js').status()
 
 /* Compile ./src/ into ./docs/scripts/
 -------------------------*/
-await Deno.stat('./docs/scripts/')
-	.then(() => Deno.remove('./docs/scripts/', { recursive: true }))
-	.finally(() => Deno.mkdir('./docs/scripts/', { recursive: true }))
+try {
+	await Deno.remove('./docs/scripts/', { recursive: true })
+}
+finally {
+	await Deno.mkdir('./docs/scripts/', { recursive: true })
+}
 
 const dirEntries = Deno.readDir('./src/')
 for await (const dirEntry of dirEntries) {
