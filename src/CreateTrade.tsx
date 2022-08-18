@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.5
+// @version      2.6
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -29,13 +29,13 @@ const { p, q, t } = Object.fromEntries(location.search.slice(1).split('&').map(a
 -------------------------*/
 if (document.querySelector('.alert-success')) {
 	if (q && q > 1_000_000 && localStorage.getItem(recursiveKey)) {
+		localStorage.removeItem(recursiveKey)
 		const args = location.search.slice(1).split('&')
 		const i = args.findIndex(arg => arg.startsWith('q='))
 		args[ i ] = `q=${q as number - 1_000_000}`
 		location.href = location.origin + location.pathname + '?' + args.join('&')
 	}
 	else {
-		localStorage.removeItem(recursiveKey)
 		const href = ((document.querySelector('a i.fa-backward') as HTMLElement).parentElement as HTMLAnchorElement).href.split('?')
 		const args = href[ 1 ].split('&')
 		const i = args.findIndex(arg => arg.startsWith('minimum='))
