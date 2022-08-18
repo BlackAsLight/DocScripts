@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.4
+// @version      2.5
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -28,7 +28,7 @@ const { p, q, t } = Object.fromEntries(location.search.slice(1).split('&').map(a
 /* Main
 -------------------------*/
 if (document.querySelector('.alert-success')) {
-	if (q && q > 1_000_000 && !localStorage.getItem(recursiveKey)) {
+	if (q && q > 1_000_000 && localStorage.getItem(recursiveKey)) {
 		const args = location.search.slice(1).split('&')
 		const i = args.findIndex(arg => arg.startsWith('q='))
 		args[ i ] = `q=${q as number - 1_000_000}`
@@ -91,7 +91,7 @@ else if (document.querySelector('#createTrade')) {
 		}
 		if (q && (q as number) >= 1_000_000)
 			tag.addEventListener('click', () => {
-				if (Math.min(q as number, 1_000_000) !== parseInt((document.querySelector('#amount') as HTMLInputElement).getAttribute('value') ?? '')) {
+				if (Math.min(q as number, 1_000_000) === parseInt((document.querySelector('#amount') as HTMLInputElement).getAttribute('value') ?? '')) {
 					localStorage.setItem(ticksKey, `${new Date().getTime()}`)
 					localStorage.setItem(recursiveKey, '0')
 				}
