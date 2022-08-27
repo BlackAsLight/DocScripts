@@ -11,6 +11,7 @@
 // ==/UserScript==
 
 import x from "../jsx.tsx"
+import { sleep } from "../utils.ts";
 
 /* Double Injection Protection
 -------------------------*/
@@ -97,21 +98,4 @@ else if (document.querySelector('#createTrade')) {
 				}
 			})
 	}
-
-	// document.querySelector('#showTopOffersBtn')?.addEventListener('click', async () => {
-	// 	await waitTilFalse(() => !(document.querySelector('#topOffersSection') as HTMLElement).childElementCount, 50)
-
-	// })
-}
-
-/* Functions
--------------------------*/
-function sleep(ms: number) {
-	return new Promise<true>(a => setTimeout(() => a(true), ms))
-}
-
-// deno-lint-ignore no-explicit-any
-async function waitTilFalse(func: (() => any), delay = 0) {
-	while (func())
-		await sleep(0)
 }

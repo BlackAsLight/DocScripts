@@ -10,19 +10,21 @@ declare global {
 	}
 }
 
-export type Props = Record<string, string> | null
-export type Children = [ HTMLElement | Promise<HTMLElement> ]
-export default function x(typeOrFunc: string | ((props: Props, ...children: Children) => HTMLElement), props: Props, ...children: Children) {
+export type Props = Record<string, string | boolean> | null
+export type Children = [ HTMLElement | Promise<HTMLElement> | [ HTMLElement | Promise<HTMLElement> ] ] | undefined[]
+export default function x<T extends HTMLElement>(typeOrFunc: string | ((props: Props, ...children: Children) => T), props: Props = null, ...children: Children) {
 	if (typeof typeOrFunc !== 'string')
 		return typeOrFunc(props, ...children)
 
-	const parentTag = document.createElement(typeOrFunc)
+	const parentTag = document.createElement(typeOrFunc) as T
 	if (props)
-		Object.entries(props).forEach(([ key, value ]) => parentTag.setAttribute(key, value))
+		Object.entries(props).forEach(([ key, value ]) => typeof value === 'boolean' ? parentTag.toggleAttribute(key, value) : parentTag.setAttribute(key, value))
 	children.flat().forEach(async childTag => {
+		if (childTag == undefined)
+			return
 		if (childTag.toString() !== '[object Promise]')
 			return parentTag.append(childTag as HTMLElement)
-		const divTag = <div /> as HTMLElement
+		const divTag = <div /> as HTMLDivElement
 		parentTag.append(divTag)
 		childTag = await childTag
 		if (divTag.parentElement) {
@@ -31,4 +33,8 @@ export default function x(typeOrFunc: string | ((props: Props, ...children: Chil
 		}
 	})
 	return parentTag
+}
+
+export function y(_props: Props, ...children: Children) {
+	return children
 }

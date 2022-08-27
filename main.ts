@@ -1,4 +1,4 @@
-import { readLines } from "https://deno.land/std@0.151.0/io/mod.ts"
+import { readLines } from 'https://deno.land/std@0.151.0/io/mod.ts'
 
 function cmd(command: string) {
 	console.log(`Command: ${command}`)

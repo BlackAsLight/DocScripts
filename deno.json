@@ -1,5 +1,6 @@
 {
 	"tasks": {
+		"test": "deno run --allow-all test.ts",
 		"build": "deno run --allow-all main.ts"
 	},
 	"compilerOptions": {
@@ -8,7 +9,8 @@
 			"dom",
 			"deno.ns"
 		],
-		"jsxFactory": "x"
+		"jsxFactory": "x",
+		"jsxFragmentFactory": "y"
 	},
 	"fmt": {
 		"options": {
