@@ -85,10 +85,10 @@ function updateIcons(myScore: number) {
 			tdTag.insertBefore(<img src='https://politicsandwar.com/img/icons/16/emotion_spy.png' />, tdTag.lastChild)
 		if (inWarRange(theirScore, myScore))
 			if (inWarRange(myScore, theirScore))
-				tdTag.insertBefore(<img src='https://docscripts.stagintin.com/green_red.png' />, tdTag.lastChild)
+				tdTag.insertBefore(<img src='https://docscripts.stagintin.com/icons/green_red.png' />, tdTag.lastChild)
 			else
 				tdTag.insertBefore(<img src='https://politicsandwar.com/img/icons/16/tick_shield.png' />, tdTag.lastChild)
 		else if (inWarRange(myScore, theirScore))
-			tdTag.insertBefore(<img src='https://docscripts.stagintin.com/red.png' />, tdTag.lastChild)
+			tdTag.insertBefore(<img src='https://docscripts.stagintin.com/icons/red.png' />, tdTag.lastChild)
 	})
 }
