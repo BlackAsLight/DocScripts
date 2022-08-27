@@ -55,10 +55,20 @@ formTag.parentElement?.insertBefore(<div>
 	})) }
 	<br />
 	{ new Date(parseInt(localStorage.getItem(ticksKey) ?? '0')).toJSON() }
-	{/* { pass<HTMLButtonElement>(<button>Refresh</button>, buttonTag => buttonTag.addEventListener('click', event => {
+	{ pass<HTMLButtonElement>(<button>Refresh</button>, buttonTag => buttonTag.addEventListener('click', async event => {
 		const buttonTag = event.target as HTMLButtonElement
 		// Scape to Update Ticks and Score
-	})) } */}
+		buttonTag.toggleAttribute('disabled', true)
+		const score = parseFloat((new DOMParser().parseFromString(await (await fetch('https://politicsandwar.com/nation/war/')).text(), 'text/html').querySelector('a.btn.btn-warning.btn-lg') as HTMLAnchorElement).href.split('?')[ 1 ].split('&').find(arg => arg.startsWith('keyword='))?.slice(8) ?? '0')
+		console.log(`Score: ${score}`)
+		const date = new Date()
+		if (buttonTag.previousSibling)
+			buttonTag.previousSibling.textContent = date.toJSON()
+		localStorage.setItem(ticksKey, `${date.getTime()}`)
+		localStorage.setItem(scoreKey, `${score}`)
+		updateIcons(score)
+		buttonTag.toggleAttribute('disabled', false)
+	})) }
 </div>, formTag.nextElementSibling)
 updateIcons(parseFloat(localStorage.getItem(scoreKey) ?? '0'))
 
