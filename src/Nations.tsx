@@ -66,7 +66,8 @@ formTag.parentElement?.insertBefore(<div>
 			buttonTag.previousSibling.textContent = date.toJSON()
 		localStorage.setItem(ticksKey, `${date.getTime()}`)
 		localStorage.setItem(scoreKey, `${score}`)
-		updateIcons(score)
+		updateIcons(score);
+		(buttonTag.previousElementSibling as HTMLInputElement).value = `${score}`
 		buttonTag.toggleAttribute('disabled', false)
 	})) }
 </div>, formTag.nextElementSibling)
@@ -97,7 +98,7 @@ function updateIcons(myScore: number) {
 			if (inWarRange(myScore, theirScore))
 				tdTag.insertBefore(<img src='https://docscripts.stagintin.com/icons/green_red.png' />, tdTag.lastChild)
 			else
-				tdTag.insertBefore(<img src='https://politicsandwar.com/img/icons/16/tick_shield.png' />, tdTag.lastChild)
+				tdTag.insertBefore(<img src='https://docscripts.stagintin.com/icons/green.png' />, tdTag.lastChild)
 		else if (inWarRange(myScore, theirScore))
 			tdTag.insertBefore(<img src='https://docscripts.stagintin.com/icons/red.png' />, tdTag.lastChild)
 	})
