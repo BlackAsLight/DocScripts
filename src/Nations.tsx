@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Nations
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.1
+// @version      0.2
 // @description  Improves the Nations page UI
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nations/
@@ -24,18 +24,6 @@ document.body.append(<div id='Doc_Nations' style='display: none;' />)
 const scoreKey = 'Doc_N1'
 const ticksKey = 'Doc_N2'
 
-/* User Configuration Settings
--------------------------*/
-// document.querySelector('#leftcolumn')?.append(<div class='Doc_Config'>
-
-// </div>)
-
-/* Styling
--------------------------*/
-// document.head.append(pass<HTMLStyleElement>(<style />, styleTag => {
-
-// }));
-
 /* Main
 -------------------------*/
 const formTag = document.querySelector('form[method="GET"]') as HTMLFormElement
@@ -55,7 +43,7 @@ formTag.parentElement?.insertBefore(<div>
 	})) }
 	<br />
 	{ new Date(parseInt(localStorage.getItem(ticksKey) ?? '0')).toJSON() }
-	{ pass<HTMLButtonElement>(<button>Refresh</button>, buttonTag => buttonTag.addEventListener('click', async event => {
+	{ pass<HTMLButtonElement>(<button class='btn btn-primary' style='margin-inline: 0.5em;'>Refresh</button>, buttonTag => buttonTag.addEventListener('click', async event => {
 		const buttonTag = event.target as HTMLButtonElement
 		// Scape to Update Ticks and Score
 		buttonTag.toggleAttribute('disabled', true)
@@ -67,7 +55,7 @@ formTag.parentElement?.insertBefore(<div>
 		localStorage.setItem(ticksKey, `${date.getTime()}`)
 		localStorage.setItem(scoreKey, `${score}`)
 		updateIcons(score);
-		(buttonTag.previousElementSibling as HTMLInputElement).value = `${score}`
+		((buttonTag.previousElementSibling as HTMLBRElement).previousElementSibling as HTMLInputElement).value = `${score}`
 		buttonTag.toggleAttribute('disabled', false)
 	})) }
 </div>, formTag.nextElementSibling)
