@@ -1,6 +1,7 @@
 {
 	"cSpell.words": [
 		"acctrade",
+		"asynciterable",
 		"behavour",
 		"buysell",
 		"cancelhomegame",
@@ -41,6 +42,5 @@
 	],
 	"javascript.format.semicolons": "insert",
 	"deno.enable": true,
-	"deno.lint": true,
-	"deno.unstable": true
+	"deno.lint": true
 }

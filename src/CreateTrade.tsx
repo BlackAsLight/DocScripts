@@ -10,8 +10,8 @@
 // @grant        none
 // ==/UserScript==
 
-import x from "../jsx.tsx"
-import { sleep } from "../utils.ts";
+import { x } from "../imports.ts";
+import { sleep } from '../utils.ts'
 
 /* Double Injection Protection
 -------------------------*/

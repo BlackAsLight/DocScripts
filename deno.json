@@ -5,8 +5,9 @@
 	},
 	"compilerOptions": {
 		"lib": [
-			"ESNext",
 			"dom",
+			"dom.iterable",
+			"dom.asynciterable",
 			"deno.ns"
 		],
 		"jsxFactory": "x",

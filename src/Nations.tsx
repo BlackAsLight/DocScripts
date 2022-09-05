@@ -10,7 +10,7 @@
 // @grant        none
 // ==/UserScript==
 
-import x from "../jsx.tsx"
+import { x } from "../imports.ts";
 import { pass } from "../utils.ts"
 
 /* Double Injection Protection
