@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.6
+// @version      2.7
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -10,7 +10,7 @@
 // @grant        none
 // ==/UserScript==
 
-import { x } from "../imports.ts";
+import { x } from "../imports.ts"
 import { sleep } from '../utils.ts'
 
 /* Double Injection Protection
@@ -24,7 +24,7 @@ document.body.append(<div id='Doc_CreateTrade' style='display: none;' />)
 const ticksKey = 'Doc_CT1'
 const recursiveKey = 'Doc_CT2'
 const priceKey = 'Doc_CT3'
-const { p, q, t } = Object.fromEntries(location.search.slice(1).split('&').map(args => args.split('=')).map(([ key, value ]) => [ key, `${parseFloat(value)}` === 'NaN' ? value : parseFloat(value) ])) as Record<string, string | number | undefined>
+const { resource, p, q, t } = Object.fromEntries(location.search.slice(1).split('&').map(args => args.split('=')).map(([ key, value ]) => [ key, `${parseFloat(value)}` === 'NaN' ? value : parseFloat(value) ])) as Record<string, string | number | undefined>
 
 /* Main
 -------------------------*/
@@ -35,6 +35,9 @@ if (document.querySelector('.alert-success')) {
 		const i = args.findIndex(arg => arg.startsWith('q='))
 		args[ i ] = `q=${q as number - 1_000_000}`
 		location.href = location.origin + location.pathname + '?' + args.join('&')
+	}
+	else if (resource) {
+		location.href = `https://politicsandwar.com/index.php?id=26&display=world&resource1=${resource}&buysell=${[ 'buy', 'sell' ][ parseInt(localStorage.getItem('Doc_MarketView') as string) ] ?? ''}&ob=price&od=DEF&maximum=100&minimum=0&search=Go`
 	}
 	else {
 		const href = ((document.querySelector('a i.fa-backward') as HTMLElement).parentElement as HTMLAnchorElement).href.split('?')
