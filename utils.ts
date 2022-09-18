@@ -51,18 +51,44 @@ export function capitalise(text: string) {
 
 export function max(...integers: bigint[]) {
 	let max = integers.shift() as bigint
-	for (const integer of integers)
-		if (max < integer)
-			max = integer
+	for (let i = 0; i < integers.length; ++i)
+		if (max < integers[ i ])
+			max = integers[ i ]
 	return max
 }
 
 export function min(...integers: bigint[]) {
 	let min = integers.shift() as bigint
-	for (const integer of integers)
-		if (integer < min)
-			min = integer
+	for (let i = 0; i < integers.length; ++i)
+		if (integers[ i ] < min)
+			min = integers[ i ]
 	return min
+}
+
+export function cusMax<T, U>(func: ((value: T) => U), ...values: T[]) {
+	let maxValue = values.shift() as T
+	let maxResult = func(maxValue)
+	for (let i = 0; i < values.length; ++i) {
+		const result = func(values[ i ])
+		if (maxResult < result) {
+			maxValue = values[ i ]
+			maxResult = result
+		}
+	}
+	return maxValue
+}
+
+export function cusMin<T, U>(func: ((value: T) => U), ...values: T[]) {
+	let minValue = values.shift() as T
+	let minResult = func(minValue)
+	for (let i = 0; i < values.length; ++i) {
+		const result = func(values[ i ])
+		if (result < minResult) {
+			minValue = values[ i ]
+			minResult = result
+		}
+	}
+	return minValue
 }
 
 export function uniqueRandomID() {
@@ -81,14 +107,20 @@ export function endTime(startTime: number) {
 	return (endTime - startTime).toLocaleString('en-US', { maximumFractionDigits: 2 }) + 'ms'
 }
 
+export function passIfTruthy<T>(x: T | None, func: ((x: T) => void)) {
+	if (x)
+		func(x)
+	return x
+}
+
 // deno-lint-ignore no-explicit-any
 export function pass<T>(x: T, func: ((x: T) => any)) {
 	func(x)
 	return x
 }
 
-export async function wrap<T, U>(x: T, func: ((x: T) => U | Promise<U>)) {
-	return await func(x)
+export function wrap<T, U>(x: T, func: ((x: T) => U)) {
+	return func(x)
 }
 
 // deno-lint-ignore no-explicit-any
@@ -130,7 +162,7 @@ export function formatDate(date = new Date()) {
 }
 
 export function formatNumber(number: number, digits = 2) {
-	return number.toLocaleString('en-US', {maximumFractionDigits: digits})
+	return number.toLocaleString('en-US', { maximumFractionDigits: digits })
 }
 
 export function formatBigInt(x: bigint) {
