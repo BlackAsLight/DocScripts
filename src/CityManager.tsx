@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: City Manager
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.1
+// @version      0.2
 // @description  Improving the experience of switching improvements.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/city/id=*
@@ -10,7 +10,7 @@
 // ==/UserScript==
 
 import { x } from "../imports.ts"
-import { waitTilFalse, wrap } from "../utils.ts"
+import { pass, sleep, waitTilFalse, wrap } from "../utils.ts"
 
 /* Double Injection Protection
 -------------------------*/
@@ -49,7 +49,10 @@ document.querySelectorAll('form[action*="#improvements"]')
 			wrap(inputTag.parentElement as HTMLParagraphElement, pTag => (pTag.nextElementSibling ? pTag.nextElementSibling : pTag.previousElementSibling) as HTMLParagraphElement).textContent = wrap((dom.querySelector(`input[name="${inputTag.name}"]`) as HTMLInputElement).parentElement as HTMLParagraphElement, pTag => (pTag.nextElementSibling ? pTag.nextElementSibling : pTag.previousElementSibling) as HTMLParagraphElement).textContent
 			const spanTags = [ ...document.querySelectorAll('.improvementQuantity') ]
 			dom.querySelectorAll('.improvementQuantity').forEach((spanTag, i) => spanTags[ i ].textContent = spanTag.textContent);
-			(document.querySelector('#improvements') as HTMLParagraphElement).insertBefore(dom.querySelector('#improvements>span') as HTMLSpanElement, document.querySelector('#improvements>span'))
+			(document.querySelector('#improvements') as HTMLParagraphElement).insertBefore(dom.querySelector('#improvements>span') as HTMLSpanElement, pass(document.querySelector('#improvements>span') as HTMLSpanElement, async spanTag => {
+				await sleep(0)
+				spanTag.remove()
+			}))
 
 			submitting = false
 			inputTag.toggleAttribute('disabled', false)
