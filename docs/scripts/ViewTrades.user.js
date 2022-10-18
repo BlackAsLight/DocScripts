@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      6.4
+// @version      6.5
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @include      https://politicsandwar.com/index.php?id=26*
@@ -640,21 +640,21 @@ function GenerateNationBio(divTag, tdTag, offerIsPublicOrEmbargo, offerWanted, w
 		}
 	}
 	divTag.append(CreateElement('a', aTag => {
-		aTag.setAttribute('href', tdTag.children[ 0 ].href);
-		aTag.append(tdTag.children[ 0 ].textContent);
+		aTag.setAttribute('href', tdTag.children[ 0 ].children[ 0 ].href);
+		aTag.append(tdTag.children[ 0 ].children[ 0 ].textContent);
 		aTag.append(CreateElement('img', imgTag => {
 			imgTag.classList.add('tinyflag');
-			imgTag.setAttribute('src', tdTag.children[ 0 ].children[ 0 ].src);
+			imgTag.setAttribute('src', tdTag.children[ 0 ].children[ 0 ].children[ 0 ].src);
 		}));
 	}));
 	divTag.append(document.createElement('br'));
-	divTag.append(tdTag.children[ 1 ].nextSibling.textContent.trim());
+	divTag.append(tdTag.children[ 0 ].children[ 1 ].nextSibling.textContent.trim());
 	divTag.append(document.createElement('br'));
-	if (tdTag.lastChild.nodeName === '#text') {
+	if (tdTag.children[ 0 ].lastChild.nodeName === '#text') {
 		divTag.append(CreateElement('i', iTag => iTag.append('None')));
 	}
 	else {
-		const tag = tdTag.lastChild.nodeName === 'A' ? tdTag.lastChild : tdTag.lastChild.previousElementSibling;
+		const tag = tdTag.children[ 0 ].lastChild.nodeName === 'A' ? tdTag.children[ 0 ].lastChild : tdTag.children[ 0 ].lastChild.previousElementSibling;
 		divTag.append(CreateElement('a', aTag => {
 			aTag.setAttribute('href', tag.href);
 			aTag.append(tag.textContent);
