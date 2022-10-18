@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      6.5
+// @version      6.6
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @include      https://politicsandwar.com/index.php?id=26*
@@ -452,7 +452,7 @@ function CreateRow(tdTags) {
 		}
 		return tdTags[ 6 ].textContent.includes('Accepted') ? 'Accepted' : 'Embargo';
 	})();
-	const sellUnits = offerType.endsWith('Public') || offerType === 'Embargo' ? sellerWanted : parseInt(tdTags[ 2 ].children[ 0 ].href.split('=')[ 1 ]) === nationID === (offerType !== 'Receive-Personal');
+	const sellUnits = offerType.endsWith('Public') || offerType === 'Embargo' ? sellerWanted : parseInt(tdTags[ 2 ].children[ 0 ].children[ 0 ].href.split('=')[ 1 ]) === nationID === (offerType !== 'Receive-Personal');
 	const resource = Capitalize(tdTags[ 4 ].children[ 0 ].getAttribute('title'));
 	if (myOffers[ resource ] === undefined) {
 		myOffers[ resource ] = 0;
