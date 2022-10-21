@@ -22,6 +22,21 @@ export enum Resource {
 	Credits
 }
 
+export enum Market {
+	Oil,
+	Coal,
+	Iron,
+	Bauxite,
+	Lead,
+	Uranium,
+	Food,
+	Gasoline,
+	Steel,
+	Aluminum,
+	Munitions,
+	Credits
+}
+
 /* Functions
 -------------------------*/
 export function sleep(ms: number) {
@@ -47,6 +62,10 @@ export function filterMap<T, U>(array: T[], func: ((element: T, i: number) => U 
 
 export function capitalise(text: string) {
 	return filterMap(text.split(' '), word => word ? word[ 0 ].toLocaleUpperCase() + word.slice(1).toLocaleLowerCase() : null).join(' ')
+}
+
+export function abs(integer: bigint) {
+	return integer < 0 ? integer * -1n : integer
 }
 
 export function max(...integers: bigint[]) {
