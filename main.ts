@@ -12,6 +12,8 @@ async function esbuild(inPath: string, outPath: string) {
 		format: 'esm',
 		bundle: true,
 		minify: true,
+		jsxFactory: 'x',
+		jsxFragment: 'y'
 	})
 	errors.forEach(error => console.error(error))
 	warnings.forEach(warning => console.warn(warning))

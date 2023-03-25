@@ -11,7 +11,9 @@ async function esbuild(inPath: string, outPath: string) {
 		outfile: outPath,
 		format: 'esm',
 		bundle: true,
-		keepNames: true
+		keepNames: true,
+		jsxFactory: 'x',
+		jsxFragment: 'y',
 	})
 	errors.forEach(error => console.error(error))
 	warnings.forEach(warning => console.warn(warning))
@@ -21,7 +23,7 @@ try {
 	await Deno.remove('./tests/', { recursive: true })
 }
 // deno-lint-ignore no-empty
-catch {}
+catch { }
 finally {
 	await Deno.mkdir('./tests/', { recursive: true })
 }

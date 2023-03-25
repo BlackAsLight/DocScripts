@@ -1,104 +1,91 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.7
+// @version      2.8
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
-// @include      https://politicsandwar.com/index.php?id=27*
+// @match        https://politicsandwar.com/index.php?id=27*
 // @icon         https://avatars.githubusercontent.com/u/44320105
 // @grant        none
 // ==/UserScript==
 
-import { x } from "../imports.ts"
+import { build, x } from 'https://deno.land/x/basic_jsx@v3.0.1/mod.tsx'
 import { sleep } from '../utils.ts'
 
 /* Double Injection Protection
 -------------------------*/
 if (document.querySelector('#Doc_CreateTrade'))
 	throw Error('This script was already injected...')
-document.body.append(<div id='Doc_CreateTrade' style='display: none;' />)
+document.body.append(build(<div id='Doc_CreateTrade' style='display: none;' />))
 
 /* Global Variables
 -------------------------*/
-const ticksKey = 'Doc_CT1'
-const recursiveKey = 'Doc_CT2'
-const priceKey = 'Doc_CT3'
-const { resource, p, q, t } = Object.fromEntries(location.search.slice(1).split('&').map(args => args.split('=')).map(([ key, value ]) => [ key, `${parseFloat(value)}` === 'NaN' ? value : parseFloat(value) ])) as Record<string, string | number | undefined>
+const enum LocalStorageKeys {
+	Ticks = '!Doc_CT1',
+	Recursive = '!Doc_CT2',
+	Price = '!Doc_CT3',
+	MarketView = 'Doc_MarketView',
+}
+const { resource, p, q, t } = Object.fromEntries(self.location.search.slice(1).split('&').map(args => {
+	const [ key, value ] = args.split('=')
+	const number = parseFloat(value)
+	if (`${number}` === 'NaN')
+		return [ key, value ]
+	return [ key, number ]
+})) as { resource: string | undefined, p: number | undefined, q: number | undefined, t: string | undefined }
 
 /* Main
 -------------------------*/
+// If successfully made a trade offer.
 if (document.querySelector('.alert-success')) {
-	if (q && q > 1_000_000 && localStorage.getItem(recursiveKey)) {
-		localStorage.removeItem(recursiveKey)
-		const args = location.search.slice(1).split('&')
-		const i = args.findIndex(arg => arg.startsWith('q='))
-		args[ i ] = `q=${q as number - 1_000_000}`
-		location.href = location.origin + location.pathname + '?' + args.join('&')
-	}
-	else if (resource) {
-		location.href = `https://politicsandwar.com/index.php?id=26&display=world&resource1=${resource}&buysell=${[ 'buy', 'sell' ][ parseInt(localStorage.getItem('Doc_MarketView') as string) ] ?? ''}&ob=price&od=DEF&maximum=100&minimum=0&search=Go`
-	}
-	else {
-		const href = ((document.querySelector('a i.fa-backward') as HTMLElement).parentElement as HTMLAnchorElement).href.split('?')
-		const args = href[ 1 ].split('&')
-		const i = args.findIndex(arg => arg.startsWith('minimum='))
-		if (i < 0)
-			location.href = href.join('?')
-		else {
-			args[ i ] = 'minimum=0'
-			location.href = href[ 0 ] + '?' + args.join('&')
+	localStorage.setItem(LocalStorageKeys.Ticks, `${new Date().getTime() + 5000}`)
+	if (q && q > 1_000_000 && localStorage.getItem(LocalStorageKeys.Recursive)) {
+		const args = self.location.search.slice(1).split('&')
+		args[ args.findIndex(arg => arg.startsWith('q=')) ] = `q=${q - 1_000_000}`
+		if (localStorage.getItem(LocalStorageKeys.Price)) {
+			args[ args.findIndex(arg => arg.startsWith('p=')) ] = `p=${localStorage.getItem(LocalStorageKeys.Price)}`
+			localStorage.removeItem(LocalStorageKeys.Price)
 		}
+		self.location.href = self.location.origin + self.location.pathname + '?' + args.join('&')
 	}
+	else
+		self.location.href = `https://politicsandwar.com/index.php?id=26&display=world&resource1=${resource ?? document.querySelector<HTMLAnchorElement>('.alert-success a[href^="https://politicsandwar.com/index.php"]')!.href.split('?')[ 1 ].split('&').find(arg => arg.startsWith('resource1='))?.split('=')[ 1 ]}&buysell=${[ 'buy', 'sell' ][ parseInt(localStorage.getItem('Doc_MarketView')!) ] ?? ''}&ob=price&od=DEF&maximum=100&minimum=0&search=Go`
 }
-else if (document.querySelector('#createTrade')) {
-	localStorage.removeItem(recursiveKey)
-	document.querySelector('#createTrade')?.scrollIntoView({
+else if (resource && document.querySelector('form#createTrade')) {
+	localStorage.removeItem(LocalStorageKeys.Recursive)
+	const formTag = document.querySelector('form#createTrade')!
+	formTag.scrollIntoView({
 		behavior: 'smooth',
 		block: 'center'
 	})
-
-	if (p) {
-		const inputTag = document.querySelector('#priceper') as HTMLInputElement
-		inputTag.setAttribute('value', p as string)
-		inputTag.addEventListener('change', () => {
-			const value = inputTag.value
-			if (parseInt(value) === p)
-				localStorage.removeItem(priceKey)
-			else
-				localStorage.setItem(priceKey, value)
-		})
-	}
-	if (q)
-		(document.querySelector('#amount') as HTMLInputElement).setAttribute('value', Math.min(q as number, 1_000_000).toString())
-	if (t) {
-		const tag = (() => {
-			const sellTag = (document.querySelector('button i.fa-hands-usd') as HTMLElement).parentElement as HTMLButtonElement
-			const buyTag = sellTag.nextElementSibling as HTMLButtonElement
-			(t === 's' ? buyTag : sellTag).remove()
-			return t === 's' ? sellTag : buyTag
-		})()
-		tag.style.setProperty('border-radius', '6px')
-		tag.setAttribute('type', 'submit')
-		tag.setAttribute('name', 'submit')
-		tag.setAttribute('value', t === 's' ? 'Sell' : 'Buy')
-		tag.removeAttribute('data-target')
-		const ticks = parseInt(localStorage.getItem(ticksKey) ?? '')
-		if (ticks) {
-			const delay = 5000 + ticks - new Date().getTime()
-			if (delay > 0) {
-				sleep(delay)
-					.then(() => tag.toggleAttribute('disabled', false))
-				tag.toggleAttribute('disabled', true)
-			}
-			localStorage.removeItem(ticksKey)
+	formTag.addEventListener('submit', _event => {
+		if (p) {
+			const price = document.querySelector<HTMLInputElement>('input#priceper')!.valueAsNumber
+			if (price !== p)
+				localStorage.setItem(LocalStorageKeys.Price, `${price}`)
 		}
-		if (q && (q as number) >= 1_000_000)
-			tag.addEventListener('click', () => {
-				if (Math.min(q as number, 1_000_000) === parseInt((document.querySelector('#amount') as HTMLInputElement).getAttribute('value') ?? '')) {
-					localStorage.setItem(ticksKey, `${new Date().getTime()}`)
-					localStorage.setItem(recursiveKey, '0')
-				}
-			})
+		if (q && q >= 1_000_000 && 1_000_000 === document.querySelector<HTMLInputElement>('input#amount')!.valueAsNumber)
+			localStorage.setItem(LocalStorageKeys.Recursive, '0')
+	})
+
+	if (p)
+		document.querySelector<HTMLInputElement>('input#priceper')!.setAttribute('value', `${p}`)
+	if (q)
+		document.querySelector<HTMLInputElement>('input#amount')!.setAttribute('value', `${Math.min(q, 1_000_000)}`)
+	if (t) {
+		document.querySelector<HTMLButtonElement>(`button[data-target="#${t === 's' ? 'buy' : 'sell'}Confirmation"]`)!.remove()
+		const buttonTag = document.querySelector<HTMLButtonElement>(`button[data-target="#${t === 's' ? 'sell' : 'buy'}Confirmation"]`)!
+		buttonTag.style.setProperty('border-radius', '6px')
+		buttonTag.setAttribute('type', 'submit')
+		buttonTag.setAttribute('name', 'submit')
+		buttonTag.setAttribute('value', t === 's' ? 'Sell' : 'Buy')
+		buttonTag.removeAttribute('data-target')
+		const ticks = parseInt(localStorage.getItem(LocalStorageKeys.Ticks) ?? '0') - new Date().getTime()
+		if (ticks > 0) {
+			buttonTag.toggleAttribute('disabled', true)
+			sleep(ticks)
+				.then(() => buttonTag.toggleAttribute('disabled', false))
+		}
 	}
 }
