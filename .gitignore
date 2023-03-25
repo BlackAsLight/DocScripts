@@ -1,2 +1,2 @@
-.DS_Store
 tests/
+docs/scripts/*.min.js

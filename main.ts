@@ -1,8 +1,20 @@
-import { readLines } from 'https://deno.land/std@0.151.0/io/mod.ts'
+import { readLines } from 'https://deno.land/std@0.181.0/io/mod.ts'
+import { build, stop } from 'https://deno.land/x/esbuild@v0.15.10/mod.js'
+import { denoPlugin } from 'https://deno.land/x/esbuild_deno_loader@0.6.0/mod.ts'
+const startTime = performance.now()
 
-function cmd(command: string) {
-	console.log(`Command: ${command}`)
-	return Deno.run({ cmd: command.split(' ') })
+async function esbuild(inPath: string, outPath: string) {
+	console.log(`Transpiling: ${inPath} -> ${outPath}`)
+	const { errors, warnings } = await build({
+		plugins: [ denoPlugin() ],
+		entryPoints: [ inPath ],
+		outfile: outPath,
+		format: 'esm',
+		bundle: true,
+		minify: true,
+	})
+	errors.forEach(error => console.error(error))
+	warnings.forEach(warning => console.warn(warning))
 }
 
 /* Create ./docs/js/main.js
@@ -10,17 +22,21 @@ function cmd(command: string) {
 try {
 	await Deno.remove('./docs/js/', { recursive: true })
 }
+// deno-lint-ignore no-empty
+catch { }
 finally {
 	await Deno.mkdir('./docs/js/', { recursive: true })
 }
 
-await cmd('deno bundle ./ts/main.tsx ./docs/js/main.js').status()
+const promises: Promise<void>[] = [ esbuild('./ts/main.tsx', './docs/js/main.js') ]
 
 /* Compile ./src/ into ./docs/scripts/
 -------------------------*/
 // try {
 // 	await Deno.remove('./docs/scripts/', { recursive: true })
 // }
+// // deno-lint-ignore no-empty
+// catch { }
 // finally {
 // 	await Deno.mkdir('./docs/scripts/', { recursive: true })
 // }
@@ -30,34 +46,47 @@ for await (const dirEntry of dirEntries) {
 	if (!dirEntry.isFile || !(dirEntry.name.endsWith('.tsx') || dirEntry.name.endsWith('.ts')))
 		continue
 
-	const lines: string[] = []
-	let copyLine = false
-	for await (const line of readLines(await Deno.open(`./src/${dirEntry.name}`))) {
-		if (!copyLine) {
-			copyLine = line.trim() === '// ==UserScript=='
-			if (!copyLine)
-				continue
+	promises.push((async () => {
+		const lines: string[] = []
+		{
+			let copyLine = false
+			const file = await Deno.open(`./src/${dirEntry.name}`)
+			for await (const line of readLines(file)) {
+				if (!copyLine)
+					if (line.trim() === '// ==UserScript==')
+						copyLine = true
+					else
+						continue
+				lines.push(line.trim())
+				if (line.trim() === '// ==/UserScript==')
+					break
+			}
+			file.close()
 		}
-		lines.push(line.trim())
-		if (line.trim() === '// ==/UserScript==')
-			break
-	}
-	if (!lines.length)
-		continue
-	lines.push('\'use strict\';\n')
+		if (!lines.length)
+			return
+		lines.push('\'use strict\';\n')
 
-	console.log('\n' + dirEntry.name + '\n')
-	const name = dirEntry.name.slice(0, dirEntry.name.lastIndexOf('.')).replaceAll(' ', '')
-	if (!(await cmd(`deno bundle ./src/${dirEntry.name} ./docs/scripts/${name}.js`).status()).success)
-		continue
-	if (!(await cmd(`esbuild ./docs/scripts/${name}.js --bundle --minify --outfile=./docs/scripts/${name}.min.js`).status()).success)
-		continue
+		const name = dirEntry.name.slice(0, dirEntry.name.lastIndexOf('.')).replaceAll(' ', '')
+		const fileWrite = await Deno.create(`./docs/scripts/${name}.user.js`)
+		await fileWrite.write(Uint8Array.from(lines.join('\n').split('').map(char => char.charCodeAt(0))))
 
-	const file = await Deno.create(`./docs/scripts/${name}.user.js`)
-	await file.write(Uint8Array.from(lines.join('\n').split('').map(char => char.charCodeAt(0))))
-	for await (const line of readLines(await Deno.open(`./docs/scripts/${name}.min.js`)))
-		await file.write(Uint8Array.from((line + '\n').split('').map(char => char.charCodeAt(0))))
+		await esbuild(`./src/${dirEntry.name}`, `./docs/scripts/${name}.min.js`)
+		{
+			console.log(`Converting: ./docs/scripts/${name}.min.js -> ./docs/scripts/${name}.user.js`)
+			const fileRead = await Deno.open(`./docs/scripts/${name}.min.js`)
+			for await (const line of readLines(fileRead))
+				await fileWrite.write(Uint8Array.from((line + '\n').split('').map(char => char.charCodeAt(0))))
+			fileRead.close()
+		}
+		fileWrite.close()
 
-	await Deno.remove(`./docs/scripts/${name}.js`)
-	await Deno.remove(`./docs/scripts/${name}.min.js`)
+		console.log(`Deleting: ./docs/scripts/${name}.min.js`)
+		await Deno.remove(`./docs/scripts/${name}.min.js`)
+	})())
 }
+await Promise.allSettled(promises)
+stop()
+
+const endTime = performance.now()
+console.log(`${(endTime - startTime).toLocaleString('en-US', { maximumFractionDigits: 2 })}ms`)

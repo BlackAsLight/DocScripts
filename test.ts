@@ -1,8 +1,20 @@
-import { readLines } from 'https://deno.land/std@0.151.0/io/mod.ts'
+import { readLines } from 'https://deno.land/std@0.181.0/io/mod.ts'
+import { build, stop } from 'https://deno.land/x/esbuild@v0.15.10/mod.js'
+import { denoPlugin } from 'https://deno.land/x/esbuild_deno_loader@0.6.0/mod.ts'
+const startTime = performance.now()
 
-function cmd(command: string) {
-	console.log(`Command: ${command}`)
-	return Deno.run({ cmd: command.split(' ') })
+async function esbuild(inPath: string, outPath: string) {
+	console.log(`Transpiling: ${inPath} -> ${outPath}`)
+	const { errors, warnings } = await build({
+		plugins: [ denoPlugin() ],
+		entryPoints: [ inPath ],
+		outfile: outPath,
+		format: 'esm',
+		bundle: true,
+		keepNames: true
+	})
+	errors.forEach(error => console.error(error))
+	warnings.forEach(warning => console.warn(warning))
 }
 
 try {
@@ -14,31 +26,42 @@ finally {
 	await Deno.mkdir('./tests/', { recursive: true })
 }
 
-const args = Deno.args
-for (let i = 0; i < args.length; ++i) {
+await Promise.allSettled(Deno.args.map(async arg => {
 	const lines: string[] = []
-	let copyLine = false
-	for await (const line of readLines(await Deno.open(args[ i ]))) {
-		if (!copyLine) {
-			copyLine = line.trim() === '// ==UserScript=='
+	{
+		let copyLine = false
+		const file = await Deno.open(arg)
+		for await (const line of readLines(file)) {
 			if (!copyLine)
-				continue
+				if (line.trim() === '// ==UserScript==')
+					copyLine = true
+				else
+					continue
+			lines.push(line.trim())
+			if (line.trim() === '// ==/UserScript==')
+				break
 		}
-		lines.push(line.trim())
-		if (line.trim() === '// ==/UserScript==')
-			break
+		file.close()
 	}
+	if (!lines.length)
+		return
 	lines.push('\'use strict\';\n')
 
-	console.log(`\n ${args[ i ]} \n`)
-	const name = args[ i ].slice(args[ i ].lastIndexOf('/') + 1, args[ i ].lastIndexOf('.')).replaceAll(' ', '')
-	if (!(await cmd(`deno bundle ${args[ i ]} ./tests/${name}.bundle.js`).status()).success)
-		continue
-	if (!(await cmd(`esbuild ./tests/${name}.bundle.js --bundle --minify --outfile=./tests/${name}.min.js`).status()).success)
-		continue
+	const name = arg.slice(arg.lastIndexOf('/') + 1, arg.lastIndexOf('.')).replaceAll(' ', '')
+	const fileWrite = await Deno.create(`./tests/${name}.js`)
+	await fileWrite.write(Uint8Array.from(lines.join('\n').split('').map(char => char.charCodeAt(0))))
 
-	const file = await Deno.create(`./tests/${name}.js`)
-	await file.write(Uint8Array.from(lines.join('\n').split('').map(char => char.charCodeAt(0))))
-	for await (const line of readLines(await Deno.open(`./tests/${name}.min.js`)))
-		await file.write(Uint8Array.from((line + '\n').split('').map(char => char.charCodeAt(0))))
-}
+	await esbuild(arg, `./tests/${name}.bundle.js`)
+	{
+		console.log(`Converting: ./tests/${name}.bundle.js -> ./tests/${name}.js`)
+		const fileRead = await Deno.open(`./tests/${name}.bundle.js`)
+		for await (const line of readLines(fileRead))
+			await fileWrite.write(Uint8Array.from((line + '\n').split('').map(char => char.charCodeAt(0))))
+		fileRead.close()
+	}
+	fileWrite.close()
+}))
+stop()
+
+const endTime = performance.now()
+console.log(`${(endTime - startTime).toLocaleString('en-US', { maximumFractionDigits: 2 })}ms`)
