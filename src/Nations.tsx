@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Nations
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.2
+// @version      0.3
 // @description  Improves the Nations page UI
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nations/
@@ -10,14 +10,14 @@
 // @grant        none
 // ==/UserScript==
 
-import { x } from "../imports.ts";
+import { build, x } from "https://deno.land/x/basic_jsx@v3.0.1/mod.tsx"
 import { pass } from "../utils.ts"
 
 /* Double Injection Protection
 -------------------------*/
 if (document.querySelector('#Doc_Nations'))
 	throw Error('This script was already injected...')
-document.body.append(<div id='Doc_Nations' style='display: none;' />)
+document.body.append(build(<div id='Doc_Nations' style='display: none;' />))
 
 /* Global Variables
 -------------------------*/
@@ -27,9 +27,9 @@ const ticksKey = 'Doc_N2'
 /* Main
 -------------------------*/
 const formTag = document.querySelector('form[method="GET"]') as HTMLFormElement
-formTag.parentElement?.insertBefore(<div>
+formTag.parentElement?.insertBefore(build(<div>
 	<label for='Doc_Score'>Nation Score: </label>
-	{ pass<HTMLInputElement>(<input id='Doc_Score' type='number' value={ localStorage.getItem(scoreKey) ?? 0 } />, inputTag => inputTag.addEventListener('change', event => {
+	{ pass(build<HTMLInputElement>(<input id='Doc_Score' type='number' value={ `${localStorage.getItem(scoreKey) ?? 0}` } />), inputTag => inputTag.addEventListener('change', event => {
 		const inputTag = event.target as HTMLInputElement
 		const score = parseFloat(inputTag.value)
 		if (`${score}` === 'NaN')
@@ -43,7 +43,7 @@ formTag.parentElement?.insertBefore(<div>
 	})) }
 	<br />
 	{ new Date(parseInt(localStorage.getItem(ticksKey) ?? '0')).toJSON() }
-	{ pass<HTMLButtonElement>(<button class='btn btn-primary' style='margin-inline: 0.5em;'>Refresh</button>, buttonTag => buttonTag.addEventListener('click', async event => {
+	{ pass(build<HTMLButtonElement>(<button class='btn btn-primary' style='margin-inline: 0.5em;'>Refresh</button>), buttonTag => buttonTag.addEventListener('click', async event => {
 		const buttonTag = event.target as HTMLButtonElement
 		// Scape to Update Ticks and Score
 		buttonTag.toggleAttribute('disabled', true)
@@ -58,7 +58,7 @@ formTag.parentElement?.insertBefore(<div>
 		((buttonTag.previousElementSibling as HTMLBRElement).previousElementSibling as HTMLInputElement).value = `${score}`
 		buttonTag.toggleAttribute('disabled', false)
 	})) }
-</div>, formTag.nextElementSibling)
+</div>), formTag.nextElementSibling)
 updateIcons(parseFloat(localStorage.getItem(scoreKey) ?? '0'))
 
 /* Functions
@@ -81,13 +81,13 @@ function updateIcons(myScore: number) {
 			imgTag.remove()
 		})
 		if (inSpyRange(theirScore, myScore))
-			tdTag.insertBefore(<img src='https://politicsandwar.com/img/icons/16/emotion_spy.png' />, tdTag.lastChild)
+			tdTag.insertBefore(build(<img src='https://politicsandwar.com/img/icons/16/emotion_spy.png' />), tdTag.lastChild)
 		if (inWarRange(theirScore, myScore))
 			if (inWarRange(myScore, theirScore))
-				tdTag.insertBefore(<img src='https://docscripts.stagintin.com/icons/green_red.png' />, tdTag.lastChild)
+				tdTag.insertBefore(build(<img src='https://docscripts.stagintin.com/icons/green_red.png' />), tdTag.lastChild)
 			else
-				tdTag.insertBefore(<img src='https://docscripts.stagintin.com/icons/green.png' />, tdTag.lastChild)
+				tdTag.insertBefore(build(<img src='https://docscripts.stagintin.com/icons/green.png' />), tdTag.lastChild)
 		else if (inWarRange(myScore, theirScore))
-			tdTag.insertBefore(<img src='https://docscripts.stagintin.com/icons/red.png' />, tdTag.lastChild)
+			tdTag.insertBefore(build(<img src='https://docscripts.stagintin.com/icons/red.png' />), tdTag.lastChild)
 	})
 }
