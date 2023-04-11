@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      6.7
+// @version      6.8
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @include      https://politicsandwar.com/index.php?id=26*
@@ -372,7 +372,7 @@ function CreateOfferLink(resource, price, sellersWanted, quantity) {
 	if (typeof quantity !== 'number') {
 		const max = parseInt(localStorage.getItem(`Doc_MaxResource_${ resource }`)) || Infinity
 		if (localStorage.getItem('Doc_VT_ZeroAccountability')) {
-			quantity = Math.max(Math.min(Math.floor(sellersWanted ? (resourceBar.Money - MinAmount('Money')) / price - GetQuantity(quantity) : resourceBar[ resource ] - MinAmount(resource) - GetQuantity(quantity)), max), 0)
+			quantity = Math.max(Math.min(Math.floor(sellersWanted ? (resourceBar.Money - MinAmount('Money')) / price - ((quantity && GetQuantity(quantity)) ?? 0) : resourceBar[ resource ] - MinAmount(resource) - ((quantity && GetQuantity(quantity)) ?? 0)), max), 0)
 		}
 		else {
 			quantity = Math.max(Math.min(Math.floor(sellersWanted ? (resourceBar.Money - MinAmount('Money') - myOffers.Money) / price : resourceBar[ resource ] - MinAmount(resource) - myOffers[ resource ]), max), 0)
@@ -389,7 +389,7 @@ function UpdateLinks() {
 
 		for (let i = 0; i < 2; ++i) {
 			[ ...document.querySelectorAll(`.${ i ? 's' : 'b' }Outbid_${ resource }`) ].forEach(aTag => UpdateLink(aTag, CreateOfferLink(resource, GetPrice(aTag.parentElement.parentElement) + (i ? 1 : -1), i ? true : false)));
-			[ ...document.querySelectorAll(`.${ i ? 's' : 'b' }Match_${ resource }, .${ i ? 's' : 'b' }TopUp_${ resource }`) ].forEach(aTag => UpdateLink(aTag, CreateOfferLink(resource, GetPrice(aTag.parentElement.parentElement), i ? true : false, aTag.classList.contains(`${ i ? 's' : 'b' }TopUp_${resource}`) ? aTag.parentElement.parentElement : undefined)))
+			[ ...document.querySelectorAll(`.${ i ? 's' : 'b' }Match_${ resource }, .${ i ? 's' : 'b' }TopUp_${ resource }`) ].forEach(aTag => UpdateLink(aTag, CreateOfferLink(resource, GetPrice(aTag.parentElement.parentElement), i ? true : false, aTag.classList.contains(`${ i ? 's' : 'b' }TopUp_${ resource }`) ? aTag.parentElement.parentElement : undefined)))
 		}
 	}
 }
