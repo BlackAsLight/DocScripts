@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      6.8
+// @version      6.9
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @include      https://politicsandwar.com/index.php?id=26*
@@ -378,7 +378,9 @@ function CreateOfferLink(resource, price, sellersWanted, quantity) {
 			quantity = Math.max(Math.min(Math.floor(sellersWanted ? (resourceBar.Money - MinAmount('Money') - myOffers.Money) / price : resourceBar[ resource ] - MinAmount(resource) - myOffers[ resource ]), max), 0)
 		}
 	}
-	return `https://politicsandwar.com/nation/trade/create/?resource=${ resource.toLowerCase() }&p=${ price }&q=${ quantity }&t=${ sellersWanted ? 'b' : 's' }`
+	if (quantity) {
+		return `https://politicsandwar.com/nation/trade/create/?resource=${ resource.toLowerCase() }&p=${ price }&q=${ quantity }&t=${ sellersWanted ? 'b' : 's' }`
+	}
 }
 
 function UpdateLinks() {
