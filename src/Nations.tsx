@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Nations
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.3
+// @version      0.4
 // @description  Improves the Nations page UI
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nations/
@@ -10,7 +10,7 @@
 // @grant        none
 // ==/UserScript==
 
-import { build, x } from "https://deno.land/x/basic_jsx@v3.0.1/mod.tsx"
+import { build, x } from "https://deno.land/x/basic_jsx@v3.1.2/mod.tsx"
 import { pass } from "../utils.ts"
 
 /* Double Injection Protection
