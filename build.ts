@@ -1,12 +1,13 @@
-import { readLines } from 'https://deno.land/std@0.181.0/io/mod.ts'
-import { build, stop } from 'https://deno.land/x/esbuild@v0.15.10/mod.js'
-import { denoPlugin } from 'https://deno.land/x/esbuild_deno_loader@0.6.0/mod.ts'
+import { readLines } from "https://deno.land/std@0.190.0/io/mod.ts"
+import { build, stop } from 'https://deno.land/x/esbuild@v0.17.19/mod.js'
+import { denoPlugins } from 'https://deno.land/x/esbuild_deno_loader@0.7.0/mod.ts'
+
 const startTime = performance.now()
 
 async function esbuild(inPath: string, outPath: string) {
-	console.log(`Transpiling: ${inPath} -> ${outPath}`)
+	console.log(`Compiling: ${inPath} -> ${outPath}`)
 	const { errors, warnings } = await build({
-		plugins: [ denoPlugin() ],
+		plugins: denoPlugins(),
 		entryPoints: [ inPath ],
 		outfile: outPath,
 		format: 'esm',
@@ -30,7 +31,8 @@ finally {
 	await Deno.mkdir('./docs/js/', { recursive: true })
 }
 
-const promises: Promise<void>[] = [ esbuild('./ts/main.tsx', './docs/js/main.js') ]
+const promises: Promise<void>[] = [ esbuild('./ts/main.ts', './docs/js/main.js') ]
+console.log('')
 
 /* Compile ./src/ into ./docs/scripts/
 -------------------------*/
@@ -45,7 +47,7 @@ const promises: Promise<void>[] = [ esbuild('./ts/main.tsx', './docs/js/main.js'
 
 const dirEntries = Deno.readDir('./src/')
 for await (const dirEntry of dirEntries) {
-	if (!dirEntry.isFile || !(dirEntry.name.endsWith('.tsx') || dirEntry.name.endsWith('.ts')))
+	if (!dirEntry.isFile || !(dirEntry.name.endsWith('.tsx') || !dirEntry.name.endsWith('.ts')))
 		continue
 
 	promises.push((async () => {
@@ -74,13 +76,12 @@ for await (const dirEntry of dirEntries) {
 		await fileWrite.write(Uint8Array.from(lines.join('\n').split('').map(char => char.charCodeAt(0))))
 
 		await esbuild(`./src/${dirEntry.name}`, `./docs/scripts/${name}.min.js`)
-		{
-			console.log(`Converting: ./docs/scripts/${name}.min.js -> ./docs/scripts/${name}.user.js`)
-			const fileRead = await Deno.open(`./docs/scripts/${name}.min.js`)
-			for await (const line of readLines(fileRead))
-				await fileWrite.write(Uint8Array.from((line + '\n').split('').map(char => char.charCodeAt(0))))
-			fileRead.close()
-		}
+
+		console.log(`Appending: ./docs/scripts/${name}.min.js -> ./docs/scripts/${name}.user.js`)
+		const fileRead = await Deno.open(`./docs/scripts/${name}.min.js`)
+		for await (const line of readLines(fileRead))
+			await fileWrite.write(Uint8Array.from((line + '\n').split('').map(char => char.charCodeAt(0))))
+		fileRead.close()
 		fileWrite.close()
 
 		console.log(`Deleting: ./docs/scripts/${name}.min.js`)
