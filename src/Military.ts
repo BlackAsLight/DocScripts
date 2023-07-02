@@ -27,9 +27,12 @@ const data: Promise<{
 	soldiers_today: number,
 	tanks: number,
 	tanks_today: number,
+	aircraft: number,
+	aircraft_today: number,
 	cities: {
 		barracks: number,
-		factory: number
+		factory: number,
+		hanger: number
 	}[]
 }> = fetch(`https://api.politicsandwar.com/graphql?api_key=${LocalStorage.APIKey()}`, {
 	method: 'POST',
@@ -145,6 +148,52 @@ createTag<HTMLFormElement>('form', formTag => {
 		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/tanks/')
+			aTag.textContent = 'Go to Page'
+		})
+	)
+})
+
+// Aircraft
+createTag<HTMLFormElement>('form', formTag => {
+	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
+	divTag.parentElement!.insertBefore(formTag, divTag)
+	divTag.remove()
+
+	formTag.append(
+		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
+			'Aircraft Possessed: ', createTag<HTMLSpanElement>('span', spanTag => {
+				spanTag.append('?')
+				data.then(nation => spanTag.textContent = nation.aircraft.toString())
+			})
+		)),
+		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
+			'Aircraft Manufactured Today: ', createTag<HTMLSpanElement>('span', spanTag => {
+				spanTag.append('?')
+				data.then(nation => spanTag.textContent = nation.aircraft_today.toString())
+			})
+		)),
+		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
+			'Manufacture/Decommission: ', createTag<HTMLInputElement>('input', inputTag => {
+				inputTag.setAttribute('type', 'number')
+				inputTag.setAttribute('name', 'aircraft')
+				inputTag.setAttribute('value', '0')
+				data.then(nation => inputTag.value = Math.round(nation.cities.reduce((sum, city) => sum + city.hanger, 0) * 50 - nation.aircraft_today).toString())
+			})
+		)),
+		createTag<HTMLInputElement>('input', inputTag => {
+			inputTag.setAttribute('type', 'submit')
+			inputTag.setAttribute('name', 'buyaircraft')
+			inputTag.setAttribute('value', 'Manufacture/Decommission Aircraft')
+			inputTag.toggleAttribute('disabled', true)
+			data.then(_nation => inputTag.toggleAttribute('disabled', false))
+		}),
+		createTag<HTMLInputElement>('input', inputTag => {
+			inputTag.setAttribute('type', 'hidden')
+			inputTag.setAttribute('name', 'token')
+			inputTag.setAttribute('value', '')
+		}),
+		createTag<HTMLAnchorElement>('a', aTag => {
+			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/aircraft/')
 			aTag.textContent = 'Go to Page'
 		})
 	)
