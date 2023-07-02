@@ -47,7 +47,7 @@ console.log('')
 
 const dirEntries = Deno.readDir('./src/')
 for await (const dirEntry of dirEntries) {
-	if (!dirEntry.isFile || !(dirEntry.name.endsWith('.tsx') || !dirEntry.name.endsWith('.ts')))
+	if (!dirEntry.isFile || !((dirEntry.name.endsWith('.tsx') || dirEntry.name.endsWith('.ts'))))
 		continue
 
 	promises.push((async () => {
