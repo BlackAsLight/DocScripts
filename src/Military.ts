@@ -29,17 +29,20 @@ const data: Promise<{
 	tanks_today: number,
 	aircraft: number,
 	aircraft_today: number,
+	ships: number,
+	ships_today: number,
 	cities: {
 		barracks: number,
 		factory: number,
-		hanger: number
+		hanger: number,
+		drydock: number
 	}[]
 }> = fetch(`https://api.politicsandwar.com/graphql?api_key=${LocalStorage.APIKey()}`, {
 	method: 'POST',
 	headers: {
 		'Content-Type': 'application/json'
 	},
-	body: JSON.stringify({ query: '{me{nation{soldiers,soldiers_today,tanks,tanks_today,cities{barracks,factory}}}}' })
+	body: JSON.stringify({ query: '{me{nation{soldiers,soldiers_today,tanks,tanks_today,aircraft,aircraft_today,ships,ships_today,cities{barracks,factory,hanger,drydock}}}}' })
 })
 	.then(x => x.json())
 	.then(x => x.data.me.nation)
@@ -194,6 +197,52 @@ createTag<HTMLFormElement>('form', formTag => {
 		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/aircraft/')
+			aTag.textContent = 'Go to Page'
+		})
+	)
+})
+
+// Navel Ships
+createTag<HTMLFormElement>('form', formTag => {
+	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
+	divTag.parentElement!.insertBefore(formTag, divTag)
+	divTag.remove()
+
+	formTag.append(
+		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
+			'Ships Possessed: ', createTag<HTMLSpanElement>('span', spanTag => {
+				spanTag.append('?')
+				data.then(nation => spanTag.textContent = nation.ships.toString())
+			})
+		)),
+		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
+			'Ships Manufactured Today: ', createTag<HTMLSpanElement>('span', spanTag => {
+				spanTag.append('?')
+				data.then(nation => spanTag.textContent = nation.ships_today.toString())
+			})
+		)),
+		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
+			'Manufacture/Decommission: ', createTag<HTMLInputElement>('input', inputTag => {
+				inputTag.setAttribute('type', 'number')
+				inputTag.setAttribute('name', 'ships')
+				inputTag.setAttribute('value', '0')
+				data.then(nation => inputTag.value = Math.round(nation.cities.reduce((sum, city) => sum + city.drydock, 0) * 50 - nation.ships_today).toString())
+			})
+		)),
+		createTag<HTMLInputElement>('input', inputTag => {
+			inputTag.setAttribute('type', 'submit')
+			inputTag.setAttribute('name', 'buyships')
+			inputTag.setAttribute('value', 'Manufacture/Decommission Ships')
+			inputTag.toggleAttribute('disabled', true)
+			data.then(_nation => inputTag.toggleAttribute('disabled', false))
+		}),
+		createTag<HTMLInputElement>('input', inputTag => {
+			inputTag.setAttribute('type', 'hidden')
+			inputTag.setAttribute('name', 'token')
+			inputTag.setAttribute('value', '')
+		}),
+		createTag<HTMLAnchorElement>('a', aTag => {
+			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/navy/')
 			aTag.textContent = 'Go to Page'
 		})
 	)
