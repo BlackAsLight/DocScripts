@@ -127,7 +127,7 @@ createTag<HTMLFormElement>('form', formTag => {
 			})
 		)),
 		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Enlist/Discharge: ', createTag<HTMLInputElement>('input', inputTag => {
+			'Manufacture/Decommission: ', createTag<HTMLInputElement>('input', inputTag => {
 				inputTag.setAttribute('type', 'number')
 				inputTag.setAttribute('name', 'tanks')
 				inputTag.setAttribute('value', '0')
