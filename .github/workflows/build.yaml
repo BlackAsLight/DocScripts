@@ -1,0 +1,23 @@
+name: Build DocScripts
+on:
+  push:
+    branch:
+      - main
+
+jobs:
+  run_deno_command:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Deno
+        uses: denolib/setup-deno@v2
+
+      - name: Run Deno command
+        run: deno run -A build.ts
+
+      - name: Commit changes
+        run: |
+          git commit -am "Build DocScripts via Deno"
+          git push
