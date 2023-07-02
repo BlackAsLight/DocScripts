@@ -16,8 +16,12 @@ interface LocalStorage {
 export const LocalStorage: LocalStorage = {
 	APIKey(set?: string | null): Irrelevant {
 		return localStorage[ set === undefined ? 'getItem' : set !== null ? 'setItem' : 'removeItem' ]('Doc_APIKey', set!)
-	}
+	},
 }
 export enum GetLocalStorageKey {
 	Doc_APIKey = 'APIKey'
+}
+
+export function divSpacer(): HTMLDivElement {
+	return createTag<HTMLDivElement>('div', divTag => divTag.classList.add('spacer'))
 }

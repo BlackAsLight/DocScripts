@@ -9,7 +9,7 @@
 // @grant        none
 // ==/UserScript==
 
-import { createTag, LocalStorage } from "./lib/utils.ts"
+import { createTag, divSpacer, LocalStorage } from "./lib/utils.ts"
 
 /* Double Injection Protection
 -------------------------*/
@@ -52,6 +52,13 @@ const data: Promise<{
 
 /* Styling
 -------------------------*/
+document.head.append(createTag<HTMLStyleElement>('style', styleTag => {
+	styleTag.textContent += '.doc_military { display: grid; grid-template-columns: repeat(2, calc(50% - 0.5rem)); gap: 1rem; }'
+	styleTag.textContent += '.doc_military a { grid-column: 1 / 3; text-align: center; }'
+
+	styleTag.textContent += '.spacer-row { display: flex; flex-direction: row; align-items: center; }'
+	styleTag.textContent += '.spacer { flex-grow: 1; }'
+}))
 
 /* Main
 -------------------------*/
@@ -61,30 +68,40 @@ createTag<HTMLFormElement>('form', formTag => {
 	divTag.parentElement!.insertBefore(formTag, divTag)
 	divTag.remove()
 
+	formTag.classList.add('doc_military')
 	formTag.append(
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Soldiers Enlisted: ', createTag<HTMLSpanElement>('span', spanTag => {
-				spanTag.append('?')
-				data.then(nation => spanTag.textContent = nation.soldiers.toString())
-			})
-		)),
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Soldiers Enlisted Today: ', createTag<HTMLSpanElement>('span', spanTag => {
-				spanTag.append('?')
-				data.then(nation => spanTag.textContent = nation.soldiers_today.toString())
-			})
-		)),
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Enlist/Discharge: ', createTag<HTMLInputElement>('input', inputTag => {
-				inputTag.setAttribute('type', 'number')
-				inputTag.setAttribute('name', 'soldiers')
-				inputTag.setAttribute('value', '0')
-				data.then(nation => {
-					const max = nation.cities.reduce((sum, city) => sum + city.barracks, 0) * 3000
-					inputTag.value = Math.min(Math.round(max / 3 - nation.soldiers_today), max - nation.soldiers).toString()
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Soldiers Enlisted:', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.soldiers.toString())
 				})
-			})
-		)),
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Soldiers Enlisted Today:', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.soldiers_today.toString())
+				})
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Enlist/Discharge:', divSpacer(), createTag<HTMLInputElement>('input', inputTag => {
+					inputTag.setAttribute('type', 'number')
+					inputTag.setAttribute('name', 'soldiers')
+					inputTag.setAttribute('value', '0')
+					data.then(nation => {
+						const max = nation.cities.reduce((sum, city) => sum + city.barracks, 0) * 3000
+						inputTag.value = Math.min(Math.round(max / 3 - nation.soldiers_today), max - nation.soldiers).toString()
+					})
+				})
+			)
+		}),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buysoldiers')
@@ -120,30 +137,40 @@ createTag<HTMLFormElement>('form', formTag => {
 	divTag.parentElement!.insertBefore(formTag, divTag)
 	divTag.remove()
 
+	formTag.classList.add('doc_military')
 	formTag.append(
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Tanks Possessed: ', createTag<HTMLSpanElement>('span', spanTag => {
-				spanTag.append('?')
-				data.then(nation => spanTag.textContent = nation.tanks.toString())
-			})
-		)),
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Tanks Manufactured Today: ', createTag<HTMLSpanElement>('span', spanTag => {
-				spanTag.append('?')
-				data.then(nation => spanTag.textContent = nation.tanks_today.toString())
-			})
-		)),
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Manufacture/Decommission: ', createTag<HTMLInputElement>('input', inputTag => {
-				inputTag.setAttribute('type', 'number')
-				inputTag.setAttribute('name', 'tanks')
-				inputTag.setAttribute('value', '0')
-				data.then(nation => {
-					const max = nation.cities.reduce((sum, city) => sum + city.factory, 0) * 250
-					inputTag.value = Math.min(Math.round(max / 5 - nation.tanks_today), max - nation.tanks).toString()
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Tanks Possessed: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.tanks.toString())
 				})
-			})
-		)),
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Tanks Manufactured Today: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.tanks_today.toString())
+				})
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Manufacture/Decommission: ', divSpacer(), createTag<HTMLInputElement>('input', inputTag => {
+					inputTag.setAttribute('type', 'number')
+					inputTag.setAttribute('name', 'tanks')
+					inputTag.setAttribute('value', '0')
+					data.then(nation => {
+						const max = nation.cities.reduce((sum, city) => sum + city.factory, 0) * 250
+						inputTag.value = Math.min(Math.round(max / 5 - nation.tanks_today), max - nation.tanks).toString()
+					})
+				})
+			)
+		}),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buytanks')
@@ -179,30 +206,40 @@ createTag<HTMLFormElement>('form', formTag => {
 	divTag.parentElement!.insertBefore(formTag, divTag)
 	divTag.remove()
 
+	formTag.classList.add('doc_military')
 	formTag.append(
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Aircraft Possessed: ', createTag<HTMLSpanElement>('span', spanTag => {
-				spanTag.append('?')
-				data.then(nation => spanTag.textContent = nation.aircraft.toString())
-			})
-		)),
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Aircraft Manufactured Today: ', createTag<HTMLSpanElement>('span', spanTag => {
-				spanTag.append('?')
-				data.then(nation => spanTag.textContent = nation.aircraft_today.toString())
-			})
-		)),
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Manufacture/Decommission: ', createTag<HTMLInputElement>('input', inputTag => {
-				inputTag.setAttribute('type', 'number')
-				inputTag.setAttribute('name', 'aircraft')
-				inputTag.setAttribute('value', '0')
-				data.then(nation => {
-					const max = nation.cities.reduce((sum, city) => sum + city.hangar, 0) * 15
-					inputTag.value = Math.min(Math.round(max / 5 - nation.aircraft_today), max - nation.aircraft).toString()
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Aircraft Possessed: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.aircraft.toString())
 				})
-			})
-		)),
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Aircraft Manufactured Today: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.aircraft_today.toString())
+				})
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Manufacture/Decommission: ', divSpacer(), createTag<HTMLInputElement>('input', inputTag => {
+					inputTag.setAttribute('type', 'number')
+					inputTag.setAttribute('name', 'aircraft')
+					inputTag.setAttribute('value', '0')
+					data.then(nation => {
+						const max = nation.cities.reduce((sum, city) => sum + city.hangar, 0) * 15
+						inputTag.value = Math.min(Math.round(max / 5 - nation.aircraft_today), max - nation.aircraft).toString()
+					})
+				})
+			)
+		}),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buyaircraft')
@@ -238,30 +275,40 @@ createTag<HTMLFormElement>('form', formTag => {
 	divTag.parentElement!.insertBefore(formTag, divTag)
 	divTag.remove()
 
+	formTag.classList.add('doc_military')
 	formTag.append(
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Ships Possessed: ', createTag<HTMLSpanElement>('span', spanTag => {
-				spanTag.append('?')
-				data.then(nation => spanTag.textContent = nation.ships.toString())
-			})
-		)),
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Ships Manufactured Today: ', createTag<HTMLSpanElement>('span', spanTag => {
-				spanTag.append('?')
-				data.then(nation => spanTag.textContent = nation.ships_today.toString())
-			})
-		)),
-		createTag<HTMLLabelElement>('label', labelTag => labelTag.append(
-			'Manufacture/Decommission: ', createTag<HTMLInputElement>('input', inputTag => {
-				inputTag.setAttribute('type', 'number')
-				inputTag.setAttribute('name', 'ships')
-				inputTag.setAttribute('value', '0')
-				data.then(nation => {
-					const max = nation.cities.reduce((sum, city) => sum + city.drydock, 0)
-					inputTag.value = Math.min(Math.round(max / 5 - nation.ships_today), max - nation.ships).toString()
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Ships Possessed: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.ships.toString())
 				})
-			})
-		)),
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Ships Manufactured Today: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.ships_today.toString())
+				})
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Manufacture/Decommission: ', divSpacer(), createTag<HTMLInputElement>('input', inputTag => {
+					inputTag.setAttribute('type', 'number')
+					inputTag.setAttribute('name', 'ships')
+					inputTag.setAttribute('value', '0')
+					data.then(nation => {
+						const max = nation.cities.reduce((sum, city) => sum + city.drydock, 0)
+						inputTag.value = Math.min(Math.round(max / 5 - nation.ships_today), max - nation.ships).toString()
+					})
+				})
+			)
+		}),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buyships')
