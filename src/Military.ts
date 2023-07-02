@@ -9,7 +9,7 @@
 // @grant        none
 // ==/UserScript==
 
-import { createTag, divSpacer, LocalStorage } from "./lib/utils.ts"
+import { createTag, divSpacer, LocalStorage, sleep } from "./lib/utils.ts"
 
 /* Double Injection Protection
 -------------------------*/
@@ -46,6 +46,9 @@ const data: Promise<{
 })
 	.then(x => x.json())
 	.then(x => x.data.me.nation)
+
+const initToken = fetch('').then(x => x.text()).then(x => new DOMParser().parseFromString(x, 'text/html').querySelector<HTMLInputElement>('input[name="token"]')!.value)
+let wait = false
 
 /* User Configuration Settings
 -------------------------*/
@@ -110,7 +113,7 @@ createTag<HTMLFormElement>('form', formTag => {
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
 			inputTag.setAttribute('name', 'token')
-			inputTag.setAttribute('value', '')
+			initToken.then(token => inputTag.setAttribute('value', token))
 		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/soldiers/')
@@ -118,17 +121,10 @@ createTag<HTMLFormElement>('form', formTag => {
 		})
 	)
 
-	formTag.addEventListener('submit', async function (event) {
-		event.preventDefault()
-		this.querySelectorAll('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-		await fetch(this.querySelector<HTMLAnchorElement>('a')!.href, {
-			method: 'POST',
-			body: new FormData(this)
-		})
-	}, { passive: false })
+	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
 		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	data.then(_nation => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
+	data.then(_nation => initToken.then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
 })
 
 // Tanks
@@ -179,7 +175,7 @@ createTag<HTMLFormElement>('form', formTag => {
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
 			inputTag.setAttribute('name', 'token')
-			inputTag.setAttribute('value', '')
+			initToken.then(token => inputTag.setAttribute('value', token))
 		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/tanks/')
@@ -187,17 +183,10 @@ createTag<HTMLFormElement>('form', formTag => {
 		})
 	)
 
-	formTag.addEventListener('submit', async function (event) {
-		event.preventDefault()
-		this.querySelectorAll('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-		await fetch(this.querySelector<HTMLAnchorElement>('a')!.href, {
-			method: 'POST',
-			body: new FormData(this)
-		})
-	}, { passive: false })
+	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
 		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	data.then(_nation => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
+	data.then(_nation => initToken.then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
 })
 
 // Aircraft
@@ -248,7 +237,7 @@ createTag<HTMLFormElement>('form', formTag => {
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
 			inputTag.setAttribute('name', 'token')
-			inputTag.setAttribute('value', '')
+			initToken.then(token => inputTag.setAttribute('value', token))
 		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/aircraft/')
@@ -256,17 +245,10 @@ createTag<HTMLFormElement>('form', formTag => {
 		})
 	)
 
-	formTag.addEventListener('submit', async function (event) {
-		event.preventDefault()
-		this.querySelectorAll('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-		await fetch(this.querySelector<HTMLAnchorElement>('a')!.href, {
-			method: 'POST',
-			body: new FormData(this)
-		})
-	}, { passive: false })
+	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
 		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	data.then(_nation => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
+	data.then(_nation => initToken.then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
 })
 
 // Navel Ships
@@ -317,7 +299,7 @@ createTag<HTMLFormElement>('form', formTag => {
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
 			inputTag.setAttribute('name', 'token')
-			inputTag.setAttribute('value', '')
+			initToken.then(token => inputTag.setAttribute('value', token))
 		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/navy/')
@@ -325,15 +307,24 @@ createTag<HTMLFormElement>('form', formTag => {
 		})
 	)
 
-	formTag.addEventListener('submit', async function (event) {
-		event.preventDefault()
-		this.querySelectorAll('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-		await fetch(this.querySelector<HTMLAnchorElement>('a')!.href, {
-			method: 'POST',
-			body: new FormData(this)
-		})
-	}, { passive: false })
+	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
 		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	data.then(_nation => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
+	data.then(_nation => initToken.then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
 })
+
+/* Functions
+-------------------------*/
+async function formSubmitEvent(this: HTMLFormElement, event: SubmitEvent): Promise<void> {
+	event.preventDefault()
+	this.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	while (wait)
+		await sleep(50)
+	wait = true
+	const token = new DOMParser().parseFromString(await (await fetch(this.querySelector<HTMLAnchorElement>('a')!.href, {
+		method: 'POST',
+		body: new FormData(this)
+	})).text(), 'text/html').querySelector<HTMLInputElement>('input[name="token"]')!.value
+	document.querySelectorAll('input[name="token"]').forEach(inputTag => inputTag.setAttribute('value', token))
+	wait = false
+}

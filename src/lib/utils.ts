@@ -22,6 +22,10 @@ export enum GetLocalStorageKey {
 	Doc_APIKey = 'APIKey'
 }
 
+export function sleep(ms: number): Promise<true> {
+	return new Promise<true>(a => setTimeout(() => a(true), ms))
+}
+
 export function divSpacer(): HTMLDivElement {
 	return createTag<HTMLDivElement>('div', divTag => divTag.classList.add('spacer'))
 }
