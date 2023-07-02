@@ -47,7 +47,7 @@ const data: Promise<{
 	.then(x => x.json())
 	.then(x => x.data.me.nation)
 
-const initToken = fetch('').then(x => x.text()).then(x => new DOMParser().parseFromString(x, 'text/html').querySelector<HTMLInputElement>('input[name="token"]')!.value)
+const initToken = fetch('https://politicsandwar.com/nation/military/soldiers/').then(x => x.text()).then(x => new DOMParser().parseFromString(x, 'text/html').querySelector<HTMLInputElement>('input[name="token"]')!.value)
 let wait = false
 
 /* User Configuration Settings
