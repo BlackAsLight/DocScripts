@@ -34,7 +34,7 @@ const data: Promise<{
 	cities: {
 		barracks: number,
 		factory: number,
-		hanger: number,
+		hangar: number,
 		drydock: number
 	}[]
 }> = fetch(`https://api.politicsandwar.com/graphql?api_key=${LocalStorage.APIKey()}`, {
@@ -42,7 +42,7 @@ const data: Promise<{
 	headers: {
 		'Content-Type': 'application/json'
 	},
-	body: JSON.stringify({ query: '{me{nation{soldiers,soldiers_today,tanks,tanks_today,aircraft,aircraft_today,ships,ships_today,cities{barracks,factory,hanger,drydock}}}}' })
+	body: JSON.stringify({ query: '{me{nation{soldiers,soldiers_today,tanks,tanks_today,aircraft,aircraft_today,ships,ships_today,cities{barracks,factory,hangar,drydock}}}}' })
 })
 	.then(x => x.json())
 	.then(x => x.data.me.nation)
@@ -79,15 +79,16 @@ createTag<HTMLFormElement>('form', formTag => {
 				inputTag.setAttribute('type', 'number')
 				inputTag.setAttribute('name', 'soldiers')
 				inputTag.setAttribute('value', '0')
-				data.then(nation => inputTag.value = Math.round(nation.cities.reduce((sum, city) => sum + city.barracks, 0) * 1000 - nation.soldiers_today).toString())
+				data.then(nation => {
+					const max = nation.cities.reduce((sum, city) => sum + city.barracks, 0) * 3000
+					inputTag.value = Math.min(Math.round(max / 3 - nation.soldiers_today), max - nation.soldiers).toString()
+				})
 			})
 		)),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buysoldiers')
 			inputTag.setAttribute('value', 'Enlist/Discharge Soldiers')
-			inputTag.toggleAttribute('disabled', true)
-			data.then(_nation => inputTag.toggleAttribute('disabled', false))
 		}),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
@@ -108,6 +109,9 @@ createTag<HTMLFormElement>('form', formTag => {
 			body: new FormData(this)
 		})
 	}, { passive: false })
+
+		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	data.then(_nation => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
 })
 
 // Tanks
@@ -134,15 +138,16 @@ createTag<HTMLFormElement>('form', formTag => {
 				inputTag.setAttribute('type', 'number')
 				inputTag.setAttribute('name', 'tanks')
 				inputTag.setAttribute('value', '0')
-				data.then(nation => inputTag.value = Math.round(nation.cities.reduce((sum, city) => sum + city.factory, 0) * 50 - nation.tanks_today).toString())
+				data.then(nation => {
+					const max = nation.cities.reduce((sum, city) => sum + city.factory, 0) * 250
+					inputTag.value = Math.min(Math.round(max / 5 - nation.tanks_today), max - nation.tanks).toString()
+				})
 			})
 		)),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buytanks')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Tanks')
-			inputTag.toggleAttribute('disabled', true)
-			data.then(_nation => inputTag.toggleAttribute('disabled', false))
 		}),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
@@ -154,6 +159,18 @@ createTag<HTMLFormElement>('form', formTag => {
 			aTag.textContent = 'Go to Page'
 		})
 	)
+
+	formTag.addEventListener('submit', async function (event) {
+		event.preventDefault()
+		this.querySelectorAll('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+		await fetch(this.querySelector<HTMLAnchorElement>('a')!.href, {
+			method: 'POST',
+			body: new FormData(this)
+		})
+	}, { passive: false })
+
+		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	data.then(_nation => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
 })
 
 // Aircraft
@@ -180,15 +197,16 @@ createTag<HTMLFormElement>('form', formTag => {
 				inputTag.setAttribute('type', 'number')
 				inputTag.setAttribute('name', 'aircraft')
 				inputTag.setAttribute('value', '0')
-				data.then(nation => inputTag.value = Math.round(nation.cities.reduce((sum, city) => sum + city.hanger, 0) * 50 - nation.aircraft_today).toString())
+				data.then(nation => {
+					const max = nation.cities.reduce((sum, city) => sum + city.hangar, 0) * 15
+					inputTag.value = Math.min(Math.round(max / 5 - nation.aircraft_today), max - nation.aircraft).toString()
+				})
 			})
 		)),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buyaircraft')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Aircraft')
-			inputTag.toggleAttribute('disabled', true)
-			data.then(_nation => inputTag.toggleAttribute('disabled', false))
 		}),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
@@ -200,6 +218,18 @@ createTag<HTMLFormElement>('form', formTag => {
 			aTag.textContent = 'Go to Page'
 		})
 	)
+
+	formTag.addEventListener('submit', async function (event) {
+		event.preventDefault()
+		this.querySelectorAll('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+		await fetch(this.querySelector<HTMLAnchorElement>('a')!.href, {
+			method: 'POST',
+			body: new FormData(this)
+		})
+	}, { passive: false })
+
+		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	data.then(_nation => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
 })
 
 // Navel Ships
@@ -226,15 +256,16 @@ createTag<HTMLFormElement>('form', formTag => {
 				inputTag.setAttribute('type', 'number')
 				inputTag.setAttribute('name', 'ships')
 				inputTag.setAttribute('value', '0')
-				data.then(nation => inputTag.value = Math.round(nation.cities.reduce((sum, city) => sum + city.drydock, 0) * 50 - nation.ships_today).toString())
+				data.then(nation => {
+					const max = nation.cities.reduce((sum, city) => sum + city.drydock, 0)
+					inputTag.value = Math.min(Math.round(max / 5 - nation.ships_today), max - nation.ships).toString()
+				})
 			})
 		)),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buyships')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Ships')
-			inputTag.toggleAttribute('disabled', true)
-			data.then(_nation => inputTag.toggleAttribute('disabled', false))
 		}),
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
@@ -246,7 +277,16 @@ createTag<HTMLFormElement>('form', formTag => {
 			aTag.textContent = 'Go to Page'
 		})
 	)
-})
 
-/* Functions
--------------------------*/
+	formTag.addEventListener('submit', async function (event) {
+		event.preventDefault()
+		this.querySelectorAll('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+		await fetch(this.querySelector<HTMLAnchorElement>('a')!.href, {
+			method: 'POST',
+			body: new FormData(this)
+		})
+	}, { passive: false })
+
+		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	data.then(_nation => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
+})
