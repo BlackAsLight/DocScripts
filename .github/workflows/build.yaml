@@ -19,5 +19,7 @@ jobs:
 
       - name: Commit changes
         run: |
+          git config --global user.name "BlackAsLight"
+          git config --global user.email "44320105+BlackAsLight@users.noreply.github.com"
           git commit -am "Build DocScripts via Deno"
           git push
