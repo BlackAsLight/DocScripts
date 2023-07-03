@@ -1,0 +1,54 @@
+name: Build and Deploy to Github Pages
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Load Repo
+        uses: actions/checkout@v3
+      - name: Check for Changes
+        id: has_change
+        run: |
+          if git diff --name-only HEAD^ | sed -n '/*.ts/q'; then
+            echo "::set-output name=changes::true"
+          else
+            echo "::set-output name=changes::false"
+          fi
+      - name: Load Deno
+        if: steps.has_change.outputs.changes == 'true'
+        uses: denoland/setup-deno@v1
+      - name: Convert ts > js
+        if: steps.has_change.outputs.changes == 'true'
+        run: deno run -A build.ts
+      - name: Commit Changes
+        if: steps.has_change.outputs.changes == 'true'
+        run: |
+          if git diff --name-only HEAD^ | sed -n '/*.js/q'; then
+            git config --global user.name "BlackAsLight"
+            git config --global user.email "44320105+BlackAsLight@users.noreply.github.com"
+            git commit -am "Built docs/"
+            git push
+          fi
+
+      - name: Reload Repo
+        uses: actions/checkout@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: 'docs/'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
