@@ -20,10 +20,10 @@ jobs:
       - name: Check for Changes
         id: has_change
         run: |
-          if git diff --name-only HEAD^ | sed -n '/*.ts/q'; then
-            echo "::set-output name=changes::true"
+          if ${{git diff --name-only HEAD^ | grep ts/ || git diff --name-only HEAD^ | grep src/ }}; then
+            echo "{changes}={true}" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=changes::false"
+            echo "{changes}={false}" >> $GITHUB_OUTPUT
           fi
       - name: Load Deno
         if: steps.has_change.outputs.changes == 'true'
@@ -34,7 +34,7 @@ jobs:
       - name: Commit Changes
         if: steps.has_change.outputs.changes == 'true'
         run: |
-          if git diff --name-only HEAD^ | sed -n '/*.js/q'; then
+          if git diff --name-only HEAD^ | grep docs/; then
             git config --global user.name "BlackAsLight"
             git config --global user.email "44320105+BlackAsLight@users.noreply.github.com"
             git commit -am "Built docs/"
