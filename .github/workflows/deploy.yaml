@@ -20,7 +20,7 @@ jobs:
       - name: Check for Changes
         id: has_change
         run: |
-          if ${{git diff --name-only HEAD^ | grep ts/ || git diff --name-only HEAD^ | grep src/ }}; then
+          if git diff --name-only HEAD^ | grep ts/ || git diff --name-only HEAD^ | grep src/; then
             echo "{changes}={true}" >> $GITHUB_OUTPUT
           else
             echo "{changes}={false}" >> $GITHUB_OUTPUT
