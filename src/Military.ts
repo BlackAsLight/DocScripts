@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Military
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.2
+// @version      0.3
 // @description  Making it easier to militarise and demilitarise your army.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/military/
@@ -22,6 +22,10 @@ document.body.append(createTag<HTMLDivElement>('div', divTag => {
 
 /* Global Variables
 -------------------------*/
+fetch('https://politicsandwar.com/nation/military/soldiers/')
+	.then(x => x.text())
+	.then(x => sessionStorage.setItem('Doc_Token', new DOMParser().parseFromString(x, 'text/html').querySelector<HTMLInputElement>('input[name="token"]')!.value))
+
 const data: Promise<{
 	soldiers: number,
 	soldiers_today: number,
@@ -36,18 +40,17 @@ const data: Promise<{
 		factory: number,
 		hangar: number,
 		drydock: number
-	}[]
+	}[],
+	propaganda_bureau: boolean
 }> = fetch(`https://api.politicsandwar.com/graphql?api_key=${LocalStorage.APIKey()}`, {
 	method: 'POST',
 	headers: {
 		'Content-Type': 'application/json'
 	},
-	body: JSON.stringify({ query: '{me{nation{soldiers,soldiers_today,tanks,tanks_today,aircraft,aircraft_today,ships,ships_today,cities{barracks,factory,hangar,drydock}}}}' })
+	body: JSON.stringify({ query: '{me{nation{soldiers,soldiers_today,tanks,tanks_today,aircraft,aircraft_today,ships,ships_today,cities{barracks,factory,hangar,drydock},propaganda_bureau}}}' })
 })
 	.then(x => x.json())
 	.then(x => x.data.me.nation)
-
-const initToken = fetch('https://politicsandwar.com/nation/military/soldiers/').then(x => x.text()).then(x => new DOMParser().parseFromString(x, 'text/html').querySelector<HTMLInputElement>('input[name="token"]')!.value)
 let wait = false
 
 /* User Configuration Settings
@@ -99,8 +102,8 @@ createTag<HTMLFormElement>('form', formTag => {
 					inputTag.setAttribute('name', 'soldiers')
 					inputTag.setAttribute('value', '0')
 					data.then(nation => {
-						const max = nation.cities.reduce((sum, city) => sum + city.barracks, 0) * 3000
-						inputTag.value = Math.min(Math.round(max / 3 - nation.soldiers_today), max - nation.soldiers).toString()
+						const maxUnits = nation.cities.reduce((sum, city) => sum + city.barracks, 0) * 3000
+						inputTag.value = Math.min(Math.round(maxUnits / 3 * (nation.propaganda_bureau ? 1.1 : 1) - nation.soldiers_today), maxUnits - nation.soldiers).toString()
 					})
 				})
 			)
@@ -113,7 +116,7 @@ createTag<HTMLFormElement>('form', formTag => {
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
 			inputTag.setAttribute('name', 'token')
-			initToken.then(token => inputTag.setAttribute('value', token))
+			getSessionToken().then(token => inputTag.setAttribute('value', token))
 		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/soldiers/')
@@ -124,7 +127,7 @@ createTag<HTMLFormElement>('form', formTag => {
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
 		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	data.then(_nation => initToken.then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
+	data.then(_nation => getSessionToken().then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
 })
 
 // Tanks
@@ -161,8 +164,8 @@ createTag<HTMLFormElement>('form', formTag => {
 					inputTag.setAttribute('name', 'tanks')
 					inputTag.setAttribute('value', '0')
 					data.then(nation => {
-						const max = nation.cities.reduce((sum, city) => sum + city.factory, 0) * 250
-						inputTag.value = Math.min(Math.round(max / 5 - nation.tanks_today), max - nation.tanks).toString()
+						const maxUnits = nation.cities.reduce((sum, city) => sum + city.factory, 0) * 250
+						inputTag.value = Math.min(Math.round(maxUnits / 5 * (nation.propaganda_bureau ? 1.1 : 1) - nation.tanks_today), maxUnits - nation.tanks).toString()
 					})
 				})
 			)
@@ -175,7 +178,7 @@ createTag<HTMLFormElement>('form', formTag => {
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
 			inputTag.setAttribute('name', 'token')
-			initToken.then(token => inputTag.setAttribute('value', token))
+			getSessionToken().then(token => inputTag.setAttribute('value', token))
 		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/tanks/')
@@ -186,7 +189,7 @@ createTag<HTMLFormElement>('form', formTag => {
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
 		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	data.then(_nation => initToken.then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
+	data.then(_nation => getSessionToken().then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
 })
 
 // Aircraft
@@ -223,8 +226,8 @@ createTag<HTMLFormElement>('form', formTag => {
 					inputTag.setAttribute('name', 'aircraft')
 					inputTag.setAttribute('value', '0')
 					data.then(nation => {
-						const max = nation.cities.reduce((sum, city) => sum + city.hangar, 0) * 15
-						inputTag.value = Math.min(Math.round(max / 5 - nation.aircraft_today), max - nation.aircraft).toString()
+						const maxUnits = nation.cities.reduce((sum, city) => sum + city.hangar, 0) * 15
+						inputTag.value = Math.min(Math.round(maxUnits / 5 * (nation.propaganda_bureau ? 1.1 : 1) - nation.aircraft_today), maxUnits - nation.aircraft).toString()
 					})
 				})
 			)
@@ -237,7 +240,7 @@ createTag<HTMLFormElement>('form', formTag => {
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
 			inputTag.setAttribute('name', 'token')
-			initToken.then(token => inputTag.setAttribute('value', token))
+			getSessionToken().then(token => inputTag.setAttribute('value', token))
 		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/aircraft/')
@@ -248,7 +251,7 @@ createTag<HTMLFormElement>('form', formTag => {
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
 		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	data.then(_nation => initToken.then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
+	data.then(_nation => getSessionToken().then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
 })
 
 // Navel Ships
@@ -285,8 +288,8 @@ createTag<HTMLFormElement>('form', formTag => {
 					inputTag.setAttribute('name', 'ships')
 					inputTag.setAttribute('value', '0')
 					data.then(nation => {
-						const max = nation.cities.reduce((sum, city) => sum + city.drydock, 0)
-						inputTag.value = Math.min(Math.round(max / 5 - nation.ships_today), max - nation.ships).toString()
+						const maxUnits = nation.cities.reduce((sum, city) => sum + city.drydock, 0) * 5
+						inputTag.value = Math.min(Math.round(maxUnits / 5 * (nation.propaganda_bureau ? 1.1 : 1) - nation.ships_today), maxUnits - nation.ships).toString()
 					})
 				})
 			)
@@ -299,7 +302,7 @@ createTag<HTMLFormElement>('form', formTag => {
 		createTag<HTMLInputElement>('input', inputTag => {
 			inputTag.setAttribute('type', 'hidden')
 			inputTag.setAttribute('name', 'token')
-			initToken.then(token => inputTag.setAttribute('value', token))
+			getSessionToken().then(token => inputTag.setAttribute('value', token))
 		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/navy/')
@@ -310,7 +313,8 @@ createTag<HTMLFormElement>('form', formTag => {
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
 		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	data.then(_nation => initToken.then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
+	Promise.all([ data, getSessionToken() ])
+		.then(() => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
 })
 
 /* Functions
@@ -323,8 +327,14 @@ async function formSubmitEvent(this: HTMLFormElement, event: SubmitEvent): Promi
 	wait = true
 	const token = new DOMParser().parseFromString(await (await fetch(this.querySelector<HTMLAnchorElement>('a')!.href, {
 		method: 'POST',
-		body: new FormData(this)
+		body: [ ...this.querySelectorAll<HTMLInputElement>('input[name][value]') ].reduce((formData, inputTag) => (formData.append(inputTag.name, inputTag.value), formData), new FormData())
 	})).text(), 'text/html').querySelector<HTMLInputElement>('input[name="token"]')!.value
 	document.querySelectorAll('input[name="token"]').forEach(inputTag => inputTag.setAttribute('value', token))
 	wait = false
+}
+
+async function getSessionToken() {
+	while (!sessionStorage.getItem('Doc_Token'))
+		await sleep(50)
+	return sessionStorage.getItem('Doc_Token')!
 }
