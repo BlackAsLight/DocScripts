@@ -54,3 +54,32 @@ export function sleep(ms: number): Promise<true> {
 export function divSpacer(): HTMLDivElement {
 	return createTag<HTMLDivElement>('div', divTag => divTag.classList.add('spacer'))
 }
+
+function userConfig() {
+	return document.querySelector<HTMLDivElement>('#Doc_Config') ?? createTag<HTMLDivElement>('div', divTag => {
+		document.querySelector('#leftcolumn')!.append(divTag)
+		divTag.setAttribute('id', 'Doc_Config')
+	})
+}
+
+export function userConfig_Label(label: string) {
+	const divTag = userConfig()
+	divTag.append(document.createElement('hr'))
+	divTag.append(createTag<HTMLElement>('b', bTag => bTag.append(label)))
+}
+
+export function userConfig_APIKey() {
+	const divTag = userConfig()
+	divTag.append(document.createElement('br'))
+	divTag.append(createTag<HTMLButtonElement>('button', buttonTag => {
+		const apiKey = LocalStorage.APIKey()
+		buttonTag.append(apiKey ? 'Update API Key' : 'Insert API Key')
+		buttonTag.addEventListener('click', _event => {
+			const response = prompt('Insert API Key | It can be found at the bottom of the Accounts Page:', apiKey ?? '')
+			if (response === null)
+				return
+			LocalStorage.APIKey(response || null)
+			location.reload()
+		})
+	}))
+}

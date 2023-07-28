@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Military
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.3
+// @version      0.4
 // @description  Making it easier to militarise and demilitarise your army.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/military/
@@ -9,7 +9,7 @@
 // @grant        none
 // ==/UserScript==
 
-import { createTag, divSpacer, LocalStorage, sleep } from "./lib/utils.ts"
+import { createTag, divSpacer, LocalStorage, sleep, userConfig_APIKey, userConfig_Label } from "./lib/utils.ts"
 
 /* Double Injection Protection
 -------------------------*/
@@ -55,6 +55,8 @@ let wait = false
 
 /* User Configuration Settings
 -------------------------*/
+userConfig_Label('Military')
+userConfig_APIKey()
 
 /* Styling
 -------------------------*/
@@ -64,6 +66,11 @@ document.head.append(createTag<HTMLStyleElement>('style', styleTag => {
 
 	styleTag.textContent += '.spacer-row { display: flex; flex-direction: row; align-items: center; }'
 	styleTag.textContent += '.spacer { flex-grow: 1; }'
+
+	styleTag.append('#Doc_Config { text-align: center; padding: 0 1em; font-size: 0.8em; }')
+	styleTag.append('#Doc_Config b { font-size: 1.25em; }')
+	styleTag.append('#Doc_Config button { font-size: inherit; font-weight: normal; padding: 0; }')
+	styleTag.append('#Doc_Config hr { margin: 0.5em 0; }')
 }))
 
 /* Main
