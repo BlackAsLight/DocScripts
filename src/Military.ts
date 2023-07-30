@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Military
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.4
+// @version      0.5
 // @description  Making it easier to militarise and demilitarise your army.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/military/
@@ -35,19 +35,30 @@ const data: Promise<{
 	aircraft_today: number,
 	ships: number,
 	ships_today: number,
+	spies: number,
+	spies_today: number,
+	missiles: number,
+	missiles_today: number,
+	nukes: number,
+	nukes_today: number,
 	cities: {
 		barracks: number,
 		factory: number,
 		hangar: number,
 		drydock: number
 	}[],
-	propaganda_bureau: boolean
+	propaganda_bureau: boolean,
+	central_intelligence_agency: boolean,
+	spy_satellite: boolean,
+	missile_launch_pad: boolean,
+	space_program: boolean,
+	nuclear_research_facility: boolean
 }> = fetch(`https://api.politicsandwar.com/graphql?api_key=${LocalStorage.APIKey()}`, {
 	method: 'POST',
 	headers: {
 		'Content-Type': 'application/json'
 	},
-	body: JSON.stringify({ query: '{me{nation{soldiers,soldiers_today,tanks,tanks_today,aircraft,aircraft_today,ships,ships_today,cities{barracks,factory,hangar,drydock},propaganda_bureau}}}' })
+	body: JSON.stringify({ query: '{me{nation{soldiers,soldiers_today,tanks,tanks_today,aircraft,aircraft_today,ships,ships_today,spies,spies_today,missiles,missiles_today,nukes,nukes_today,cities{barracks,factory,hangar,drydock},propaganda_bureau,central_intelligence_agency,spy_satellite,missile_launch_pad,space_program,nuclear_research_facility}}}' })
 })
 	.then(x => x.json())
 	.then(x => x.data.me.nation)
@@ -322,6 +333,197 @@ createTag<HTMLFormElement>('form', formTag => {
 		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
 	Promise.all([ data, getSessionToken() ])
 		.then(() => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
+})
+
+// Spies
+createTag<HTMLFormElement>('form', formTag => {
+	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
+	divTag.parentElement!.insertBefore(formTag, divTag)
+	divTag.remove()
+
+	formTag.classList.add('doc_military')
+	formTag.append(
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Spies Enlisted: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.spies.toString())
+				})
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Spies Enlisted Today: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.spies_today.toString())
+				})
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Enlist/Discharge: ', divSpacer(), createTag<HTMLInputElement>('input', inputTag => {
+					inputTag.setAttribute('type', 'number')
+					inputTag.setAttribute('name', 'spies')
+					inputTag.setAttribute('value', '0')
+					data.then(nation => inputTag.value = Math.min(
+						(nation.central_intelligence_agency ? 3 : 2) + (nation.spy_satellite ? 1 : 0) - nation.spies_today,
+						(nation.central_intelligence_agency ? 60 : 50) - nation.spies
+					).toString())
+				})
+			)
+		}),
+		createTag<HTMLInputElement>('input', inputTag => {
+			inputTag.setAttribute('type', 'submit')
+			inputTag.setAttribute('name', 'train_spies')
+			inputTag.setAttribute('value', 'Enlist/Discharge Spies')
+		}),
+		createTag<HTMLInputElement>('input', inputTag => {
+			inputTag.setAttribute('type', 'hidden')
+			inputTag.setAttribute('name', 'token')
+			getSessionToken().then(token => inputTag.setAttribute('value', token))
+		}),
+		createTag<HTMLAnchorElement>('a', aTag => {
+			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/spies/')
+			aTag.textContent = 'Go to Page'
+		})
+	)
+
+	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
+
+		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	Promise.all([ data, getSessionToken() ])
+		.then(() => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
+})
+
+// Missiles
+createTag<HTMLFormElement>('form', formTag => {
+	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
+	divTag.parentElement!.insertBefore(formTag, divTag)
+	divTag.remove()
+
+	formTag.classList.add('doc_military')
+	formTag.append(
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Missiles Stockpiled: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.missiles.toString())
+				})
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Missiles Manufactured Today: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.missiles_today.toString())
+				})
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Manufacture/Decommission: ', divSpacer(), createTag<HTMLInputElement>('input', inputTag => {
+					inputTag.setAttribute('type', 'number')
+					inputTag.setAttribute('name', 'missile_purchase_input_amount')
+					inputTag.setAttribute('value', '0')
+					data.then(nation => inputTag.value = ((nation.space_program ? 3 : 2) - nation.missiles_today).toString())
+				})
+			)
+		}),
+		createTag<HTMLInputElement>('input', inputTag => {
+			inputTag.setAttribute('type', 'submit')
+			inputTag.setAttribute('name', 'missile_purchase_form_submit')
+			inputTag.setAttribute('value', 'Manufacture/Decommission Missiles')
+		}),
+		createTag<HTMLInputElement>('input', inputTag => {
+			inputTag.setAttribute('type', 'hidden')
+			inputTag.setAttribute('name', 'token')
+			getSessionToken().then(token => inputTag.setAttribute('value', token))
+		}),
+		createTag<HTMLAnchorElement>('a', aTag => {
+			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/missiles/')
+			aTag.textContent = 'Go to Page'
+		})
+	)
+
+	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
+
+		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	data.then(async nation => {
+		if (!nation.missile_launch_pad)
+			return
+		await getSessionToken()
+			;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))
+	})
+})
+
+// Nukes
+createTag<HTMLFormElement>('form', formTag => {
+	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
+	divTag.parentElement!.insertBefore(formTag, divTag)
+	divTag.remove()
+
+	formTag.classList.add('doc_military')
+	formTag.append(
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Nuclear Weapons Possessed: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.nukes.toString())
+				})
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Nuclear Weapons Manufactured Today: ', divSpacer(), createTag<HTMLSpanElement>('span', spanTag => {
+					spanTag.append('?')
+					data.then(nation => spanTag.textContent = nation.nukes_today.toString())
+				})
+			)
+		}),
+		createTag<HTMLLabelElement>('label', labelTag => {
+			labelTag.classList.add('spacer-row')
+			labelTag.append(
+				'Manufacture/Decommission: ', divSpacer(), createTag<HTMLInputElement>('input', inputTag => {
+					inputTag.setAttribute('type', 'number')
+					inputTag.setAttribute('name', 'ships')
+					inputTag.setAttribute('value', '0')
+					data.then(nation => inputTag.value = (1 - nation.nukes_today).toString())
+				})
+			)
+		}),
+		createTag<HTMLInputElement>('input', inputTag => {
+			inputTag.setAttribute('type', 'submit')
+			inputTag.setAttribute('name', 'buyships')
+			inputTag.setAttribute('value', 'Manufacture/Decommission Nuclear Weapons')
+		}),
+		createTag<HTMLInputElement>('input', inputTag => {
+			inputTag.setAttribute('type', 'hidden')
+			inputTag.setAttribute('name', 'token')
+			getSessionToken().then(token => inputTag.setAttribute('value', token))
+		}),
+		createTag<HTMLAnchorElement>('a', aTag => {
+			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/nukes/')
+			aTag.textContent = 'Go to Page'
+		})
+	)
+
+	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
+
+		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	data.then(async nation => {
+		if (!nation.nuclear_research_facility)
+			return
+		await getSessionToken()
+			;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))
+	})
 })
 
 /* Functions
