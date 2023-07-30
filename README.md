@@ -17,4 +17,4 @@ On most platforms you can recevie DocScripts' updates automatically but on a few
 
 ## Contributing
 
-If you'd like to contribute then you're welcome to fork this project and open a pull request. The repo is currently under a slow shift to moving the scripts to TypeScript instead of JavaScript so any new contributions will need to be done in TypeScript. You'll also need Deno and esbuild to successfully convert it to JavaScript for users to access it on the website. 
+If you'd like to contribute then you're welcome to fork this project and open a pull request. The repo is currently under a slow shift to moving the scripts to TypeScript instead of JavaScript so any new contributions will need to be done in TypeScript. You'll need Deno to convert the ts to js to test locally, but the Github Actions will end up doing the final conversion for the website version. Do make sure you update the server version in the script.
