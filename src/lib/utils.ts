@@ -1,6 +1,18 @@
+import * as localStorage from './localStorage.ts'
+
 export type None = undefined | null
 // deno-lint-ignore no-explicit-any
 export type Irrelevant = any
+
+const locks: Record<string, boolean> = {}
+export async function lock<T>(key: string, func: () => Promise<T>): Promise<T> {
+	while (locks[ key ])
+		await sleep(50)
+	locks[ key ] = true
+	try { return await func() }
+	catch (error) { throw error }
+	finally { locks[ key ] = false }
+}
 
 export function createTag<T extends HTMLElement>(type: string, func?: ((tag: T) => void)): T {
 	const tag = document.createElement(type) as T
@@ -9,34 +21,6 @@ export function createTag<T extends HTMLElement>(type: string, func?: ((tag: T) 
 	return tag
 }
 
-interface LocalStorage {
-	APIKey(): string | null
-	APIKey(set: string | null): void
-	Hash(): string | null
-	Hash(set: string | null): void
-	Token(func: ((token: string | null) => string | null | Promise<string | null>)): Promise<void>
-	aSynclyLastChecked(): number
-	aSynclyLastChecked(set: number | null): void
-}
-export const LocalStorage: LocalStorage = {
-	APIKey(set?: string | null): Irrelevant {
-		return localStorage[ set === undefined ? 'getItem' : set !== null ? 'setItem' : 'removeItem' ]('Doc_APIKey', set!)
-	},
-	Hash(set?: string | null): Irrelevant {
-		return localStorage[ set === undefined ? 'getItem' : set !== null ? 'setItem' : 'removeItem' ]('!Doc_Hash', set!)
-	},
-	async Token(func: (token: string | null) => string | null | Promise<string | null>): Promise<Irrelevant> {
-		const set = await func(localStorage.getItem('!Doc_Token'))
-		localStorage[ set !== null ? 'setItem' : 'removeItem' ]('!Doc_Token', set!)
-	},
-	aSynclyLastChecked(set?: number | null): Irrelevant {
-		if (set === undefined)
-			return parseInt(localStorage.getItem('!Doc_aS1') ?? '0') || 0
-		if (set !== null)
-			return localStorage.setItem('!Doc_aS1', set.toString())
-		localStorage.removeItem('!Doc_aS1')
-	}
-}
 export enum GetLocalStorageKey {
 	Doc_APIKey = 'APIKey'
 }
@@ -72,13 +56,13 @@ export function userConfig_APIKey() {
 	const divTag = userConfig()
 	divTag.append(document.createElement('br'))
 	divTag.append(createTag<HTMLButtonElement>('button', buttonTag => {
-		const apiKey = LocalStorage.APIKey()
+		const apiKey = localStorage.APIKey()
 		buttonTag.append(apiKey ? 'Update API Key' : 'Insert API Key')
 		buttonTag.addEventListener('click', _event => {
 			const response = prompt('Insert API Key | It can be found at the bottom of the Accounts Page:', apiKey ?? '')
 			if (response === null)
 				return
-			LocalStorage.APIKey(response || null)
+			localStorage.APIKey(response || null)
 			location.reload()
 		})
 	}))

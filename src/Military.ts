@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Military
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.5
+// @version      0.6
 // @description  Making it easier to militarise and demilitarise your army.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/military/
@@ -9,7 +9,9 @@
 // @grant        none
 // ==/UserScript==
 
-import { createTag, divSpacer, LocalStorage, sleep, userConfig_APIKey, userConfig_Label } from "./lib/utils.ts"
+import * as localStorage from './lib/localStorage.ts'
+import * as sessionStorage from './lib/sessionStorage.ts'
+import { createTag, divSpacer, lock, sleep, userConfig_APIKey, userConfig_Label } from './lib/utils.ts'
 
 /* Double Injection Protection
 -------------------------*/
@@ -22,10 +24,6 @@ document.body.append(createTag<HTMLDivElement>('div', divTag => {
 
 /* Global Variables
 -------------------------*/
-fetch('https://politicsandwar.com/nation/military/soldiers/')
-	.then(x => x.text())
-	.then(x => sessionStorage.setItem('Doc_Token', new DOMParser().parseFromString(x, 'text/html').querySelector<HTMLInputElement>('input[name="token"]')!.value))
-
 const data: Promise<{
 	soldiers: number,
 	soldiers_today: number,
@@ -53,7 +51,7 @@ const data: Promise<{
 	missile_launch_pad: boolean,
 	space_program: boolean,
 	nuclear_research_facility: boolean
-}> = fetch(`https://api.politicsandwar.com/graphql?api_key=${LocalStorage.APIKey()}`, {
+}> = fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.APIKey()}`, {
 	method: 'POST',
 	headers: {
 		'Content-Type': 'application/json'
@@ -62,7 +60,6 @@ const data: Promise<{
 })
 	.then(x => x.json())
 	.then(x => x.data.me.nation)
-let wait = false
 
 /* User Configuration Settings
 -------------------------*/
@@ -131,11 +128,6 @@ createTag<HTMLFormElement>('form', formTag => {
 			inputTag.setAttribute('name', 'buysoldiers')
 			inputTag.setAttribute('value', 'Enlist/Discharge Soldiers')
 		}),
-		createTag<HTMLInputElement>('input', inputTag => {
-			inputTag.setAttribute('type', 'hidden')
-			inputTag.setAttribute('name', 'token')
-			getSessionToken().then(token => inputTag.setAttribute('value', token))
-		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/soldiers/')
 			aTag.textContent = 'Go to Page'
@@ -144,8 +136,9 @@ createTag<HTMLFormElement>('form', formTag => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	data.then(_nation => getSessionToken().then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	Promise.all([ data, sessionStorage.Token(() => undefined) ])
+		.then(_token => formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
 })
 
 // Tanks
@@ -193,11 +186,6 @@ createTag<HTMLFormElement>('form', formTag => {
 			inputTag.setAttribute('name', 'buytanks')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Tanks')
 		}),
-		createTag<HTMLInputElement>('input', inputTag => {
-			inputTag.setAttribute('type', 'hidden')
-			inputTag.setAttribute('name', 'token')
-			getSessionToken().then(token => inputTag.setAttribute('value', token))
-		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/tanks/')
 			aTag.textContent = 'Go to Page'
@@ -206,8 +194,9 @@ createTag<HTMLFormElement>('form', formTag => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	data.then(_nation => getSessionToken().then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	Promise.all([ data, sessionStorage.Token(() => undefined) ])
+		.then(_token => formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
 })
 
 // Aircraft
@@ -255,11 +244,6 @@ createTag<HTMLFormElement>('form', formTag => {
 			inputTag.setAttribute('name', 'buyaircraft')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Aircraft')
 		}),
-		createTag<HTMLInputElement>('input', inputTag => {
-			inputTag.setAttribute('type', 'hidden')
-			inputTag.setAttribute('name', 'token')
-			getSessionToken().then(token => inputTag.setAttribute('value', token))
-		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/aircraft/')
 			aTag.textContent = 'Go to Page'
@@ -268,8 +252,9 @@ createTag<HTMLFormElement>('form', formTag => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	data.then(_nation => getSessionToken().then(_token => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))))
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	Promise.all([ data, sessionStorage.Token(() => undefined) ])
+		.then(_token => formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
 })
 
 // Navel Ships
@@ -317,11 +302,6 @@ createTag<HTMLFormElement>('form', formTag => {
 			inputTag.setAttribute('name', 'buyships')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Ships')
 		}),
-		createTag<HTMLInputElement>('input', inputTag => {
-			inputTag.setAttribute('type', 'hidden')
-			inputTag.setAttribute('name', 'token')
-			getSessionToken().then(token => inputTag.setAttribute('value', token))
-		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/navy/')
 			aTag.textContent = 'Go to Page'
@@ -330,9 +310,9 @@ createTag<HTMLFormElement>('form', formTag => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	Promise.all([ data, getSessionToken() ])
-		.then(() => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	Promise.all([ data, sessionStorage.Token(() => undefined) ])
+		.then(() => formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
 })
 
 // Spies
@@ -380,11 +360,6 @@ createTag<HTMLFormElement>('form', formTag => {
 			inputTag.setAttribute('name', 'train_spies')
 			inputTag.setAttribute('value', 'Enlist/Discharge Spies')
 		}),
-		createTag<HTMLInputElement>('input', inputTag => {
-			inputTag.setAttribute('type', 'hidden')
-			inputTag.setAttribute('name', 'token')
-			getSessionToken().then(token => inputTag.setAttribute('value', token))
-		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/spies/')
 			aTag.textContent = 'Go to Page'
@@ -393,9 +368,9 @@ createTag<HTMLFormElement>('form', formTag => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	Promise.all([ data, getSessionToken() ])
-		.then(() => [ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	Promise.all([ data, sessionStorage.Token(() => undefined) ])
+		.then(() => formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', false)))
 })
 
 // Missiles
@@ -440,11 +415,6 @@ createTag<HTMLFormElement>('form', formTag => {
 			inputTag.setAttribute('name', 'missile_purchase_form_submit')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Missiles')
 		}),
-		createTag<HTMLInputElement>('input', inputTag => {
-			inputTag.setAttribute('type', 'hidden')
-			inputTag.setAttribute('name', 'token')
-			getSessionToken().then(token => inputTag.setAttribute('value', token))
-		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/missiles/')
 			aTag.textContent = 'Go to Page'
@@ -453,12 +423,12 @@ createTag<HTMLFormElement>('form', formTag => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
 	data.then(async nation => {
 		if (!nation.missile_launch_pad)
 			return
-		await getSessionToken()
-			;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))
+		await sessionStorage.Token(() => undefined)
+		formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', false))
 	})
 })
 
@@ -504,11 +474,6 @@ createTag<HTMLFormElement>('form', formTag => {
 			inputTag.setAttribute('name', 'buyships')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Nuclear Weapons')
 		}),
-		createTag<HTMLInputElement>('input', inputTag => {
-			inputTag.setAttribute('type', 'hidden')
-			inputTag.setAttribute('name', 'token')
-			getSessionToken().then(token => inputTag.setAttribute('value', token))
-		}),
 		createTag<HTMLAnchorElement>('a', aTag => {
 			aTag.setAttribute('href', 'https://politicsandwar.com/nation/military/nukes/')
 			aTag.textContent = 'Go to Page'
@@ -517,12 +482,12 @@ createTag<HTMLFormElement>('form', formTag => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-		;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', true))
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
 	data.then(async nation => {
 		if (!nation.nuclear_research_facility)
 			return
-		await getSessionToken()
-			;[ ...formTag.querySelectorAll<HTMLInputElement>('input') ].forEach(inputTag => inputTag.toggleAttribute('disabled', false))
+		await sessionStorage.Token(() => undefined)
+		formTag.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', false))
 	})
 })
 
@@ -531,19 +496,9 @@ createTag<HTMLFormElement>('form', formTag => {
 async function formSubmitEvent(this: HTMLFormElement, event: SubmitEvent): Promise<void> {
 	event.preventDefault()
 	this.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', true))
-	while (wait)
-		await sleep(50)
-	wait = true
-	const token = new DOMParser().parseFromString(await (await fetch(this.querySelector<HTMLAnchorElement>('a')!.href, {
+	await sessionStorage.Token(async token => new DOMParser().parseFromString(await (await fetch(this.querySelector<HTMLAnchorElement>('a')!.href, {
 		method: 'POST',
-		body: [ ...this.querySelectorAll<HTMLInputElement>('input[name][value]') ].reduce((formData, inputTag) => (formData.append(inputTag.name, inputTag.value), formData), new FormData())
-	})).text(), 'text/html').querySelector<HTMLInputElement>('input[name="token"]')!.value
-	document.querySelectorAll('input[name="token"]').forEach(inputTag => inputTag.setAttribute('value', token))
-	wait = false
-}
-
-async function getSessionToken() {
-	while (!sessionStorage.getItem('Doc_Token'))
-		await sleep(50)
-	return sessionStorage.getItem('Doc_Token')!
+		body: [ ...this.querySelectorAll<HTMLInputElement>('input[name][value]'), { name: 'token', value: token } ]
+			.reduce((formData, inputTag) => (formData.append(inputTag.name, inputTag.value), formData), new FormData())
+	})).text(), 'text/html').querySelector<HTMLInputElement>('input[name="token"]')?.value ?? null)
 }
