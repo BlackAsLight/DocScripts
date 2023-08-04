@@ -11,7 +11,7 @@ export async function lock<T>(key: string, func: () => Promise<T>): Promise<T> {
 	locks[ key ] = true
 	try { return await func() }
 	catch (error) { throw error }
-	finally { locks[ key ] = false }
+	finally { delete locks[ key ] }
 }
 
 export function createTag<T extends HTMLElement>(type: string, func?: ((tag: T) => void)): T {
