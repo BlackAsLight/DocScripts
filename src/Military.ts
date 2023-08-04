@@ -11,7 +11,7 @@
 
 import * as localStorage from './lib/localStorage.ts'
 import * as sessionStorage from './lib/sessionStorage.ts'
-import { createTag, divSpacer, lock, sleep, userConfig_APIKey, userConfig_Label } from './lib/utils.ts'
+import { createTag, divSpacer, userConfig_APIKey, userConfig_Label } from './lib/utils.ts'
 
 /* Double Injection Protection
 -------------------------*/
