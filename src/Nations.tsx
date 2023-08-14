@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Nations
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.4
+// @version      0.5
 // @description  Improves the Nations page UI
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nations/
@@ -47,7 +47,7 @@ formTag.parentElement?.insertBefore(build(<div>
 		const buttonTag = event.target as HTMLButtonElement
 		// Scape to Update Ticks and Score
 		buttonTag.toggleAttribute('disabled', true)
-		const score = parseFloat((new DOMParser().parseFromString(await (await fetch('https://politicsandwar.com/nation/war/')).text(), 'text/html').querySelector('a.btn.btn-warning.btn-lg') as HTMLAnchorElement).href.split('?')[ 1 ].split('&').find(arg => arg.startsWith('keyword='))?.slice(8) ?? '0')
+		const score = parseFloat((new DOMParser().parseFromString(await (await fetch('https://politicsandwar.com/nation/war/')).text(), 'text/html').querySelector('a[href^="/index.php?id=15"]') as HTMLAnchorElement).href.split('?')[ 1 ].split('&').find(arg => arg.startsWith('keyword='))?.slice(8) ?? '0')
 		console.log(`Score: ${score}`)
 		const date = new Date()
 		if (buttonTag.previousSibling)
