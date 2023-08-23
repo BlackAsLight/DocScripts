@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Play Baseball
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.3
+// @version      2.4
 // @description  Makes Playing Baseball Better
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/obl/host/*
@@ -20,21 +20,6 @@ document.body.append(CreateElement('div', divTag => {
 	divTag.setAttribute('id', 'Doc_Baseball');
 	divTag.style.setProperty('display', 'none');
 }));
-
-/* Migration
--------------------------*/
-async function Migration() {
-	const nationIDs = (JSON.parse(localStorage.getItem('Doc_SB_Books')) || []).filter(book => book.leaderName === undefined).map(book => book.nationID);
-	while (nationIDs.length) {
-		const subNationIDs = nationIDs.splice(0, 500);
-		const nations = JSON.parse(await (await fetch(`https://api.politicsandwar.com/graphql?api_key=${localStorage.getItem('Doc_APIKey')}&query={nations(id:[${subNationIDs.join(',')}]){data{id leader_name}}}`)).text()).data.nations.data;
-		const books = JSON.parse(localStorage.getItem('Doc_SB_Books'));
-		for (const nation of nations) {
-			(books.find(book => book.nationID === parseInt(nation.id)) || {}).leaderName = nation.leader_name;
-		}
-		localStorage.setItem('Doc_SB_Books', JSON.stringify(books.filter(book => book.leaderName)));
-	}
-}
 
 /* Global Variables
 -------------------------*/
@@ -503,7 +488,7 @@ async function AwayGame() {
 
 async function GetDoc(options) {
 	let doc = new DOMParser().parseFromString(await (await fetch(location.href, options)).text(), 'text/html');
-	while (!doc.querySelector('input')) {
+	while (!doc.querySelector('input[name="token"]') && !doc.querySelector('a[href="https://politicsandwar.com/obl/play/"]')) {
 		console.info(doc);
 		if (!localStorage.getItem('Doc_SB_Human')) {
 			location.reload();
@@ -731,7 +716,7 @@ async function RemoveNotify(pTag, ms) {
 
 /* Start
 -------------------------*/
-Migration().then(() => Main());
+Main();
 function Main() {
 	NotifySection();
 	const divTag = CreateElement('div', divTag => {
