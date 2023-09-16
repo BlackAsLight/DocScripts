@@ -15,27 +15,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Load Repo
-        uses: actions/checkout@v3
-      - name: Load Deno
-        uses: denoland/setup-deno@v1
-      - name: Convert ts > js
-        run: deno run -A bundle.ts
-      - name: Commit Changes
-        run: |
+      - uses: actions/checkout@v3
+      - uses: jetli/wasm-bindgen-action@v0.2.0
+      - uses: denoland/setup-deno@v1
+      - run: make release
+      - run: |
           if git diff --name-only | grep -q ''; then
             git config --global user.name "BlackAsLight"
             git config --global user.email "44320105+BlackAsLight@users.noreply.github.com"
             git commit -am "Built static/"
             git push
           fi
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+      - uses: actions/configure-pages@v3
+      - uses: actions/upload-pages-artifact@v1
         with:
           path: 'static/'
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - id: deployment
         uses: actions/deploy-pages@v2
