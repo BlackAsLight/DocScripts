@@ -20,13 +20,13 @@ jobs:
       - name: Load Deno
         uses: denoland/setup-deno@v1
       - name: Convert ts > js
-        run: deno run -A build.ts
+        run: deno run -A bundle.ts
       - name: Commit Changes
         run: |
           if git diff --name-only | grep -q ''; then
             git config --global user.name "BlackAsLight"
             git config --global user.email "44320105+BlackAsLight@users.noreply.github.com"
-            git commit -am "Built docs/"
+            git commit -am "Built static/"
             git push
           fi
 
@@ -35,7 +35,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: 'docs/'
+          path: 'static/'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2

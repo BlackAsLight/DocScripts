@@ -1,2 +1,3 @@
+static/wasm/
+target/
 tests/
-docs/scripts/*.min.js

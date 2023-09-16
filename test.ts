@@ -1,10 +1,9 @@
 import { readLines } from "https://deno.land/std@0.192.0/io/mod.ts"
+// @deno-types="https://deno.land/x/esbuild@v0.17.19/mod.d.ts"
 import { build, stop } from 'https://deno.land/x/esbuild@v0.17.19/mod.js'
 import { denoPlugins } from 'https://deno.land/x/esbuild_deno_loader@0.7.0/mod.ts'
-const startTime = performance.now()
 
 async function esbuild(inPath: string, outPath: string) {
-	console.log(`Compiling: ${inPath} -> ${outPath}`)
 	const { errors, warnings } = await build({
 		plugins: denoPlugins(),
 		entryPoints: [ inPath ],
@@ -13,26 +12,17 @@ async function esbuild(inPath: string, outPath: string) {
 		bundle: true,
 		keepNames: true,
 		jsxFactory: 'x',
-		jsxFragment: 'y',
+		jsxFragment: 'y'
 	})
 	errors.forEach(error => console.error(error))
 	warnings.forEach(warning => console.warn(warning))
 }
 
-try {
-	await Deno.remove('./tests/', { recursive: true })
-}
-// deno-lint-ignore no-empty
-catch { }
-finally {
-	await Deno.mkdir('./tests/', { recursive: true })
-}
-
-await Promise.allSettled(Deno.args.map(async arg => {
+async function createScript(path: string) {
 	const lines: string[] = []
 	{
 		let copyLine = false
-		const file = await Deno.open(arg)
+		const file = await Deno.open(path)
 		for await (const line of readLines(file)) {
 			if (!copyLine)
 				if (line.trim() === '// ==UserScript==')
@@ -49,19 +39,27 @@ await Promise.allSettled(Deno.args.map(async arg => {
 		return
 	lines.push('\'use strict\';\n')
 
-	const name = arg.slice(arg.lastIndexOf('/') + 1, arg.lastIndexOf('.')).replaceAll(' ', '')
-	const fileWrite = await Deno.create(`./tests/${name}.js`)
-	await fileWrite.write(Uint8Array.from(lines.join('\n').split('').map(char => char.charCodeAt(0))))
+	const name = path.slice(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
+	const file = await Deno.create(`./tests/${name}.user.js`)
+	await file.write(Uint8Array.from(lines.join('\n').split('').map(char => char.charCodeAt(0))))
+	await esbuild(path, `./tests/${name}.min.js`)
+	await file.write(await Deno.readFile(`./tests/${name}.min.js`))
+	file.close()
+	await Deno.remove(`./tests/${name}.min.js`)
+}
 
-	await esbuild(arg, `./tests/${name}.bundle.js`)
-	console.log(`Appending: ./tests/${name}.bundle.js -> ./tests/${name}.js`)
-	const fileRead = await Deno.open(`./tests/${name}.bundle.js`)
-	for await (const line of readLines(fileRead))
-		await fileWrite.write(Uint8Array.from((line + '\n').split('').map(char => char.charCodeAt(0))))
-	fileRead.close()
-	fileWrite.close()
-}))
+/* Create ./tests/
+-------------------------*/
+try {
+	await Deno.remove('./tests/', { recursive: true })
+}
+// deno-lint-ignore no-empty
+catch { }
+finally {
+	await Deno.mkdir('./tests/', { recursive: true })
+}
+
+await Promise.allSettled(Deno.args.map(arg => createScript(arg)))
 stop()
 
-const endTime = performance.now()
-console.log(`${(endTime - startTime).toLocaleString('en-US', { maximumFractionDigits: 2 })}ms`)
+console.log(`${performance.now().toLocaleString('en-US', { maximumFractionDigits: 2 })}ms`)

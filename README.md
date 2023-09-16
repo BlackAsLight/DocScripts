@@ -1,5 +1,5 @@
 # DocScripts
-This repo contains the source code for the scripts maintainced by Doctor for a game called [Politics and War](http://politicsandwar.com).
+This repo contains the source code for the scripts maintained by Doctor for a game called [Politics and War](http://politicsandwar.com).
 
 These scripts offer QoL things to the game in various specific areas. To find out more about how to use the scripts head to [DocScripts](https://docscripts.stagintin.com/)
 
@@ -13,7 +13,7 @@ DocScripts can be installed on many browsers and platforms. You can find the ins
 
 ## Update
 
-On most platforms you can recevie DocScripts' updates automatically but on a few you'll need to manually update. You're also able to disable updates. You can find information about updates [here](https://docscripts.stagintin.com/#updates)
+On most platforms you can receive DocScripts' updates automatically but on a few you'll need to manually update. You're also able to disable updates. You can find information about updates [here](https://docscripts.stagintin.com/#updates)
 
 ## Contributing
 
