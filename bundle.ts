@@ -52,7 +52,7 @@ async function createScript(path: string) {
 await Promise.all([
 	/* Create ./docs/js/
 	-------------------------*/
-	Deno.remove('static/js/', { recursive: true }).catch()
+	Deno.remove('static/js/', { recursive: true }).catch(() => {})
 		.finally(() => Deno.mkdir('./static/js/', { recursive: true })),
 
 	/* Create ./static/scripts/
