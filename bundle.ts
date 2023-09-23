@@ -1,4 +1,5 @@
-import { readLines } from "https://deno.land/std@0.192.0/io/mod.ts"
+import { readLines } from "https://deno.land/std@0.201.0/io/mod.ts"
+import { encode } from "https://deno.land/std@0.201.0/encoding/base64.ts";
 // @deno-types="https://deno.land/x/esbuild@v0.17.19/mod.d.ts"
 import { build, stop } from 'https://deno.land/x/esbuild@v0.17.19/mod.js'
 import { denoPlugins } from 'https://deno.land/x/esbuild_deno_loader@0.7.0/mod.ts'
@@ -72,10 +73,7 @@ const promises: Promise<void>[] = [
 		if (await Deno.stat('./static/wasm/trade_bg.wasm').then(() => true).catch(() => false)) {
 			await Deno.writeTextFile(
 				'./static/wasm/Trade.ts',
-				`${await Deno.readTextFile('./trade/prefix.ts')}\nimport { initSync } from './trade.js'\ninitSync(new WebAssembly.Module(Uint8Array.from(atob('${btoa(
-					[ ...await Deno.readFile('./static/wasm/trade_bg.wasm') ]
-						.map(byte => String.fromCharCode(byte)).join('')
-				)}').split('').map(char => char.charCodeAt(0)))))`
+				`${await Deno.readTextFile('./trade/prefix.ts')}\nimport x from './trade.js'\nx(fetch('data:application/wasm;base64,${encode(await Deno.readFile('./static/wasm/trade_bg.wasm'))}'))`
 			)
 			await createScript('./static/wasm/Trade.ts')
 		}
