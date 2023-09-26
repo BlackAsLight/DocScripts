@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.8
+// @version      2.9
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -40,9 +40,9 @@ const { resource, p, q, t } = Object.fromEntries(self.location.search.slice(1).s
 // If successfully made a trade offer.
 if (document.querySelector('.alert-success')) {
 	localStorage.setItem(LocalStorageKeys.Ticks, `${new Date().getTime() + 5000}`)
-	if (q && q > 1_000_000 && localStorage.getItem(LocalStorageKeys.Recursive)) {
+	if (q && q > 10_000_000 && localStorage.getItem(LocalStorageKeys.Recursive)) {
 		const args = self.location.search.slice(1).split('&')
-		args[ args.findIndex(arg => arg.startsWith('q=')) ] = `q=${q - 1_000_000}`
+		args[ args.findIndex(arg => arg.startsWith('q=')) ] = `q=${q - 10_000_000}`
 		if (localStorage.getItem(LocalStorageKeys.Price)) {
 			args[ args.findIndex(arg => arg.startsWith('p=')) ] = `p=${localStorage.getItem(LocalStorageKeys.Price)}`
 			localStorage.removeItem(LocalStorageKeys.Price)
@@ -65,14 +65,14 @@ else if (resource && document.querySelector('form#createTrade')) {
 			if (price !== p)
 				localStorage.setItem(LocalStorageKeys.Price, `${price}`)
 		}
-		if (q && q >= 1_000_000 && 1_000_000 === document.querySelector<HTMLInputElement>('input#amount')!.valueAsNumber)
+		if (q && q >= 10_000_000 && 10_000_000 === document.querySelector<HTMLInputElement>('input#amount')!.valueAsNumber)
 			localStorage.setItem(LocalStorageKeys.Recursive, '0')
 	})
 
 	if (p)
 		document.querySelector<HTMLInputElement>('input#priceper')!.setAttribute('value', `${p}`)
 	if (q)
-		document.querySelector<HTMLInputElement>('input#amount')!.setAttribute('value', `${Math.min(q, 1_000_000)}`)
+		document.querySelector<HTMLInputElement>('input#amount')!.setAttribute('value', `${Math.min(q, 10_000_000)}`)
 	if (t) {
 		document.querySelector<HTMLButtonElement>(`button[data-target="#${t === 's' ? 'buy' : 'sell'}Confirmation"]`)!.remove()
 		const buttonTag = document.querySelector<HTMLButtonElement>(`button[data-target="#${t === 's' ? 'sell' : 'buy'}Confirmation"]`)!
