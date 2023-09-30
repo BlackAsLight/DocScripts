@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-console_error_panic_hook = "0.1.7"
-console_log = "1.0.0"
-leptos = { version = "0.5.0-rc", features = ["nightly", "csr"] }
-leptos_meta = { version = "0.5.0-rc", features = ["nightly", "csr"] }
-log = "0.4.20"
+console_error_panic_hook = "0.1.x"
+console_log = "1.0.x"
+leptos = { version = "0.5.x", features = ["nightly", "csr"] }
+leptos_meta = { version = "0.5.x", features = ["nightly", "csr"] }
+log = "0.4.x"
