@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Military
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.7
+// @version      0.8
 // @description  Making it easier to militarise and demilitarise your army.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/military/
@@ -501,4 +501,6 @@ async function formSubmitEvent(this: HTMLFormElement, event: SubmitEvent): Promi
 		body: [ ...this.querySelectorAll<HTMLInputElement>('input[name][value]'), { name: 'token', value: token } ]
 			.reduce((formData, inputTag) => (formData.append(inputTag.name, inputTag.value), formData), new FormData())
 	})).text(), 'text/html').querySelector<HTMLInputElement>('input[name="token"]')?.value ?? null)
+	this.querySelector<HTMLInputElement>('input[type="number"]')!.value = '0'
+	this.querySelectorAll<HTMLInputElement>('input').forEach(inputTag => inputTag.toggleAttribute('disabled', false))
 }
