@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.2
+// @version      0.1.0
 // @description  Offering a new Page?
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/trade

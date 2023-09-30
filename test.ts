@@ -1,4 +1,4 @@
-import { readLines } from "https://deno.land/std@0.192.0/io/mod.ts"
+import { readLines } from "https://deno.land/std@0.201.0/io/mod.ts"
 // @deno-types="https://deno.land/x/esbuild@v0.17.19/mod.d.ts"
 import { build, stop } from 'https://deno.land/x/esbuild@v0.17.19/mod.js'
 import { denoPlugins } from 'https://deno.land/x/esbuild_deno_loader@0.7.0/mod.ts'
