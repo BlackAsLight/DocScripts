@@ -1,8 +1,4 @@
 {
-	"tasks": {
-		"test": "deno run --allow-all test.ts",
-		"build": "deno run --allow-all build.ts"
-	},
 	"compilerOptions": {
 		"lib": [
 			"dom",
