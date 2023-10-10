@@ -1,8 +1,7 @@
-import { encodeBase64 } from "https://deno.land/std@0.203.0/encoding/base64.ts"
+import { encodeBase64 } from 'https://deno.land/std@0.203.0/encoding/base64.ts'
 import { encodeHex } from 'https://deno.land/std@0.203.0/encoding/hex.ts'
 import { parse } from 'https://deno.land/std@0.203.0/toml/mod.ts'
-import { readLines } from "https://deno.land/std@0.201.0/io/mod.ts"
-
+import { TextLineStream } from 'https://deno.land/std@0.203.0/streams/mod.ts'
 // @deno-types="https://deno.land/x/esbuild@v0.17.19/mod.d.ts"
 import { build, stop } from 'https://deno.land/x/esbuild@v0.17.19/mod.js'
 import { denoPlugins } from 'https://deno.land/x/esbuild_deno_loader@0.7.0/mod.ts'
@@ -27,8 +26,11 @@ async function createScript(path: string) {
 	const lines: string[] = []
 	{
 		let copyLine = false
-		const file = await Deno.open(path)
-		for await (const line of readLines(file)) {
+		for await (
+			const line of (await Deno.open(path)).readable
+				.pipeThrough(new TextDecoderStream())
+				.pipeThrough(new TextLineStream())
+		) {
 			if (!copyLine)
 				if (line.trim() === '// ==UserScript==')
 					copyLine = true
@@ -38,7 +40,6 @@ async function createScript(path: string) {
 			if (line.trim() === '// ==/UserScript==')
 				break
 		}
-		file.close()
 	}
 	if (!lines.length)
 		return
@@ -54,15 +55,17 @@ async function createScript(path: string) {
 }
 
 async function patchUpdate(path: string) {
-	const readFile = await Deno.open(path)
-	const writeFile = await Deno.create(`${path}.txt`)
-	for await (let line of readLines(readFile)) {
+	const file = await Deno.create(`${path}.txt`)
+	for await (
+		let line of (await Deno.open(path)).readable
+			.pipeThrough(new TextDecoderStream())
+			.pipeThrough(new TextLineStream())
+	) {
 		if (line.startsWith('// @version'))
 			line = line.slice(0, line.lastIndexOf('.') + 1) + (parseInt(line.slice(line.lastIndexOf('.') + 1)) + 1 || 0)
-		await writeFile.write(new TextEncoder().encode(line + '\n'))
+		await file.write(new TextEncoder().encode(line + '\n'))
 	}
-	readFile.close()
-	writeFile.close()
+	file.close()
 	await Deno.rename(`${path}.txt`, path)
 }
 

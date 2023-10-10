@@ -1,4 +1,4 @@
-import { readLines } from "https://deno.land/std@0.201.0/io/mod.ts"
+import { TextLineStream } from 'https://deno.land/std@0.203.0/streams/mod.ts'
 // @deno-types="https://deno.land/x/esbuild@v0.17.19/mod.d.ts"
 import { build, stop } from 'https://deno.land/x/esbuild@v0.17.19/mod.js'
 import { denoPlugins } from 'https://deno.land/x/esbuild_deno_loader@0.7.0/mod.ts'
@@ -22,8 +22,7 @@ async function createScript(path: string) {
 	const lines: string[] = []
 	{
 		let copyLine = false
-		const file = await Deno.open(path)
-		for await (const line of readLines(file)) {
+		for await (const line of (await Deno.open(path)).readable.pipeThrough(new TextDecoderStream()).pipeThrough(new TextLineStream())) {
 			if (!copyLine)
 				if (line.trim() === '// ==UserScript==')
 					copyLine = true
@@ -33,7 +32,6 @@ async function createScript(path: string) {
 			if (line.trim() === '// ==/UserScript==')
 				break
 		}
-		file.close()
 	}
 	if (!lines.length)
 		return
