@@ -2,7 +2,7 @@ release:
 	cargo build --release --target=wasm32-unknown-unknown
 	mkdir -p static/wasm/
 	wasm-bindgen --out-dir static/wasm/ --out-name trade --target web --omit-default-module-path --no-typescript target/wasm32-unknown-unknown/release/trade.wasm
-	deno run -A bundle.ts
+	deno run -A bundle.ts --lock
 	rm -rf static/wasm/
 
 debug:
@@ -18,3 +18,7 @@ check:
 update:
 	cargo update
 	make check
+
+clean:
+	cargo clean
+	rm -rf static/wasm/
