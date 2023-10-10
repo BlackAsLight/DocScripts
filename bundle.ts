@@ -58,7 +58,7 @@ async function patchUpdate(path: string) {
 	const writeFile = await Deno.create(`${path}.txt`)
 	for await (let line of readLines(readFile)) {
 		if (line.startsWith('// @version'))
-			line = line.slice(0, line.lastIndexOf('.') + 1) + (parseInt(line.slice(line.lastIndexOf('.') + 1)) + 1)
+			line = line.slice(0, line.lastIndexOf('.') + 1) + (parseInt(line.slice(line.lastIndexOf('.') + 1)) + 1 || 0)
 		await writeFile.write(new TextEncoder().encode(line + '\n'))
 	}
 	readFile.close()
