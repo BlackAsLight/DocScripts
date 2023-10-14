@@ -1,13 +1,17 @@
 [package]
 name = "trade"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 console_error_panic_hook = "0.1.x"
 console_log = "1.0.x"
-leptos = { version = "0.5.x", features = ["nightly", "csr"] }
-leptos_meta = { version = "0.5.x", features = ["nightly", "csr"] }
 log = "0.4.x"
+
+[dependencies.leptos]
+version = "0.5.x"
+features = ["nightly","csr"]
+
+[dependencies.leptos_meta]
+version = "0.5.x"
+features = ["nightly","csr"]
