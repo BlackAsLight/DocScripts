@@ -1,6 +1,7 @@
 release:
 	deno run -A compile.ts --release
 	deno run -A bundle.ts --release
+	cargo check
 	rm -rf static/wasm/
 
 debug:
