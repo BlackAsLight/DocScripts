@@ -13,6 +13,7 @@ check:
 
 update:
 	cargo update
+	deno cache --lock-write compile.ts bundle.ts test.ts
 	make check
 
 clean:

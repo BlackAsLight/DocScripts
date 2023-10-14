@@ -1,7 +1,7 @@
-import { encodeBase64 } from 'https://deno.land/std@0.203.0/encoding/base64.ts'
-import { encodeHex } from 'https://deno.land/std@0.203.0/encoding/hex.ts'
-import { parse, stringify } from 'https://deno.land/std@0.203.0/toml/mod.ts'
-import { TextLineStream } from 'https://deno.land/std@0.203.0/streams/mod.ts'
+import { encodeBase64 } from 'https://deno.land/std@0.204.0/encoding/base64.ts'
+import { encodeHex } from 'https://deno.land/std@0.204.0/encoding/hex.ts'
+import { parse, stringify } from 'https://deno.land/std@0.204.0/toml/mod.ts'
+import { TextLineStream } from 'https://deno.land/std@0.204.0/streams/mod.ts'
 // @deno-types="https://deno.land/x/esbuild@v0.17.19/mod.d.ts"
 import { build, stop } from 'https://deno.land/x/esbuild@v0.17.19/mod.js'
 import { denoPlugins } from 'https://deno.land/x/esbuild_deno_loader@0.7.0/mod.ts'
@@ -69,7 +69,7 @@ const promises: Promise<void>[] = [
 				hashes[ member ]!.hash = hash
 				hashes[ member ]!.version.patch += 1
 				cargo.package.version = `${major}.${minor}.${patch + 1}`
-				promises.push(Deno.writeTextFile(`./${member}/Cargo.toml`, stringify(cargo)))
+				promises.push(Deno.writeTextFile(`./${member}/Cargo.toml`, stringify(cargo).trimStart()))
 			}
 		}
 

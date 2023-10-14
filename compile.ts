@@ -1,5 +1,5 @@
-import { encodeHex } from 'https://deno.land/std@0.203.0/encoding/hex.ts'
-import { parse } from 'https://deno.land/std@0.203.0/toml/mod.ts'
+import { encodeHex } from 'https://deno.land/std@0.204.0/encoding/hex.ts'
+import { parse } from 'https://deno.land/std@0.204.0/toml/mod.ts'
 
 type WorkSpace = {
 	workspace: {

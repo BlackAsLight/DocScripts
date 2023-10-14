@@ -1,4 +1,4 @@
-import { TextLineStream } from 'https://deno.land/std@0.203.0/streams/mod.ts'
+import { TextLineStream } from 'https://deno.land/std@0.204.0/streams/mod.ts'
 // @deno-types="https://deno.land/x/esbuild@v0.17.19/mod.d.ts"
 import { build, stop } from 'https://deno.land/x/esbuild@v0.17.19/mod.js'
 import { denoPlugins } from 'https://deno.land/x/esbuild_deno_loader@0.7.0/mod.ts'
