@@ -59,7 +59,7 @@ const promises: Promise<void>[] = [
 			const [ major, minor, patch ] = cargo.package.version.split('.').map(x => parseInt(x))
 			const hash = encodeHex(await crypto.subtle.digest('SHA-256', await Deno.readFile(`./static/wasm/${member}_bg.wasm`)))
 			console.log(`${member}\n\
-\t${hashes[ member ].hash}\n\
+\t${hashes[ member ]!.hash}\n\
 \t${hash}`)
 			if (!hashes[ member ])
 				hashes[ member ] = { hash, version: { major, minor, patch } }
