@@ -1,5 +1,5 @@
 release:
-	SERVER_FN_OVERRIDE_KEY="trade" cargo --locked --frozen build --bin trade --release --target=wasm32-unknown-unknown
+	SERVER_FN_OVERRIDE_KEY="trade" cargo --locked build --bin trade --release --target=wasm32-unknown-unknown
 	mkdir -p static/wasm/
 	wasm-bindgen --out-dir static/wasm/ --out-name trade --target web --omit-default-module-path --no-typescript target/wasm32-unknown-unknown/release/trade.wasm
 	deno run -A bundle.ts --lock
