@@ -1,10 +1,101 @@
 import { encodeBase64 } from 'https://deno.land/std@0.203.0/encoding/base64.ts'
 import { encodeHex } from 'https://deno.land/std@0.203.0/encoding/hex.ts'
-import { parse } from 'https://deno.land/std@0.203.0/toml/mod.ts'
+import { parse, stringify } from 'https://deno.land/std@0.203.0/toml/mod.ts'
 import { TextLineStream } from 'https://deno.land/std@0.203.0/streams/mod.ts'
 // @deno-types="https://deno.land/x/esbuild@v0.17.19/mod.d.ts"
 import { build, stop } from 'https://deno.land/x/esbuild@v0.17.19/mod.js'
 import { denoPlugins } from 'https://deno.land/x/esbuild_deno_loader@0.7.0/mod.ts'
+
+type Package = {
+	package: {
+		name: string,
+		version: string,
+		edition: string
+	}
+}
+
+const releaseMode = Deno.args.includes('--release')
+const hashes = (
+	releaseMode
+		? JSON.parse(await Deno.readTextFile('./hashes.lock').catch(() => '{}'))
+		: {}
+) as Record<string, { hash: string, version: { major: number, minor: number, patch: number } } | undefined>
+
+const members = (await Promise.all([
+	/* Get Members
+	-------------------------*/
+	(async () => {
+		const output = []
+		for await (const dirEntry of Deno.readDir('./static/wasm/'))
+			if (dirEntry.isFile && dirEntry.name.endsWith('_bg.wasm'))
+				output.push(dirEntry.name.slice(0, dirEntry.name.lastIndexOf('_bg.wasm')))
+		return output
+	})(),
+
+	/* Create ./static/js/
+	-------------------------*/
+	Deno.remove('./static/js/', { recursive: true })
+		.catch(() => { })
+		.finally(() => Deno.mkdir('./static/js/', { recursive: true })),
+
+	/* Create ./static/scripts/
+	-------------------------*/
+	// Deno.remove('static/scripts/', { recursive: true })
+	// 	.catch(() => { })
+	// 	.finally(() => Deno.mkdir('./static/scripts/', { recursive: true })),
+]))[ 0 ]
+
+const promises: Promise<void>[] = [
+	/* Create ./static/js/main.js
+	-------------------------*/
+	esbuild('./ts/main.ts', './static/js/main.js'),
+
+	/* Compile workspace projects
+	-------------------------*/
+	...members.map(async member => {
+		console.log(member, releaseMode)
+		const cargo = parse(await Deno.readTextFile(`./${member}/Cargo.toml`)) as Package
+		if (releaseMode) {
+			const [ major, minor, patch ] = cargo.package.version.split('.').map(x => parseInt(x))
+			const hash = encodeHex(await crypto.subtle.digest('SHA-256', await Deno.readFile(`./static/wasm/${member}_bg.wasm`)))
+			console.log(`${member}\n\
+\t${hashes[ member ]}\n\
+\t${hash}`)
+			if (!hashes[ member ])
+				hashes[ member ] = { hash, version: { major, minor, patch } }
+			else if (hashes[ member ]!.version.major > major || hashes[ member! ]!.version.minor > minor)
+				hashes[ member ]!.hash = hash
+			else if (hashes[ member ]!.hash !== hash) {
+				hashes[ member ]!.hash = hash
+				hashes[ member ]!.version.patch += 1
+				cargo.package.version = `${major}.${minor}.${patch + 1}`
+				promises.push(Deno.writeTextFile(`./${member}/Cargo.toml`, stringify(cargo)))
+			}
+		}
+
+		await Deno.writeTextFile(
+			`./static/wasm/${snakeToCamel(member)}.ts`,
+			`${(await Deno.readTextFile(`./${member}/prefix.ts`)).replace('<VERSION />', cargo.package.version)}\n\
+import x from './${member}.js'\n\
+x(fetch('data:application/wasm;base64,${encodeBase64(await Deno.readFile(`./static/wasm/${member}_bg.wasm`))}'))`
+		)
+		await createScript(`./static/wasm/${snakeToCamel(member)}.ts`)
+	})
+]
+
+/* Compile ./src/ into ./static/scripts/
+-------------------------*/
+for await (const dirEntry of Deno.readDir('./src/'))
+	if (dirEntry.isFile && (dirEntry.name.endsWith('.ts') || dirEntry.name.endsWith('.tsx')))
+		promises.push(createScript(`./src/${dirEntry.name}`))
+
+await Promise.allSettled(promises)
+
+if (releaseMode)
+	await Deno.writeTextFile('./hashes.lock', JSON.stringify(hashes, undefined, '\t'))
+
+stop()
+console.log(`${performance.now().toLocaleString('en-US', { maximumFractionDigits: 2 })}ms`)
 
 async function esbuild(inPath: string, outPath: string) {
 	const { errors, warnings } = await build({
@@ -54,88 +145,6 @@ async function createScript(path: string) {
 	await Deno.remove(`./static/scripts/${name}.min.js`)
 }
 
-async function patchUpdate(path: string) {
-	const file = await Deno.create(`${path}.txt`)
-	for await (
-		let line of (await Deno.open(path)).readable
-			.pipeThrough(new TextDecoderStream())
-			.pipeThrough(new TextLineStream())
-	) {
-		if (line.startsWith('// @version'))
-			line = line.slice(0, line.lastIndexOf('.') + 1) + (parseInt(line.slice(line.lastIndexOf('.') + 1)) + 1 || 0)
-		await file.write(new TextEncoder().encode(line + '\n'))
-	}
-	file.close()
-	await Deno.rename(`${path}.txt`, path)
-}
-
 function snakeToCamel(text: string) {
 	return text.split('_').map(word => word[ 0 ].toUpperCase() + word.slice(1).toLowerCase())
 }
-
-const updateLock = Deno.args.includes('--lock')
-const hashes = (
-	updateLock
-		? JSON.parse(await Deno.readTextFile('./hashes.lock').catch(() => '{}'))
-		: {}
-) as Record<string, string | undefined>
-
-await Promise.all([
-	/* Create ./docs/js/
-	-------------------------*/
-	Deno.remove('static/js/', { recursive: true })
-		.catch(() => { })
-		.finally(() => Deno.mkdir('./static/js/', { recursive: true })),
-
-	/* Create ./static/scripts/
-	-------------------------*/
-	// Deno.remove('static/scripts/', { recursive: true })
-	// 	.catch(() => { })
-	// 	.finally(() => Deno.mkdir('./static/scripts/', { recursive: true })),
-])
-
-const promises: Promise<void>[] = [
-	/* Create ./static/js/main.js
-	-------------------------*/
-	esbuild('./ts/main.ts', './static/js/main.js'),
-
-	/* Compile workspace projects
-	-------------------------*/
-	...(parse(await Deno.readTextFile('./Cargo.toml')) as { workspace: { resolver: string, members: string[] } })
-		.workspace.members.map(async member => {
-			if (await Deno.stat(`./static/wasm/${member}_bg.wasm`).then(() => false).catch(() => true))
-				return
-
-			if (updateLock) {
-				const hash = encodeHex(await crypto.subtle.digest(
-					'SHA-256',
-					await Deno.readFile(`./static/wasm/${member}_bg.wasm`)
-				))
-				if (hashes[ member ] === hash)
-					return
-				hashes[ member ] = hash
-				await patchUpdate(`./${member}/prefix.ts`)
-			}
-
-			await Deno.writeTextFile(
-				`./static/wasm/${snakeToCamel(member)}.ts`,
-				`${await Deno.readTextFile(`./${member}/prefix.ts`)}\n\
-				import x from './${member}.js'\n\
-				x(fetch('data:application/wasm;base64,${encodeBase64(await Deno.readFile(`./static/wasm/${member}_bg.wasm`))}'))`
-			)
-			await createScript(`./static/wasm/${snakeToCamel(member)}.ts`)
-		})
-]
-
-/* Compile ./src/ into ./static/scripts/
--------------------------*/
-const dirEntries = Deno.readDir('./src/')
-for await (const dirEntry of dirEntries)
-	if (dirEntry.isFile && (dirEntry.name.endsWith('.ts') || dirEntry.name.endsWith('.tsx')))
-		promises.push(createScript(`./src/${dirEntry.name}`))
-
-await Promise.allSettled(promises)
-stop()
-if (updateLock)
-	await Deno.writeTextFile('./hashes.lock', JSON.stringify(hashes, undefined, '\t'))
-console.log(`${performance.now().toLocaleString('en-US', { maximumFractionDigits: 2 })}ms`)

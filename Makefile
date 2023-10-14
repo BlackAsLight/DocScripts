@@ -1,15 +1,11 @@
 release:
-	SERVER_FN_OVERRIDE_KEY="trade" cargo --locked build --bin trade --release --target=wasm32-unknown-unknown
-	mkdir -p static/wasm/
-	wasm-bindgen --out-dir static/wasm/ --out-name trade --target web --omit-default-module-path --no-typescript target/wasm32-unknown-unknown/release/trade.wasm
-	deno run -A bundle.ts --lock
+	deno run -A compile.ts --release
+	deno run -A bundle.ts --release
 	rm -rf static/wasm/
 
 debug:
-	cargo build --bin trade --target=wasm32-unknown-unknown
-	mkdir -p static/wasm/
-	wasm-bindgen --out-dir static/wasm/ --out-name trade --target web --omit-default-module-path --no-typescript target/wasm32-unknown-unknown/debug/trade.wasm
-	deno run --allow-read --allow-write --allow-env --allow-run bundle.ts
+	deno run -A compile.ts
+	deno run -A bundle.ts
 
 check:
 	cargo check --target=wasm32-unknown-unknown
