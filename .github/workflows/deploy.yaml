@@ -1,5 +1,7 @@
 name: Build and Deploy to Github Pages
 on:
+  schedule:
+    - cron: '0 1 * * 0'
   push:
     branches:
       - main
