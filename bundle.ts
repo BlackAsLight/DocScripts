@@ -63,7 +63,7 @@ const promises: Promise<void>[] = [
 \t${hash}`)
 			if (!hashes[ member ])
 				hashes[ member ] = { hash, version: { major, minor, patch } }
-			else if (hashes[ member ]!.version.major > major || hashes[ member! ]!.version.minor > minor)
+			else if (hashes[ member ]!.version.major !== major || hashes[ member! ]!.version.minor !== minor)
 				hashes[ member ]!.hash = hash
 			else if (hashes[ member ]!.hash !== hash) {
 				hashes[ member ]!.hash = hash
