@@ -24,7 +24,7 @@ jobs:
         with:
           version: 0.2.87
       - uses: denoland/setup-deno@v1
-      - run: make update
+      - run: cargo update
       - run: make release
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
