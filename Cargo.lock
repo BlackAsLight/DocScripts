@@ -1679,7 +1679,7 @@ dependencies = [
 
 [[package]]
 name = "trade"
-version = "0.1.12"
+version = "0.1.13"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
