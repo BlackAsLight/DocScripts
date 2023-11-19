@@ -1,10 +1,10 @@
 {
 	"trade": {
-		"hash": "4ecfd56729d3f404ee145cd873f72c7567501c0190766b4c8ea9db0bbc6bf0ac",
+		"hash": "21a6dd3ec14829fb0c2bd397742e5b89c897018c9cf1383474a606197e9c94dd",
 		"version": {
 			"major": 0,
 			"minor": 1,
-			"patch": 14
+			"patch": 15
 		}
 	}
 }
