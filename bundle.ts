@@ -38,14 +38,14 @@ const promises: Promise<void>[] = [
 	/* Bundle Wasm Scripts
 	-------------------------*/
 	...members.map(async member => {
-		console.log(member)
+		const startTime = performance.now()
 		await Deno.writeTextFile(
 			`./static/wasm/${snakeToCamel(member)}.ts`,
 			`${(await Deno.readTextFile(`./${member}/prefix.ts`)).replace('<VERSION />', (parse(await Deno.readTextFile(`./${member}/Cargo.toml`)) as Package).package.version)}\n\
 import x from './${member}.js'\n\
 x(fetch('data:application/wasm;base64,${encodeBase64(await Deno.readFile(`./static/wasm/${member}_bg.wasm`))}'))`
 		)
-		await createScript(`./static/wasm/${snakeToCamel(member)}.ts`)
+		await createScript(`./static/wasm/${snakeToCamel(member)}.ts`, startTime)
 	})
 ]
 
@@ -75,8 +75,7 @@ async function esbuild(inPath: string, outPath: string) {
 	warnings.forEach(warning => console.warn(warning))
 }
 
-async function createScript(path: string) {
-	console.log(path)
+async function createScript(path: string, startTime = performance.now()) {
 	const lines: string[] = []
 	{
 		let copyLine = false
@@ -106,6 +105,7 @@ async function createScript(path: string) {
 	await file.write(await Deno.readFile(`./static/scripts/${name}.min.js`))
 	file.close()
 	await Deno.remove(`./static/scripts/${name}.min.js`)
+	console.log(`(${(performance.now() - startTime).toLocaleString('en-US', { maximumFractionDigits: 2 })}ms):\t${path}`)
 }
 
 function snakeToCamel(text: string) {

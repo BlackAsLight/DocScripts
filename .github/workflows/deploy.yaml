@@ -21,6 +21,7 @@ jobs:
       - uses: jetli/wasm-bindgen-action@v0.2.0
         with:
           version: 0.2.88
+      - run: cargo install wasm-opt@0.116.0
       - uses: denoland/setup-deno@v1
       - run: make release
       - run: make clean

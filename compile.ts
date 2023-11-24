@@ -23,19 +23,23 @@ for (const member of members)
 		if (
 			await command(`cargo +nightly build --bin ${member}${releaseMode ? ' --release ' : ' '}--target wasm32-unknown-unknown`)
 			&& await command(`wasm-bindgen --out-dir static/wasm/ --out-name ${member} --target web --omit-default-module-path --no-typescript target/wasm32-unknown-unknown/${releaseMode ? 'release' : 'debug'}/${member}.wasm`)
+			&& await command(`wasm-opt -Oz -o static/wasm/${member}_bg.wasm static/wasm/${member}_bg.wasm`)
 		)
 			(console.log(`Success: ${member}`), cleanUp.push(updateScript(member)))
 		else
 			console.log(`Fail: ${member}`)
 
 await Promise.allSettled(cleanUp)
-await Deno.writeTextFile('./scripts.lock', JSON.stringify(scripts))
+if (releaseMode)
+	await Deno.writeTextFile('./scripts.lock', JSON.stringify(scripts))
 console.log(`${performance.now().toLocaleString('en-US', { maximumFractionDigits: 2 })}ms`)
 
 async function command(command: string, env?: Record<string, string>): Promise<boolean> {
-	console.log(`Command: ${command}`)
+	const startTime = performance.now()
 	const args = command.split(' ').filter(x => x)
-	return (await new Deno.Command(args.shift()!, { env, args }).spawn().status).success
+	const success = (await new Deno.Command(args.shift()!, { env, args }).spawn().status).success
+	console.log(`(${(performance.now() - startTime).toLocaleString('en-US', { maximumFractionDigits: 2 })}ms):\t${command}`)
+	return success
 }
 
 async function updateScript(member: string): Promise<void> {
