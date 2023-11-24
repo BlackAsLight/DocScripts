@@ -21,7 +21,7 @@ for (const member of members)
 			.catch(() => false)
 	)
 		if (
-			await command(`cargo +nightly --frozen build --bin ${member}${releaseMode ? ' --release ' : ' '}--target wasm32-unknown-unknown`)
+			await command(`cargo +nightly build --bin ${member}${releaseMode ? ' --release ' : ' '}--target wasm32-unknown-unknown`)
 			&& await command(`wasm-bindgen --out-dir static/wasm/ --out-name ${member} --target web --omit-default-module-path --no-typescript target/wasm32-unknown-unknown/${releaseMode ? 'release' : 'debug'}/${member}.wasm`)
 		)
 			(console.log(`Success: ${member}`), cleanUp.push(updateScript(member)))
