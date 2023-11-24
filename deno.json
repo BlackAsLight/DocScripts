@@ -15,5 +15,10 @@
 			"singleQuote": true,
 			"useTabs": true
 		}
+	},
+	"imports": {
+		"@std/": "https://deno.land/std@0.208.0/",
+		"@esbuild/": "https://deno.land/x/esbuild@v0.19.6/",
+		"@esbuild_deno_loader/": "https://deno.land/x/esbuild_deno_loader@0.8.2/"
 	}
 }

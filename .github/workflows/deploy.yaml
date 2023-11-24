@@ -1,7 +1,5 @@
 name: Build and Deploy to Github Pages
 on:
-  schedule:
-    - cron: '0 1 * * 0'
   push:
     branches:
       - main
@@ -24,8 +22,8 @@ jobs:
         with:
           version: 0.2.88
       - uses: denoland/setup-deno@v1
-      - run: cargo update
       - run: make release
+      - run: make clean
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Built static/

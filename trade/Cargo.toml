@@ -1,17 +1,11 @@
 [package]
 name = "trade"
-version = "0.1.15"
+version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 console_error_panic_hook = "0.1.x"
 console_log = "1.0.x"
+leptos = { version = "0.5.x", features = ["csr", "nightly"] }
+leptos_meta = { version = "0.5.x", features = ["csr", "nightly"] }
 log = "0.4.x"
-
-[dependencies.leptos]
-version = "0.5.x"
-features = ["nightly","csr"]
-
-[dependencies.leptos_meta]
-version = "0.5.x"
-features = ["nightly","csr"]

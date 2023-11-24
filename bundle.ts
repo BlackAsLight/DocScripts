@@ -1,25 +1,10 @@
-import { encodeBase64 } from 'https://deno.land/std@0.204.0/encoding/base64.ts'
-import { encodeHex } from 'https://deno.land/std@0.204.0/encoding/hex.ts'
-import { parse, stringify } from 'https://deno.land/std@0.204.0/toml/mod.ts'
-import { TextLineStream } from 'https://deno.land/std@0.204.0/streams/mod.ts'
-// @deno-types="https://deno.land/x/esbuild@v0.17.19/mod.d.ts"
-import { build, stop } from 'https://deno.land/x/esbuild@v0.17.19/mod.js'
-import { denoPlugins } from 'https://deno.land/x/esbuild_deno_loader@0.7.0/mod.ts'
-
-type Package = {
-	package: {
-		name: string,
-		version: string,
-		edition: string
-	}
-}
-
-const releaseMode = Deno.args.includes('--release')
-const hashes = (
-	releaseMode
-		? JSON.parse(await Deno.readTextFile('./hashes.lock').catch(() => '{}'))
-		: {}
-) as Record<string, { hash: string, version: { major: number, minor: number, patch: number } } | undefined>
+import { encodeBase64 } from '@std/encoding/base64.ts'
+import { parse } from '@std/toml/mod.ts'
+import { TextLineStream } from '@std/streams/mod.ts'
+// @deno-types="@esbuild/mod.d.ts"
+import { build, stop } from '@esbuild/mod.js'
+import { denoPlugins } from '@esbuild_deno_loader/mod.ts'
+import { Package } from './types.ts'
 
 const members = (await Promise.all([
 	/* Get Members
@@ -50,32 +35,13 @@ const promises: Promise<void>[] = [
 	-------------------------*/
 	esbuild('./ts/main.ts', './static/js/main.js'),
 
-	/* Compile workspace projects
+	/* Bundle Wasm Scripts
 	-------------------------*/
 	...members.map(async member => {
-		console.log(member, releaseMode)
-		const cargo = parse(await Deno.readTextFile(`./${member}/Cargo.toml`)) as Package
-		if (releaseMode) {
-			const [ major, minor, patch ] = cargo.package.version.split('.').map(x => parseInt(x))
-			const hash = encodeHex(await crypto.subtle.digest('SHA-256', await Deno.readFile(`./static/wasm/${member}_bg.wasm`)))
-			console.log(`${member}\n\
-\t${hashes[ member ]!.hash}\n\
-\t${hash}`)
-			if (!hashes[ member ])
-				hashes[ member ] = { hash, version: { major, minor, patch } }
-			else if (hashes[ member ]!.version.major !== major || hashes[ member! ]!.version.minor !== minor)
-				hashes[ member ]!.hash = hash
-			else if (hashes[ member ]!.hash !== hash) {
-				hashes[ member ]!.hash = hash
-				hashes[ member ]!.version.patch += 1
-				cargo.package.version = `${major}.${minor}.${patch + 1}`
-				promises.push(Deno.writeTextFile(`./${member}/Cargo.toml`, stringify(cargo).trimStart()))
-			}
-		}
-
+		console.log(member)
 		await Deno.writeTextFile(
 			`./static/wasm/${snakeToCamel(member)}.ts`,
-			`${(await Deno.readTextFile(`./${member}/prefix.ts`)).replace('<VERSION />', cargo.package.version)}\n\
+			`${(await Deno.readTextFile(`./${member}/prefix.ts`)).replace('<VERSION />', (parse(await Deno.readTextFile(`./${member}/Cargo.toml`)) as Package).package.version)}\n\
 import x from './${member}.js'\n\
 x(fetch('data:application/wasm;base64,${encodeBase64(await Deno.readFile(`./static/wasm/${member}_bg.wasm`))}'))`
 		)
@@ -90,9 +56,6 @@ for await (const dirEntry of Deno.readDir('./src/'))
 		promises.push(createScript(`./src/${dirEntry.name}`))
 
 await Promise.allSettled(promises)
-
-if (releaseMode)
-	await Deno.writeTextFile('./hashes.lock', JSON.stringify(hashes, undefined, '\t'))
 
 stop()
 console.log(`${performance.now().toLocaleString('en-US', { maximumFractionDigits: 2 })}ms`)
