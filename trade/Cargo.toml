@@ -1,7 +1,7 @@
 [package]
+edition = "2021"
 name = "trade"
 version = "0.1.0"
-edition = "2021"
 
 [dependencies]
 console_error_panic_hook = "0.1.x"
