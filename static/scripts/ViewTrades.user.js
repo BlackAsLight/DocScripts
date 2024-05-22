@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      6.9
+// @version      6.91
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @include      https://politicsandwar.com/index.php?id=26*
@@ -128,44 +128,50 @@ document.querySelector('#leftcolumn').append(CreateElement('div', divTag => {
 
 	if (currentResource !== 'Money') {
 		divTag.append(document.createElement('br'))
-		divTag.append(CreateElement('button', buttonTag => {
-			buttonTag.append(`Max ${ currentResource }`)
-			buttonTag.onclick = () => {
-				const currentMax = MaxAmount(currentResource)
-				const newMax = parseInt(prompt(`Set the maximum amount of ${ currentResource } that you would like to offer when creating an offer:`, currentMax)).toString()
-				if (newMax !== 'NaN' && newMax !== currentMax) {
-					const key = `Doc_MaxResource_${ currentResource }`
-					if (newMax > 0) {
-						localStorage.setItem(key, newMax)
-					}
-					else if (currentMax > 0) {
-						localStorage.removeItem(key)
-					}
-					UpdateLinks()
-				}
-			}
-		}))
+    divTag.append('Max lot size:')
+    var maxAmountInput = document.createElement('input')
+    maxAmountInput.type = 'number'
+    maxAmountInput.value = MaxAmount(currentResource)
+    maxAmountInput.id = 'maxAmountInputId'
+    maxAmountInput.oninput = function() {
+      var currentMax = MaxAmount(currentResource)
+      var newMax = parseFloat(document.getElementById('maxAmountInputId').value)
+      if (newMax !== 'NaN' && newMax !== currentMax) {
+        const key = `Doc_MaxResource_${ currentResource }`
+        if (newMax > 0) {
+          localStorage.setItem(key, newMax)
+        }
+        else if (currentMax > 0) {
+          localStorage.removeItem(key)
+        }
+        UpdateLinks()
+      }
+    }
+    divTag.append(maxAmountInput)
 	}
 
-	divTag.append(document.createElement('br'))
-	divTag.append(CreateElement('button', buttonTag => {
-		buttonTag.append(`Min ${ currentResource }`)
-		buttonTag.onclick = () => {
-			const currentMin = MinAmount(currentResource)
-			const newMin = (Math.round(parseFloat(prompt(`Set the minimum amount of ${ currentResource } that you don't want to accidentally sell:`, currentMin)) * 100) / 100).toString()
-			if (newMin != 'NaN' && newMin != currentMin) {
-				const key = `Doc_MinResource_${ currentResource }`
-				if (newMin > 0) {
-					localStorage.setItem(key, newMin)
-				}
-				else if (currentMin > 0) {
-					localStorage.removeItem(key)
-				}
-				UpdateQuantities()
-				UpdateLinks()
-			}
-		}
-	}))
+  divTag.append(document.createElement('br'))
+  divTag.append('Min to keep on hand:')
+  var minAmountInput = document.createElement('input')
+  minAmountInput.type = 'number'
+  minAmountInput.value = MinAmount(currentResource)
+  minAmountInput.id = 'minAmountInputId'
+  minAmountInput.oninput = function() {
+    var currentMin = MinAmount(currentResource)
+    var newMin = parseFloat(document.getElementById('minAmountInputId').value)
+    if (newMin != 'NaN' && newMin != currentMin) {
+      const key = `Doc_MinResource_${ currentResource }`
+      if (newMin > 0) {
+        localStorage.setItem(key, newMin)
+      }
+      else if (currentMin > 0) {
+        localStorage.removeItem(key)
+      }
+      UpdateQuantities()
+      UpdateLinks()
+    }
+  }
+  divTag.append(minAmountInput)
 
 	divTag.append(document.createElement('br'))
 	divTag.append(CreateElement('div', divTag => {
