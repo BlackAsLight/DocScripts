@@ -16,15 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: rustup default nightly
-      - run: rustup target add wasm32-unknown-unknown
-      - uses: jetli/wasm-bindgen-action@v0.2.0
-        with:
-          version: 0.2.89
-      - run: cargo install wasm-opt@0.116.0
       - uses: denoland/setup-deno@v1
-      - run: make release
-      - run: make clean
+      - run: deno task ok
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Built static/
