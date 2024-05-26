@@ -2,6 +2,7 @@
   "version": "3",
   "packages": {
     "specifiers": {
+      "jsr:@doctor/create-tag@^0.1.3": "jsr:@doctor/create-tag@0.1.3",
       "jsr:@luca/esbuild-deno-loader@^0.10.3": "jsr:@luca/esbuild-deno-loader@0.10.3",
       "jsr:@std/assert@^0.213.1": "jsr:@std/assert@0.213.1",
       "jsr:@std/assert@^0.224.0": "jsr:@std/assert@0.224.0",
@@ -17,6 +18,9 @@
       "npm:esbuild@^0.21.3": "npm:esbuild@0.21.4"
     },
     "jsr": {
+      "@doctor/create-tag@0.1.3": {
+        "integrity": "7a2e9d3065a286426de9492af9c857ef801a2b363884b3d05e44d3ef0fb17e67"
+      },
       "@luca/esbuild-deno-loader@0.10.3": {
         "integrity": "32fc93f7e7f78060234fd5929a740668aab1c742b808c6048b57f9aaea514921",
         "dependencies": [
@@ -198,9 +202,7 @@
       }
     }
   },
-  "remote": {
-    "https://deno.land/x/basic_jsx@v3.1.2/mod.tsx": "97261638ea3778fbbc85fce462b304183f065359ad135dbb535385b5d4a858a2"
-  },
+  "remote": {},
   "workspace": {
     "dependencies": [
       "jsr:@doctor/create-tag@^0.1.3",
