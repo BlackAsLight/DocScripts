@@ -27,27 +27,27 @@ document.body.append(CreateElement('div', async divTag => {
 
 /* Global Variables
 -------------------------*/
-const nationID = [ ...document.querySelectorAll('.sidebar a') ].filter(aTag => aTag.href.includes('nation/id=')).map(aTag => parseInt(aTag.href.slice(37)))[ 0 ]
-const currentResource = Capitalize((location.search.slice(1).split('&').filter(arg => arg.startsWith('resource1='))[ 0 ] || '').slice(10)) || 'Money'
-const ascOrder = (location.search.slice(1).split('&').filter(arg => arg.startsWith('od='))[ 0 ] || '').slice(3) !== 'DESC'
+const nationID = [...document.querySelectorAll('.sidebar a')].filter(aTag => aTag.href.includes('nation/id=')).map(aTag => parseInt(aTag.href.slice(37)))[0]
+const currentResource = Capitalize((location.search.slice(1).split('&').filter(arg => arg.startsWith('resource1='))[0] || '').slice(10)) || 'Money'
+const ascOrder = (location.search.slice(1).split('&').filter(arg => arg.startsWith('od='))[0] || '').slice(3) !== 'DESC'
 const token = (document.querySelector('input[name="token"]') || { value: null }).value
 
 const resourceBar = (() => {
-	const resources = [ ...document.querySelectorAll('#resource-column .right') ].map(tdTag => parseFloat(tdTag.textContent.replaceAll(',', '')))
+	const resources = [...document.querySelectorAll('#resource-column .right')].map(tdTag => parseFloat(tdTag.textContent.replaceAll(',', '')))
 	return {
-		Money: resources[ 0 ],
-		Oil: resources[ 3 ],
-		Coal: resources[ 2 ],
-		Iron: resources[ 6 ],
-		Bauxite: resources[ 7 ],
-		Lead: resources[ 5 ],
-		Uranium: resources[ 4 ],
-		Food: resources[ 1 ],
-		Gasoline: resources[ 8 ],
-		Steel: resources[ 10 ],
-		Aluminum: resources[ 11 ],
-		Munitions: resources[ 9 ],
-		Credits: resources[ 12 ]
+		Money: resources[0],
+		Oil: resources[3],
+		Coal: resources[2],
+		Iron: resources[6],
+		Bauxite: resources[7],
+		Lead: resources[5],
+		Uranium: resources[4],
+		Food: resources[1],
+		Gasoline: resources[8],
+		Steel: resources[10],
+		Aluminum: resources[11],
+		Munitions: resources[9],
+		Credits: resources[12]
 	}
 })()
 
@@ -69,7 +69,7 @@ const marketType = (() => {
 		// E.g. Create Offer Page -|- The script wouldn't be injected in that specific case.
 		return -1
 	}
-	const type = (location.search.slice(1).split('&').filter(arg => arg.startsWith('display'))[ 0 ] || '').slice(8)
+	const type = (location.search.slice(1).split('&').filter(arg => arg.startsWith('display'))[0] || '').slice(8)
 	if (type === 'world') {
 		return 2
 	}
@@ -128,44 +128,52 @@ document.querySelector('#leftcolumn').append(CreateElement('div', divTag => {
 
 	if (currentResource !== 'Money') {
 		divTag.append(document.createElement('br'))
-		divTag.append(CreateElement('button', buttonTag => {
-			buttonTag.append(`Max ${ currentResource }`)
-			buttonTag.onclick = () => {
-				const currentMax = MaxAmount(currentResource)
-				const newMax = parseInt(prompt(`Set the maximum amount of ${ currentResource } that you would like to offer when creating an offer:`, currentMax)).toString()
-				if (newMax !== 'NaN' && newMax !== currentMax) {
-					const key = `Doc_MaxResource_${ currentResource }`
-					if (newMax > 0) {
-						localStorage.setItem(key, newMax)
+		divTag.append(CreateElement('label', labelTag => labelTag.append(
+			`Max ${currentResource}`,
+			CreateElement('input', inputTag => {
+				inputTag.type = 'number'
+				inputTag.value = MaxAmount(currentResource)
+				inputTag.onchange = () => {
+					const currentMax = MaxAmount(currentResource)
+					const newMax = parseInt(prompt(`Set the maximum amount of ${currentResource} that you would like to offer when creating an offer:`, currentMax)).toString()
+					if (newMax !== 'NaN' && newMax !== currentMax) {
+						const key = `Doc_MaxResource_${currentResource}`
+						if (newMax > 0) {
+							localStorage.setItem(key, newMax)
+						}
+						else if (currentMax > 0) {
+							localStorage.removeItem(key)
+						}
+						UpdateLinks()
 					}
-					else if (currentMax > 0) {
-						localStorage.removeItem(key)
-					}
-					UpdateLinks()
 				}
-			}
-		}))
+			})
+		)))
 	}
 
 	divTag.append(document.createElement('br'))
-	divTag.append(CreateElement('button', buttonTag => {
-		buttonTag.append(`Min ${ currentResource }`)
-		buttonTag.onclick = () => {
-			const currentMin = MinAmount(currentResource)
-			const newMin = (Math.round(parseFloat(prompt(`Set the minimum amount of ${ currentResource } that you don't want to accidentally sell:`, currentMin)) * 100) / 100).toString()
-			if (newMin != 'NaN' && newMin != currentMin) {
-				const key = `Doc_MinResource_${ currentResource }`
-				if (newMin > 0) {
-					localStorage.setItem(key, newMin)
+	divTag.append(CreateElement('label', labelTag => labelTag.append(
+		`Min ${currentResource}`,
+		CreateElement('input', inputTag => {
+			inputTag.type = 'number'
+			inputTag.value = MinAmount(currentResource)
+			inputTag.onchange = () => {
+				const currentMin = MinAmount(currentResource)
+				const newMin = (Math.round(parseFloat(prompt(`Set the minimum amount of ${currentResource} that you don't want to accidentally sell:`, currentMin)) * 100) / 100).toString()
+				if (newMin != 'NaN' && newMin != currentMin) {
+					const key = `Doc_MinResource_${currentResource}`
+					if (newMin > 0) {
+						localStorage.setItem(key, newMin)
+					}
+					else if (currentMin > 0) {
+						localStorage.removeItem(key)
+					}
+					UpdateQuantities()
+					UpdateLinks()
 				}
-				else if (currentMin > 0) {
-					localStorage.removeItem(key)
-				}
-				UpdateQuantities()
-				UpdateLinks()
 			}
-		}
-	}))
+		})
+	)))
 
 	divTag.append(document.createElement('br'))
 	divTag.append(CreateElement('div', divTag => {
@@ -287,7 +295,7 @@ document.head.append(CreateElement('style', styleTag => {
 // Dark Theme 1.0 = 1
 // Light Theme = 0
 function GetTheme() {
-	const links = [ ...document.querySelectorAll('link') ].map(linkTag => linkTag.href)
+	const links = [...document.querySelectorAll('link')].map(linkTag => linkTag.href)
 	if (links.includes('https://politicsandwar.com/css/dark-theme-2.0-beta.css')) {
 		return 2
 	}
@@ -305,7 +313,7 @@ function SetTheme(theme) {
 		}))
 	}
 	else {
-		[ ...document.querySelectorAll('link') ].filter(linkTag => linkTag.href === 'https://politicsandwar.com/css/dark-theme-2.0-beta.css' || linkTag.href === 'https://politicsandwar.com/css/dark-theme.min.css')[ 0 ].remove()
+		[...document.querySelectorAll('link')].filter(linkTag => linkTag.href === 'https://politicsandwar.com/css/dark-theme-2.0-beta.css' || linkTag.href === 'https://politicsandwar.com/css/dark-theme.min.css')[0].remove()
 	}
 	UpdateTheme()
 }
@@ -345,17 +353,17 @@ function Sleep(ms) {
 function Capitalize(text) {
 	const words = text.split(' ').filter(word => word.length)
 	for (const i in words) {
-		words[ i ] = words[ i ].charAt(0).toUpperCase() + words[ i ].slice(1).toLowerCase()
+		words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase()
 	}
 	return words.join(' ')
 }
 
 function MaxAmount(resource) {
-	return parseFloat(localStorage.getItem(`Doc_MaxResource_${ Capitalize(resource) }`)) || 0
+	return parseFloat(localStorage.getItem(`Doc_MaxResource_${Capitalize(resource)}`)) || 0
 }
 
 function MinAmount(resource) {
-	return parseFloat(localStorage.getItem(`Doc_MinResource_${ Capitalize(resource) }`)) || 0
+	return parseFloat(localStorage.getItem(`Doc_MinResource_${Capitalize(resource)}`)) || 0
 }
 
 function ReplaceAll(text, search, replace) {
@@ -370,16 +378,16 @@ function ReplaceAll(text, search, replace) {
 
 function CreateOfferLink(resource, price, sellersWanted, quantity) {
 	if (typeof quantity !== 'number') {
-		const max = parseInt(localStorage.getItem(`Doc_MaxResource_${ resource }`)) || Infinity
+		const max = parseInt(localStorage.getItem(`Doc_MaxResource_${resource}`)) || Infinity
 		if (localStorage.getItem('Doc_VT_ZeroAccountability')) {
-			quantity = Math.max(Math.min(Math.floor(sellersWanted ? (resourceBar.Money - MinAmount('Money')) / price - ((quantity && GetQuantity(quantity)) ?? 0) : resourceBar[ resource ] - MinAmount(resource) - ((quantity && GetQuantity(quantity)) ?? 0)), max), 0)
+			quantity = Math.max(Math.min(Math.floor(sellersWanted ? (resourceBar.Money - MinAmount('Money')) / price - ((quantity && GetQuantity(quantity)) ?? 0) : resourceBar[resource] - MinAmount(resource) - ((quantity && GetQuantity(quantity)) ?? 0)), max), 0)
 		}
 		else {
-			quantity = Math.max(Math.min(Math.floor(sellersWanted ? (resourceBar.Money - MinAmount('Money') - myOffers.Money) / price : resourceBar[ resource ] - MinAmount(resource) - myOffers[ resource ]), max), 0)
+			quantity = Math.max(Math.min(Math.floor(sellersWanted ? (resourceBar.Money - MinAmount('Money') - myOffers.Money) / price : resourceBar[resource] - MinAmount(resource) - myOffers[resource]), max), 0)
 		}
 	}
 	if (quantity) {
-		return `https://politicsandwar.com/nation/trade/create/?resource=${ resource.toLowerCase() }&p=${ price }&q=${ quantity }&t=${ sellersWanted ? 'b' : 's' }`
+		return `https://politicsandwar.com/nation/trade/create/?resource=${resource.toLowerCase()}&p=${price}&q=${quantity}&t=${sellersWanted ? 'b' : 's'}`
 	}
 }
 
@@ -390,8 +398,8 @@ function UpdateLinks() {
 		}
 
 		for (let i = 0; i < 2; ++i) {
-			[ ...document.querySelectorAll(`.${ i ? 's' : 'b' }Outbid_${ resource }`) ].forEach(aTag => UpdateLink(aTag, CreateOfferLink(resource, GetPrice(aTag.parentElement.parentElement) + (i ? 1 : -1), i ? true : false)));
-			[ ...document.querySelectorAll(`.${ i ? 's' : 'b' }Match_${ resource }, .${ i ? 's' : 'b' }TopUp_${ resource }`) ].forEach(aTag => UpdateLink(aTag, CreateOfferLink(resource, GetPrice(aTag.parentElement.parentElement), i ? true : false, aTag.classList.contains(`${ i ? 's' : 'b' }TopUp_${ resource }`) ? aTag.parentElement.parentElement : undefined)))
+			[...document.querySelectorAll(`.${i ? 's' : 'b'}Outbid_${resource}`)].forEach(aTag => UpdateLink(aTag, CreateOfferLink(resource, GetPrice(aTag.parentElement.parentElement) + (i ? 1 : -1), i ? true : false)));
+			[...document.querySelectorAll(`.${i ? 's' : 'b'}Match_${resource}, .${i ? 's' : 'b'}TopUp_${resource}`)].forEach(aTag => UpdateLink(aTag, CreateOfferLink(resource, GetPrice(aTag.parentElement.parentElement), i ? true : false, aTag.classList.contains(`${i ? 's' : 'b'}TopUp_${resource}`) ? aTag.parentElement.parentElement : undefined)))
 		}
 	}
 }
@@ -409,26 +417,26 @@ function UpdateLink(aTag, link) {
 
 function UpdateQuantities() {
 	if (currentResource === 'Money') {
-		[ ...document.querySelectorAll('.Offer') ].forEach(divTag => {
-			const offerType = [ ...divTag.classList ].filter(x => x.startsWith('Type-'))[ 0 ].slice(5)
+		[...document.querySelectorAll('.Offer')].forEach(divTag => {
+			const offerType = [...divTag.classList].filter(x => x.startsWith('Type-'))[0].slice(5)
 			if (offerType !== 'Receive-Public') {
 				return
 			}
 
-			divTag.querySelector('.Amount').value = CalcUnits(offerType, divTag.querySelector('.Hide').textContent === 'SELLERS WANTED', Capitalize([ ...divTag.classList ].filter(x => x.endsWith('Offer') && x.length > 6)[ 0 ].slice(0, -5)), GetQuantity(divTag), GetPrice(divTag))
+			divTag.querySelector('.Amount').value = CalcUnits(offerType, divTag.querySelector('.Hide').textContent === 'SELLERS WANTED', Capitalize([...divTag.classList].filter(x => x.endsWith('Offer') && x.length > 6)[0].slice(0, -5)), GetQuantity(divTag), GetPrice(divTag))
 		})
 		return
 	}
 
-	const data = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${ currentResource }`));
-	[ ...document.querySelectorAll('.Offer') ].forEach(divTag => {
-		const offerType = [ ...divTag.classList ].filter(x => x.startsWith('Type-'))[ 0 ].slice(5)
+	const data = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${currentResource}`));
+	[...document.querySelectorAll('.Offer')].forEach(divTag => {
+		const offerType = [...divTag.classList].filter(x => x.startsWith('Type-'))[0].slice(5)
 		if (offerType !== 'Receive-Public') {
 			return
 		}
 
 		const price = GetPrice(divTag)
-		const units = CalcUnits(offerType, divTag.querySelector('.Hide').textContent === 'SELLERS WANTED', Capitalize([ ...divTag.classList ].filter(x => x.endsWith('Offer') && x.length > 6)[ 0 ].slice(0, -5)), GetQuantity(divTag), price)
+		const units = CalcUnits(offerType, divTag.querySelector('.Hide').textContent === 'SELLERS WANTED', Capitalize([...divTag.classList].filter(x => x.endsWith('Offer') && x.length > 6)[0].slice(0, -5)), GetQuantity(divTag), price)
 		if (data && divTag.classList.contains('sOffer') === data.bought) {
 			const quantity = data.bought ? data.levels.reduce((quantity, level) => quantity + (price > level.price ? level.quantity : 0), 0) : data.levels.reduce((quantity, level) => quantity + (price < level.price ? level.quantity : 0), 0)
 			divTag.querySelector('.Amount').value = Math.min(units, quantity)
@@ -440,33 +448,33 @@ function UpdateQuantities() {
 }
 
 function CreateRow(tdTags) {
-	const sellerWanted = tdTags[ 1 ].textContent === 'SELLER WANTED'
-	const buyerWanted = tdTags[ 2 ].textContent === 'BUYER WANTED'
+	const sellerWanted = tdTags[1].textContent === 'SELLER WANTED'
+	const buyerWanted = tdTags[2].textContent === 'BUYER WANTED'
 	const offerType = (() => {
-		const type = tdTags[ 6 ].children[ 0 ].tagName
+		const type = tdTags[6].children[0].tagName
 		if (type === 'FORM') {
 			return sellerWanted || buyerWanted ? 'Receive-Public' : 'Receive-Personal'
 		}
 		if (type === 'A') {
 			return sellerWanted || buyerWanted ? 'Send-Public' : 'Send-Personal'
 		}
-		return tdTags[ 6 ].textContent.includes('Accepted') ? 'Accepted' : 'Embargo'
+		return tdTags[6].textContent.includes('Accepted') ? 'Accepted' : 'Embargo'
 	})()
-	const sellUnits = offerType.endsWith('Public') || offerType === 'Embargo' ? sellerWanted : parseInt(tdTags[ 2 ].children[ 0 ].children[ 0 ].href.split('=')[ 1 ]) === nationID === (offerType !== 'Receive-Personal')
-	const resource = Capitalize(tdTags[ 4 ].children[ 0 ].getAttribute('title'))
-	if (myOffers[ resource ] === undefined) {
-		myOffers[ resource ] = 0
+	const sellUnits = offerType.endsWith('Public') || offerType === 'Embargo' ? sellerWanted : parseInt(tdTags[2].children[0].children[0].href.split('=')[1]) === nationID === (offerType !== 'Receive-Personal')
+	const resource = Capitalize(tdTags[4].children[0].getAttribute('title'))
+	if (myOffers[resource] === undefined) {
+		myOffers[resource] = 0
 	}
-	const price = parseInt(tdTags[ 5 ].textContent.split('/')[ 0 ].trim().replaceAll(',', ''))
-	const quantity = parseInt(tdTags[ 4 ].textContent.trim().replaceAll(',', ''))
+	const price = parseInt(tdTags[5].textContent.split('/')[0].trim().replaceAll(',', ''))
+	const quantity = parseInt(tdTags[4].textContent.trim().replaceAll(',', ''))
 	const units = CalcUnits(offerType, sellUnits, resource, quantity, price)
-	const date = new Date(`${ tdTags[ 3 ].childNodes[ 0 ].textContent } ${ tdTags[ 3 ].childNodes[ 2 ].textContent }`)
+	const date = new Date(`${tdTags[3].childNodes[0].textContent} ${tdTags[3].childNodes[2].textContent}`)
 
 	document.querySelector('#Offers').append(CreateElement('div', divTag => {
 		divTag.classList.add('Offer')
-		divTag.classList.add(`${ sellUnits ? 's' : 'b' }Offer`)
-		divTag.classList.add(`${ resource.toLowerCase() }Offer`)
-		divTag.classList.add(`Type-${ offerType }`)
+		divTag.classList.add(`${sellUnits ? 's' : 'b'}Offer`)
+		divTag.classList.add(`${resource.toLowerCase()}Offer`)
+		divTag.classList.add(`Type-${offerType}`)
 
 		// Nations
 		divTag.append(CreateElement('div', divTag => {
@@ -474,11 +482,11 @@ function CreateRow(tdTags) {
 			divTag.style.setProperty('grid-area', 'Nations')
 			divTag.append(CreateElement('div', divTag => {
 				divTag.style.setProperty('grid-area', 'Left')
-				GenerateNationBio(divTag, tdTags[ 1 ], offerType.endsWith('Public') || offerType === 'Embargo', sellUnits, 'SELLERS WANTED')
+				GenerateNationBio(divTag, tdTags[1], offerType.endsWith('Public') || offerType === 'Embargo', sellUnits, 'SELLERS WANTED')
 			}))
 			divTag.append(CreateElement('div', divTag => {
 				divTag.style.setProperty('grid-area', 'Right')
-				GenerateNationBio(divTag, tdTags[ 2 ], offerType.endsWith('Public') || offerType === 'Embargo', !sellUnits, 'BUYERS WANTED')
+				GenerateNationBio(divTag, tdTags[2], offerType.endsWith('Public') || offerType === 'Embargo', !sellUnits, 'BUYERS WANTED')
 			}))
 		}))
 
@@ -493,7 +501,7 @@ function CreateRow(tdTags) {
 		divTag.append(CreateElement('div', divTag => {
 			divTag.classList.add('Quantity')
 			divTag.style.setProperty('grid-area', 'Quantity')
-			divTag.append(CreateElement('img', imgTag => imgTag.setAttribute('src', tdTags[ 4 ].children[ 0 ].src)))
+			divTag.append(CreateElement('img', imgTag => imgTag.setAttribute('src', tdTags[4].children[0].src)))
 			divTag.append(' ')
 			divTag.append(FormatNumber(quantity))
 		}))
@@ -514,12 +522,12 @@ function CreateRow(tdTags) {
 			if (offerType.startsWith('Receive')) {
 				// Outbid + Match
 				divTag.append(CreateElement('a', aTag => {
-					aTag.classList.add(`${ sellUnits ? 's' : 'b' }Outbid_${ resource }`)
+					aTag.classList.add(`${sellUnits ? 's' : 'b'}Outbid_${resource}`)
 					aTag.append('Outbid')
 				}))
 				divTag.append(document.createElement('br'))
 				divTag.append(CreateElement('a', aTag => {
-					aTag.classList.add(`${ sellUnits ? 's' : 'b' }Match_${ resource }`)
+					aTag.classList.add(`${sellUnits ? 's' : 'b'}Match_${resource}`)
 					aTag.append('Match')
 				}))
 				return
@@ -527,14 +535,14 @@ function CreateRow(tdTags) {
 			if (offerType === 'Send-Public') {
 				// TopUp
 				divTag.append(CreateElement('a', aTag => {
-					aTag.classList.add(`${ sellUnits ? 's' : 'b' }TopUp_${ resource }`)
+					aTag.classList.add(`${sellUnits ? 's' : 'b'}TopUp_${resource}`)
 					aTag.append('TopUp')
 				}))
 				if (sellUnits) {
 					myOffers.Money += price * quantity
 				}
 				else {
-					myOffers[ resource ] += quantity
+					myOffers[resource] += quantity
 				}
 				return
 			}
@@ -549,13 +557,13 @@ function CreateRow(tdTags) {
 		divTag.append(CreateElement('div', divTag => {
 			divTag.style.setProperty('grid-area', 'Form')
 			if (offerType === 'Accepted' || offerType === 'Embargo') {
-				divTag.append(CreateElement('img', imgTag => imgTag.setAttribute('src', tdTags[ 6 ].children[ 0 ].src)))
+				divTag.append(CreateElement('img', imgTag => imgTag.setAttribute('src', tdTags[6].children[0].src)))
 				if (offerType === 'Accepted') {
 					divTag.append(' ')
 					divTag.append(CreateElement('b', bTag => bTag.append(sellUnits ? 'SOLD' : 'BOUGHT')))
 					divTag.append(document.createElement('br'))
-					const spanTag = tdTags[ 6 ].children[ 2 ]
-					divTag.append(FormatDate(new Date(`${ spanTag.childNodes[ 0 ].textContent } ${ spanTag.childNodes[ 2 ].textContent }`)))
+					const spanTag = tdTags[6].children[2]
+					divTag.append(FormatDate(new Date(`${spanTag.childNodes[0].textContent} ${spanTag.childNodes[2].textContent}`)))
 				}
 				return
 			}
@@ -566,12 +574,12 @@ function CreateRow(tdTags) {
 					formTag.append(CreateElement('input', inputTag => {
 						inputTag.setAttribute('type', 'hidden')
 						inputTag.setAttribute('name', 'tradeaccid')
-						inputTag.setAttribute('value', tdTags[ 6 ].querySelector('input[name="tradeaccid"]').value)
+						inputTag.setAttribute('value', tdTags[6].querySelector('input[name="tradeaccid"]').value)
 					}))
 					formTag.append(CreateElement('input', inputTag => {
 						inputTag.setAttribute('type', 'hidden')
 						inputTag.setAttribute('name', 'ver')
-						inputTag.setAttribute('value', tdTags[ 6 ].querySelector('input[name="ver"]').value)
+						inputTag.setAttribute('value', tdTags[6].querySelector('input[name="ver"]').value)
 					}))
 					formTag.append(CreateElement('input', inputTag => {
 						inputTag.setAttribute('type', 'hidden')
@@ -600,9 +608,9 @@ function CreateRow(tdTags) {
 			}
 			if (offerType.startsWith('Send') || offerType.endsWith('Personal')) {
 				divTag.append(CreateElement('button', buttonTag => {
-					buttonTag.setAttribute('href', `https://politicsandwar.com/index.php?id=26&${ tdTags[ 6 ].querySelector('a').href.split('?')[ 1 ].split('&').filter(arg => arg.startsWith('tradedelid') || arg.startsWith('ver')).join('&') }`)
+					buttonTag.setAttribute('href', `https://politicsandwar.com/index.php?id=26&${tdTags[6].querySelector('a').href.split('?')[1].split('&').filter(arg => arg.startsWith('tradedelid') || arg.startsWith('ver')).join('&')}`)
 					buttonTag.setAttribute('checked', sellUnits)
-					buttonTag.append(CreateElement('img', imgTag => imgTag.setAttribute('src', tdTags[ 6 ].querySelector('a img').src)))
+					buttonTag.append(CreateElement('img', imgTag => imgTag.setAttribute('src', tdTags[6].querySelector('a img').src)))
 					buttonTag.append(' Delete')
 					// "this" doesn't work with an arrow function.
 					buttonTag.onclick = async function () {
@@ -613,7 +621,7 @@ function CreateRow(tdTags) {
 							myOffers.Money -= GetPrice(divTag) * GetQuantity(divTag)
 						}
 						else {
-							myOffers[ Capitalize([ ...divTag.classList ].filter(x => x.length > 6)[ 0 ].slice(0, -5)) ] -= GetQuantity(divTag)
+							myOffers[Capitalize([...divTag.classList].filter(x => x.length > 6)[0].slice(0, -5))] -= GetQuantity(divTag)
 						}
 						divTag.remove()
 						if (!localStorage.getItem('Doc_VT_ZeroAccountability')) {
@@ -640,21 +648,21 @@ function GenerateNationBio(divTag, tdTag, offerIsPublicOrEmbargo, offerWanted, w
 		}
 	}
 	divTag.append(CreateElement('a', aTag => {
-		aTag.setAttribute('href', tdTag.children[ 0 ].children[ 0 ].href)
-		aTag.append(tdTag.children[ 0 ].children[ 0 ].textContent)
+		aTag.setAttribute('href', tdTag.children[0].children[0].href)
+		aTag.append(tdTag.children[0].children[0].textContent)
 		aTag.append(CreateElement('img', imgTag => {
 			imgTag.classList.add('tinyflag')
-			imgTag.setAttribute('src', tdTag.children[ 0 ].children[ 0 ].children[ 0 ].src)
+			imgTag.setAttribute('src', tdTag.children[0].children[0].children[0].src)
 		}))
 	}))
 	divTag.append(document.createElement('br'))
-	divTag.append(tdTag.children[ 0 ].children[ 1 ].nextSibling.textContent.trim())
+	divTag.append(tdTag.children[0].children[1].nextSibling.textContent.trim())
 	divTag.append(document.createElement('br'))
-	if (tdTag.children[ 0 ].lastChild.nodeName === '#text') {
+	if (tdTag.children[0].lastChild.nodeName === '#text') {
 		divTag.append(CreateElement('i', iTag => iTag.append('None')))
 	}
 	else {
-		const tag = tdTag.children[ 0 ].lastChild.nodeName === 'A' ? tdTag.children[ 0 ].lastChild : tdTag.children[ 0 ].lastChild.previousElementSibling
+		const tag = tdTag.children[0].lastChild.nodeName === 'A' ? tdTag.children[0].lastChild : tdTag.children[0].lastChild.previousElementSibling
 		divTag.append(CreateElement('a', aTag => {
 			aTag.setAttribute('href', tag.href)
 			aTag.append(tag.textContent)
@@ -664,7 +672,7 @@ function GenerateNationBio(divTag, tdTag, offerIsPublicOrEmbargo, offerWanted, w
 
 function CalcUnits(offerType, sellerWanted, resource, quantity, price) {
 	if (offerType.endsWith('Public') || offerType === 'Receive-Personal') {
-		return Math.max(Math.min(Math.floor(sellerWanted ? resourceBar[ resource ] - MinAmount(resource) : (resourceBar.Money - MinAmount('Money')) / price), quantity), 0)
+		return Math.max(Math.min(Math.floor(sellerWanted ? resourceBar[resource] - MinAmount(resource) : (resourceBar.Money - MinAmount('Money')) / price), quantity), 0)
 	}
 	return quantity
 }
@@ -674,7 +682,7 @@ function GetQuantity(divTag) {
 }
 
 function GetPrice(divTag) {
-	return parseInt(divTag.querySelector('.Price').textContent.slice(1).split('/')[ 0 ].replaceAll(',', ''))
+	return parseInt(divTag.querySelector('.Price').textContent.slice(1).split('/')[0].replaceAll(',', ''))
 }
 
 function FormatDate(date = new Date()) {
@@ -685,7 +693,7 @@ function FormatDate(date = new Date()) {
 	text += ' '
 	text += date.getDate().toString().padStart(2, 0)
 	text += '/'
-	text += [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ][ date.getMonth() ]
+	text += ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()]
 	text += '/'
 	text += date.getFullYear()
 	return text
@@ -705,37 +713,37 @@ async function InfiniteScroll() {
 	}
 
 	const { offset, pages } = (() => {
-		const pTags = [ ...document.querySelectorAll('p.center') ]
-		const words = pTags[ 4 ].textContent.split(' ')
-		const nums = words.splice(1, 2)[ 0 ].split('-').map(x => parseInt(x))
-		if (nums[ 0 ]) {
+		const pTags = [...document.querySelectorAll('p.center')]
+		const words = pTags[4].textContent.split(' ')
+		const nums = words.splice(1, 2)[0].split('-').map(x => parseInt(x))
+		if (nums[0]) {
 			location.href = GetMinURL(0)
 		}
-		pTags[ 4 ].textContent = words.join(' ')
+		pTags[4].textContent = words.join(' ')
 
-		pTags[ 2 ].append(pTags[ 3 ].children[ 4 ])
-		if (nums[ 1 ] < 50) {
-			pTags[ 3 ].textContent = ''
-			pTags[ 3 ].append(`Note: The game by default only loaded ${ offset } trade offers.`)
-			pTags[ 3 ].append(document.createElement('br'))
-			pTags[ 3 ].append('We strongly recommend going to your ')
-			pTags[ 3 ].append(CreateElement('a', aTag => {
+		pTags[2].append(pTags[3].children[4])
+		if (nums[1] < 50) {
+			pTags[3].textContent = ''
+			pTags[3].append(`Note: The game by default only loaded ${offset} trade offers.`)
+			pTags[3].append(document.createElement('br'))
+			pTags[3].append('We strongly recommend going to your ')
+			pTags[3].append(CreateElement('a', aTag => {
 				aTag.setAttribute('href', 'https://politicsandwar.com/account/#4')
 				aTag.setAttribute('target', '_blank')
 				aTag.append('Account')
 			}))
-			pTags[ 3 ].append(' settings and changing the default search results to 50,')
-			pTags[ 3 ].append(document.createElement('br'))
-			pTags[ 3 ].append('or if this was a link provided by some bot, that you ask the maximum query in the link to be set to at least 50, preferably 100.')
+			pTags[3].append(' settings and changing the default search results to 50,')
+			pTags[3].append(document.createElement('br'))
+			pTags[3].append('or if this was a link provided by some bot, that you ask the maximum query in the link to be set to at least 50, preferably 100.')
 		}
 		else {
-			pTags[ 3 ].remove()
+			pTags[3].remove()
 		}
-		pTags[ 5 ].remove()
+		pTags[5].remove()
 
 		return {
-			offset: nums[ 1 ],
-			pages: Math.ceil((parseInt(words[ 1 ]) - nums[ 1 ]) / 100)
+			offset: nums[1],
+			pages: Math.ceil((parseInt(words[1]) - nums[1]) / 100)
 		}
 	})()
 	if (!pages) {
@@ -743,14 +751,14 @@ async function InfiniteScroll() {
 	}
 
 	for (let i = 0; i < pages; ++i) {
-		console.time(`Load Page - ${ i + 1 }`)
+		console.time(`Load Page - ${i + 1}`)
 		const doc = new DOMParser().parseFromString(await (await fetch(GetMinURL(100 * i + offset))).text(), 'text/html')
-		console.timeEnd(`Load Page - ${ i + 1 }`)
+		console.timeEnd(`Load Page - ${i + 1}`)
 		console.time('Convert Table')
-		const trTags = [ ...doc.querySelectorAll('.nationtable tr') ].slice(1)
+		const trTags = [...doc.querySelectorAll('.nationtable tr')].slice(1)
 		for (const trTag of trTags) {
 			try {
-				CreateRow([ ...trTag.children ])
+				CreateRow([...trTag.children])
 			}
 			catch (e) {
 				console.error(e)
@@ -765,7 +773,7 @@ function GetMinURL(min) {
 	let maxExists = false
 	const args = location.search.slice(1).split('&').map(arg => {
 		if (arg.startsWith('minimum=')) {
-			arg = `minimum=${ min }`
+			arg = `minimum=${min}`
 			minExists = true
 		}
 		else if (arg.startsWith('maximum=')) {
@@ -775,7 +783,7 @@ function GetMinURL(min) {
 		return arg
 	})
 	if (!minExists) {
-		args.push(`minimum=${ min }`)
+		args.push(`minimum=${min}`)
 	}
 	if (!maxExists) {
 		args.push('maximum=100')
@@ -784,7 +792,7 @@ function GetMinURL(min) {
 }
 
 function AutoScroll() {
-	if (marketType < 1 || currentResource === 'Money' || (location.search.slice(1).split('&').filter(arg => arg.startsWith('buysell='))[ 0 ] || '').length > 8) {
+	if (marketType < 1 || currentResource === 'Money' || (location.search.slice(1).split('&').filter(arg => arg.startsWith('buysell='))[0] || '').length > 8) {
 		document.querySelector('.Hide').scrollIntoView({
 			behavior: 'smooth',
 			block: 'center'
@@ -793,9 +801,9 @@ function AutoScroll() {
 	}
 	const divTag = document.querySelector('#Offers');
 	(divTag.querySelector('p') || CreateElement('p', pTag => {
-		divTag.insertBefore(pTag, CreateElement('hr', hrTag => divTag.insertBefore(hrTag, document.querySelector(`.${ ascOrder ? 'b' : 's' }Offer`))))
+		divTag.insertBefore(pTag, CreateElement('hr', hrTag => divTag.insertBefore(hrTag, document.querySelector(`.${ascOrder ? 'b' : 's'}Offer`))))
 		divTag.insertBefore(document.createElement('hr'), pTag)
-		pTag.append(`Profit Gap: ${ FormatMoney((GetPrice(pTag.nextElementSibling.nextElementSibling) - GetPrice(pTag.previousElementSibling.previousElementSibling)) * (ascOrder ? 1 : -1)) }/Ton`)
+		pTag.append(`Profit Gap: ${FormatMoney((GetPrice(pTag.nextElementSibling.nextElementSibling) - GetPrice(pTag.previousElementSibling.previousElementSibling)) * (ascOrder ? 1 : -1))}/Ton`)
 	})).scrollIntoView({
 		behavior: 'smooth',
 		block: 'center'
@@ -809,20 +817,20 @@ function Mistrade() {
 	let checkOne = false
 	let checkTwo = false
 	location.search.slice(1).split('&').map(arg => arg.split('=')).forEach(arg => {
-		if (arg[ 0 ] === 'buysell') {
-			if (!arg[ 1 ].length) {
+		if (arg[0] === 'buysell') {
+			if (!arg[1].length) {
 				checkOne = true
 			}
 		}
-		else if (arg[ 0 ] === 'resource1') {
-			if (arg[ 1 ].length) {
+		else if (arg[0] === 'resource1') {
+			if (arg[1].length) {
 				checkTwo = true
 			}
 		}
 	})
 	if (checkOne && checkTwo) {
-		const sellTag = ascOrder ? [ ...document.querySelectorAll('.sOffer') ].pop() : document.querySelector('.sOffer')
-		const buyTag = ascOrder ? document.querySelector('.bOffer') : [ ...document.querySelectorAll('.bOffer') ].pop()
+		const sellTag = ascOrder ? [...document.querySelectorAll('.sOffer')].pop() : document.querySelector('.sOffer')
+		const buyTag = ascOrder ? document.querySelector('.bOffer') : [...document.querySelectorAll('.bOffer')].pop()
 		if (!(sellTag && buyTag)) {
 			return false
 		}
@@ -868,7 +876,7 @@ function Mistrade() {
 
 function CreateMarketLinks() {
 	const offerSide = parseInt(localStorage.getItem('Doc_MarketView'));
-	[ ...document.querySelectorAll('#resource-column a') ].forEach(aTag => {
+	[...document.querySelectorAll('#resource-column a')].forEach(aTag => {
 		aTag.setAttribute('href', MarketLink(aTag.textContent.replaceAll('$', '').trim().slice(0, -1), offerSide))
 	})
 	return CreateElement('p', pTag => {
@@ -910,7 +918,7 @@ function CreateMarketLinks() {
 			}
 		}))
 		pTag.append(CreateElement('form', formTag => {
-			formTag.setAttribute('action', `https://politicsandwar.com/nation/id=${ nationID }&display=trade`)
+			formTag.setAttribute('action', `https://politicsandwar.com/nation/id=${nationID}&display=trade`)
 			formTag.setAttribute('method', 'POST')
 			formTag.append(CreateElement('input', inputTag => {
 				inputTag.setAttribute('type', 'number')
@@ -955,11 +963,11 @@ function MarketTag(resource, offerSide) {
 				imgTag.setAttribute('src', 'https://politicsandwar.com/img/icons/16/point_gold.png')
 			}
 			else {
-				imgTag.setAttribute('src', `https://politicsandwar.com/img/resources/${ resource.toLowerCase() }.png`)
+				imgTag.setAttribute('src', `https://politicsandwar.com/img/resources/${resource.toLowerCase()}.png`)
 			}
 		}))
-		aTag.append(` ${ resource }`)
-		if (localStorage.getItem(`Doc_VT_ReGain_${ Capitalize(resource) }`)) {
+		aTag.append(` ${resource}`)
+		if (localStorage.getItem(`Doc_VT_ReGain_${Capitalize(resource)}`)) {
 			aTag.append('*')
 		}
 	})
@@ -969,7 +977,7 @@ function MarketLink(resource, offerSide) {
 	if (resource === 'Money') {
 		return 'https://politicsandwar.com/index.php?id=26&display=nation&resource1=&buysell=&ob=date&od=DESC&maximum=100&minimum=0&search=Go'
 	}
-	return `https://politicsandwar.com/index.php?id=26&display=world&resource1=${ resource.toLowerCase() }&buysell=${ offerSide ? 'sell' : (offerSide === 0 ? 'buy' : '') }&ob=price&od=DEF&maximum=100&minimum=0&search=Go`
+	return `https://politicsandwar.com/index.php?id=26&display=world&resource1=${resource.toLowerCase()}&buysell=${offerSide ? 'sell' : (offerSide === 0 ? 'buy' : '')}&ob=price&od=DEF&maximum=100&minimum=0&search=Go`
 }
 
 function ReGain() {
@@ -979,26 +987,26 @@ function ReGain() {
 	}
 	pTag.parentElement.parentElement.insertBefore(document.createElement('hr'), pTag.nextElementSibling)
 	const words = ReplaceAll(pTag.textContent.trim(), '  ', ' ').split(' ')
-	if (words[ 2 ] !== 'accepted') {
+	if (words[2] !== 'accepted') {
 		return
 	}
 
 	pTag.setAttribute('id', 'ReGain')
 	let profit = 0
-	let quantity = parseInt(words[ 8 ].replaceAll(',', ''))
-	const price = parseInt(words[ 14 ].slice(1, -1).replaceAll(',', '')) / quantity
-	const bought = words[ 7 ] === 'bought'
-	const key = `Doc_VT_ReGain_${ Capitalize(words[ 9 ].slice(0, -1)) }`
+	let quantity = parseInt(words[8].replaceAll(',', ''))
+	const price = parseInt(words[14].slice(1, -1).replaceAll(',', '')) / quantity
+	const bought = words[7] === 'bought'
+	const key = `Doc_VT_ReGain_${Capitalize(words[9].slice(0, -1))}`
 	const data = JSON.parse(localStorage.getItem(key))
-	pTag.append(` ${ FormatMoney(price) }/Ton.`)
+	pTag.append(` ${FormatMoney(price)}/Ton.`)
 	pTag.append(document.createElement('br'))
 
 	if (data && data.bought !== bought) {
 		for (const i in data.levels) {
-			if ((!bought && price > data.levels[ i ].price) || (bought && price < data.levels[ i ].price)) {
-				const amount = Math.min(data.levels[ i ].quantity, quantity)
-				profit += amount * Math.abs(data.levels[ i ].price - price)
-				data.levels[ i ].quantity -= amount
+			if ((!bought && price > data.levels[i].price) || (bought && price < data.levels[i].price)) {
+				const amount = Math.min(data.levels[i].quantity, quantity)
+				profit += amount * Math.abs(data.levels[i].price - price)
+				data.levels[i].quantity -= amount
 				quantity -= amount
 			}
 			if (!quantity) {
@@ -1017,13 +1025,13 @@ function ReGain() {
 		buttonExists = true
 		pTag.append(CreateElement('a', aTag => {
 			aTag.setAttribute('id', 'Doc_ReGain')
-			aTag.append(`Re${ bought ? 'sell' : 'buy' } for Profit?`)
+			aTag.append(`Re${bought ? 'sell' : 'buy'} for Profit?`)
 			aTag.onclick = () => {
 				const data = JSON.parse(localStorage.getItem(key))
 				if (data) {
 					const index = data.levels.findIndex(level => level.price === price)
 					if (index > -1) {
-						data.levels[ index ].quantity += quantity
+						data.levels[index].quantity += quantity
 					}
 					else {
 						data.levels.push({
@@ -1066,7 +1074,7 @@ function ReGain() {
 		if (buttonExists) {
 			pTag.append(' | ')
 		}
-		pTag.append(`Made ${ FormatMoney(profit, 2) } Profit.`)
+		pTag.append(`Made ${FormatMoney(profit, 2)} Profit.`)
 	}
 }
 
@@ -1096,7 +1104,7 @@ function CreateReGainStats() {
 	if (currentResource === 'Money') {
 		return
 	}
-	const data = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${ currentResource }`))
+	const data = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${currentResource}`))
 	if (!data) {
 		return
 	}
@@ -1104,22 +1112,22 @@ function CreateReGainStats() {
 		divTag.setAttribute('id', 'RegainStats')
 		for (const level of data.levels) {
 			divTag.append(CreateElement('p', pTag => {
-				pTag.append(`${ data.bought ? 'Bought' : 'Sold' } ${ FormatNumber(level.quantity) } Ton${ level.quantity > 1 ? 's' : '' } @ `)
+				pTag.append(`${data.bought ? 'Bought' : 'Sold'} ${FormatNumber(level.quantity)} Ton${level.quantity > 1 ? 's' : ''} @ `)
 				pTag.append(FormatMoney(level.price))
 				pTag.append('/ton | ')
 				pTag.append(CreateElement('a', aTag => {
 					aTag.append('Forget')
 					// "this" doesn't work with an arrow function.
 					aTag.onclick = function () {
-						const price = parseInt(this.parentElement.childNodes[ 1 ].textContent.slice(1).replaceAll(',', ''))
-						const data = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${ currentResource }`))
+						const price = parseInt(this.parentElement.childNodes[1].textContent.slice(1).replaceAll(',', ''))
+						const data = JSON.parse(localStorage.getItem(`Doc_VT_ReGain_${currentResource}`))
 						data.levels = data.levels.filter(level => level.price !== price)
 						if (data.levels.length) {
-							localStorage.setItem(`Doc_VT_ReGain_${ currentResource }`, JSON.stringify(data))
+							localStorage.setItem(`Doc_VT_ReGain_${currentResource}`, JSON.stringify(data))
 							this.parentElement.remove()
 						}
 						else {
-							localStorage.removeItem(`Doc_VT_ReGain_${ currentResource }`)
+							localStorage.removeItem(`Doc_VT_ReGain_${currentResource}`)
 							const divTag = this.parentElement.parentElement
 							divTag.nextElementSibling.remove()
 							divTag.remove()
@@ -1134,7 +1142,7 @@ function CreateReGainStats() {
 				aTag.append('Forget All')
 				// "this" doesn't work with an arrow function.
 				aTag.onclick = function () {
-					localStorage.removeItem(`Doc_VT_ReGain_${ currentResource }`)
+					localStorage.removeItem(`Doc_VT_ReGain_${currentResource}`)
 					const divTag = this.parentElement
 					divTag.nextElementSibling.remove()
 					divTag.remove()
@@ -1154,10 +1162,10 @@ async function Main() {
 		const tableTag = document.querySelector('.nationtable')
 		tableTag.parentElement.insertBefore(divTag, tableTag)
 
-		const trTags = [ ...tableTag.querySelectorAll('tr') ].slice(1)
+		const trTags = [...tableTag.querySelectorAll('tr')].slice(1)
 		for (const trTag of trTags) {
 			try {
-				CreateRow([ ...trTag.children ])
+				CreateRow([...trTag.children])
 			}
 			catch (e) {
 				console.error(e)
