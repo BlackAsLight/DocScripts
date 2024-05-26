@@ -19,7 +19,7 @@ import { createTag } from '@doctor/create-tag'
 if (document.querySelector('#Doc_Military')) {
 	throw Error('This script was already injected...')
 }
-document.body.append(createTag('div', { id: 'Doc_Military' }, divTag => divTag.style.setProperty('display', 'none')))
+document.body.append(createTag('div', { id: 'Doc_Military' }, (divTag) => divTag.style.setProperty('display', 'none')))
 
 /* Global Variables
 -------------------------*/
