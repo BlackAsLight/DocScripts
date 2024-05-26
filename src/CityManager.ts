@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: City Manager
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.3
+// @version      10.0.0
 // @description  Improving the experience of switching improvements.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/city/id=*
@@ -9,17 +9,15 @@
 // @grant        none
 // ==/UserScript==
 
-import { build, x } from 'https://deno.land/x/basic_jsx@v3.0.1/mod.tsx'
 import { pass, sleep, waitTilFalse, wrap } from '../utils.ts'
+import { createTag } from '@doctor/create-tag'
 
 /* Double Injection Protection
 -------------------------*/
 if (document.querySelector('#Doc_CityManager')) {
 	throw Error('This script was already injected...')
 }
-document.body.append(
-	build(<div id='Doc_CityManager' style='display: none;' />),
-)
+document.body.append(createTag('div', { id: 'Doc_CityManger' }, (divTag) => divTag.style.setProperty('display', 'none')))
 
 /* Global Variables
 -------------------------*/
