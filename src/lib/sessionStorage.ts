@@ -1,14 +1,9 @@
 import { lock, sleep } from './utils.ts'
 
-export function Token(
-	func: (
-		token: string,
-	) => string | null | void | Promise<string | null | void>,
-): Promise<void> {
+export function Token(func: (token: string) => string | null | void | Promise<string | null | void>): Promise<void> {
 	return lock('Doc_Token', async () => {
 		let token = sessionStorage.getItem('Doc_Token') ??
-			document.querySelector<HTMLInputElement>('input[name="token"]')
-				?.value
+			document.querySelector<HTMLInputElement>('input[name="token"]')?.value
 		if (token == undefined) {
 			let response: Response
 			let dom: Document
@@ -17,21 +12,12 @@ export function Token(
 				if (response.status !== 200) {
 					throw `Failed to get Token | Status Code: ${response.status}`
 				}
-				dom = new DOMParser().parseFromString(
-					await response.text(),
-					'text/html',
-				)
-				token = dom.querySelector<HTMLInputElement>(
-					'input[name="token"]',
-				)?.value
+				dom = new DOMParser().parseFromString(await response.text(), 'text/html')
+				token = dom.querySelector<HTMLInputElement>('input[name="token"]')?.value
 				if (token) {
 					break
 				}
-				if (
-					dom.querySelector<HTMLImageElement>(
-						'img[alt="Politics & Snore"]',
-					)
-				) {
+				if (dom.querySelector<HTMLImageElement>('img[alt="Politics & Snore"]')) {
 					await sleep(5000)
 				} else {
 					throw 'Failed to get Token | Token not Found'
