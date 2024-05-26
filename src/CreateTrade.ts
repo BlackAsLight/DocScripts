@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      2.9
+// @version      10.0.0
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -10,17 +10,15 @@
 // @grant        none
 // ==/UserScript==
 
-import { build, x } from 'https://deno.land/x/basic_jsx@v3.0.1/mod.tsx'
 import { sleep } from '../utils.ts'
+import { createTag } from '@doctor/create-tag'
 
 /* Double Injection Protection
 -------------------------*/
 if (document.querySelector('#Doc_CreateTrade')) {
 	throw Error('This script was already injected...')
 }
-document.body.append(
-	build(<div id='Doc_CreateTrade' style='display: none;' />),
-)
+document.body.append(createTag('div', { id: 'Doc_CreateTag' }, (divTag) => divTag.style.setProperty('display', 'none')))
 
 /* Global Variables
 -------------------------*/
@@ -55,10 +53,10 @@ if (document.querySelector('.alert-success')) {
 		`${new Date().getTime() + 5000}`,
 	)
 	if (
-		q && q > 10_000_000 && localStorage.getItem(LocalStorageKeys.Recursive)
+		q && q > 100_000_000 && localStorage.getItem(LocalStorageKeys.Recursive)
 	) {
 		const args = self.location.search.slice(1).split('&')
-		args[args.findIndex((arg) => arg.startsWith('q='))] = `q=${q - 10_000_000}`
+		args[args.findIndex((arg) => arg.startsWith('q='))] = `q=${q - 100_000_000}`
 		if (localStorage.getItem(LocalStorageKeys.Price)) {
 			args[args.findIndex((arg) => arg.startsWith('p='))] = `p=${localStorage.getItem(LocalStorageKeys.Price)}`
 			localStorage.removeItem(LocalStorageKeys.Price)
@@ -94,8 +92,8 @@ if (document.querySelector('.alert-success')) {
 			}
 		}
 		if (
-			q && q >= 10_000_000 &&
-			10_000_000 ===
+			q && q >= 100_000_000 &&
+			100_000_000 ===
 				document.querySelector<HTMLInputElement>('input#amount')!
 					.valueAsNumber
 		) {
@@ -110,7 +108,7 @@ if (document.querySelector('.alert-success')) {
 	if (q) {
 		document.querySelector<HTMLInputElement>('input#amount')!.setAttribute(
 			'value',
-			`${Math.min(q, 10_000_000)}`,
+			`${Math.min(q, 100_000_000)}`,
 		)
 	}
 	if (t) {
