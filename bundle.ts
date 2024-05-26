@@ -36,14 +36,14 @@ await Promise.allSettled(promises)
 
 stop()
 console.log(
-	`${
-		performance.now().toLocaleString('en-US', { maximumFractionDigits: 2 })
-	}ms`,
+	`${performance.now().toLocaleString('en-US', { maximumFractionDigits: 2 })}ms`,
 )
 
 async function esbuild(inPath: string, outPath: string) {
 	const { errors, warnings } = await build({
-		plugins: denoPlugins(),
+		plugins: denoPlugins({
+			configPath: await Deno.realPath('./deno.json'),
+		}),
 		entryPoints: [inPath],
 		outfile: outPath,
 		format: 'esm',

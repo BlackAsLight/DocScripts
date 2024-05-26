@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Military
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      0.8
+// @version      10.0.0
 // @description  Making it easier to militarise and demilitarise your army.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/military/
@@ -11,19 +11,16 @@
 
 import * as localStorage from './lib/localStorage.ts'
 import * as sessionStorage from './lib/sessionStorage.ts'
-import {
-	createTag,
-	divSpacer,
-	userConfig_APIKey,
-	userConfig_Label,
-} from './lib/utils.ts'
+import { divSpacer, userConfig_APIKey, userConfig_Label } from './lib/utils.ts'
+
+import { createTag } from '@doctor/create-tag'
 
 /* Double Injection Protection
 -------------------------*/
 if (document.querySelector('#Doc_Military')) {
 	throw Error('This script was already injected...')
 }
-document.body.append(createTag<HTMLDivElement>('div', (divTag) => {
+document.body.append(createTag('div', (divTag) => {
 	divTag.setAttribute('id', 'Doc_Military')
 	divTag.style.setProperty('display', 'none')
 }))
@@ -80,14 +77,11 @@ userConfig_APIKey()
 
 /* Styling
 -------------------------*/
-document.head.append(createTag<HTMLStyleElement>('style', (styleTag) => {
-	styleTag.textContent +=
-		'.doc_military { display: grid; grid-template-columns: repeat(2, calc(50% - 0.5rem)); gap: 1rem; }'
-	styleTag.textContent +=
-		'.doc_military a { grid-column: 1 / 3; text-align: center; }'
+document.head.append(createTag('style', (styleTag) => {
+	styleTag.textContent += '.doc_military { display: grid; grid-template-columns: repeat(2, calc(50% - 0.5rem)); gap: 1rem; }'
+	styleTag.textContent += '.doc_military a { grid-column: 1 / 3; text-align: center; }'
 
-	styleTag.textContent +=
-		'.spacer-row { display: flex; flex-direction: row; align-items: center; }'
+	styleTag.textContent += '.spacer-row { display: flex; flex-direction: row; align-items: center; }'
 	styleTag.textContent += '.spacer { flex-grow: 1; }'
 
 	styleTag.append(
@@ -103,51 +97,46 @@ document.head.append(createTag<HTMLStyleElement>('style', (styleTag) => {
 /* Main
 -------------------------*/
 // Soldiers
-createTag<HTMLFormElement>('form', (formTag) => {
+createTag('form', (formTag) => {
 	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
 	divTag.parentElement!.insertBefore(formTag, divTag)
 	divTag.remove()
 
 	formTag.classList.add('doc_military')
 	formTag.append(
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Soldiers Enlisted:',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.soldiers.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.soldiers.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Soldiers Enlisted Today:',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.soldiers_today.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.soldiers_today.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Enlist/Discharge:',
 				divSpacer(),
-				createTag<HTMLInputElement>('input', (inputTag) => {
+				createTag('input', (inputTag) => {
 					inputTag.setAttribute('type', 'number')
 					inputTag.setAttribute('name', 'soldiers')
 					inputTag.setAttribute('value', '0')
 					data.then((nation) => {
-						const maxUnits = nation.cities.reduce((sum, city) =>
-							sum + city.barracks, 0) * 3000
+						const maxUnits = nation.cities.reduce((sum, city) => sum + city.barracks, 0) * 3000
 						inputTag.value = Math.min(
 							Math.round(
 								maxUnits / 3 *
@@ -160,12 +149,12 @@ createTag<HTMLFormElement>('form', (formTag) => {
 				}),
 			)
 		}),
-		createTag<HTMLInputElement>('input', (inputTag) => {
+		createTag('input', (inputTag) => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buysoldiers')
 			inputTag.setAttribute('value', 'Enlist/Discharge Soldiers')
 		}),
-		createTag<HTMLAnchorElement>('a', (aTag) => {
+		createTag('a', (aTag) => {
 			aTag.setAttribute(
 				'href',
 				'https://politicsandwar.com/nation/military/soldiers/',
@@ -176,9 +165,7 @@ createTag<HTMLFormElement>('form', (formTag) => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) =>
-		inputTag.toggleAttribute('disabled', true)
-	)
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) => inputTag.toggleAttribute('disabled', true))
 	Promise.all([data, sessionStorage.Token(() => undefined)])
 		.then((_token) =>
 			formTag.querySelectorAll<HTMLInputElement>('input').forEach(
@@ -188,51 +175,46 @@ createTag<HTMLFormElement>('form', (formTag) => {
 })
 
 // Tanks
-createTag<HTMLFormElement>('form', (formTag) => {
+createTag('form', (formTag) => {
 	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
 	divTag.parentElement!.insertBefore(formTag, divTag)
 	divTag.remove()
 
 	formTag.classList.add('doc_military')
 	formTag.append(
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Tanks Possessed: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.tanks.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.tanks.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Tanks Manufactured Today: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.tanks_today.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.tanks_today.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Manufacture/Decommission: ',
 				divSpacer(),
-				createTag<HTMLInputElement>('input', (inputTag) => {
+				createTag('input', (inputTag) => {
 					inputTag.setAttribute('type', 'number')
 					inputTag.setAttribute('name', 'tanks')
 					inputTag.setAttribute('value', '0')
 					data.then((nation) => {
-						const maxUnits = nation.cities.reduce((sum, city) =>
-							sum + city.factory, 0) * 250
+						const maxUnits = nation.cities.reduce((sum, city) => sum + city.factory, 0) * 250
 						inputTag.value = Math.min(
 							Math.round(
 								maxUnits / 5 *
@@ -245,12 +227,12 @@ createTag<HTMLFormElement>('form', (formTag) => {
 				}),
 			)
 		}),
-		createTag<HTMLInputElement>('input', (inputTag) => {
+		createTag('input', (inputTag) => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buytanks')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Tanks')
 		}),
-		createTag<HTMLAnchorElement>('a', (aTag) => {
+		createTag('a', (aTag) => {
 			aTag.setAttribute(
 				'href',
 				'https://politicsandwar.com/nation/military/tanks/',
@@ -261,9 +243,7 @@ createTag<HTMLFormElement>('form', (formTag) => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) =>
-		inputTag.toggleAttribute('disabled', true)
-	)
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) => inputTag.toggleAttribute('disabled', true))
 	Promise.all([data, sessionStorage.Token(() => undefined)])
 		.then((_token) =>
 			formTag.querySelectorAll<HTMLInputElement>('input').forEach(
@@ -273,51 +253,46 @@ createTag<HTMLFormElement>('form', (formTag) => {
 })
 
 // Aircraft
-createTag<HTMLFormElement>('form', (formTag) => {
+createTag('form', (formTag) => {
 	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
 	divTag.parentElement!.insertBefore(formTag, divTag)
 	divTag.remove()
 
 	formTag.classList.add('doc_military')
 	formTag.append(
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Aircraft Possessed: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.aircraft.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.aircraft.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Aircraft Manufactured Today: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.aircraft_today.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.aircraft_today.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Manufacture/Decommission: ',
 				divSpacer(),
-				createTag<HTMLInputElement>('input', (inputTag) => {
+				createTag('input', (inputTag) => {
 					inputTag.setAttribute('type', 'number')
 					inputTag.setAttribute('name', 'aircraft')
 					inputTag.setAttribute('value', '0')
 					data.then((nation) => {
-						const maxUnits = nation.cities.reduce((sum, city) =>
-							sum + city.hangar, 0) * 15
+						const maxUnits = nation.cities.reduce((sum, city) => sum + city.hangar, 0) * 15
 						inputTag.value = Math.min(
 							Math.round(
 								maxUnits / 5 *
@@ -330,12 +305,12 @@ createTag<HTMLFormElement>('form', (formTag) => {
 				}),
 			)
 		}),
-		createTag<HTMLInputElement>('input', (inputTag) => {
+		createTag('input', (inputTag) => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buyaircraft')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Aircraft')
 		}),
-		createTag<HTMLAnchorElement>('a', (aTag) => {
+		createTag('a', (aTag) => {
 			aTag.setAttribute(
 				'href',
 				'https://politicsandwar.com/nation/military/aircraft/',
@@ -346,9 +321,7 @@ createTag<HTMLFormElement>('form', (formTag) => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) =>
-		inputTag.toggleAttribute('disabled', true)
-	)
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) => inputTag.toggleAttribute('disabled', true))
 	Promise.all([data, sessionStorage.Token(() => undefined)])
 		.then((_token) =>
 			formTag.querySelectorAll<HTMLInputElement>('input').forEach(
@@ -358,51 +331,46 @@ createTag<HTMLFormElement>('form', (formTag) => {
 })
 
 // Navel Ships
-createTag<HTMLFormElement>('form', (formTag) => {
+createTag('form', (formTag) => {
 	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
 	divTag.parentElement!.insertBefore(formTag, divTag)
 	divTag.remove()
 
 	formTag.classList.add('doc_military')
 	formTag.append(
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Ships Possessed: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.ships.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.ships.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Ships Manufactured Today: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.ships_today.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.ships_today.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Manufacture/Decommission: ',
 				divSpacer(),
-				createTag<HTMLInputElement>('input', (inputTag) => {
+				createTag('input', (inputTag) => {
 					inputTag.setAttribute('type', 'number')
 					inputTag.setAttribute('name', 'ships')
 					inputTag.setAttribute('value', '0')
 					data.then((nation) => {
-						const maxUnits = nation.cities.reduce((sum, city) =>
-							sum + city.drydock, 0) * 5
+						const maxUnits = nation.cities.reduce((sum, city) => sum + city.drydock, 0) * 5
 						inputTag.value = Math.min(
 							Math.round(
 								maxUnits / 5 *
@@ -415,12 +383,12 @@ createTag<HTMLFormElement>('form', (formTag) => {
 				}),
 			)
 		}),
-		createTag<HTMLInputElement>('input', (inputTag) => {
+		createTag('input', (inputTag) => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buyships')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Ships')
 		}),
-		createTag<HTMLAnchorElement>('a', (aTag) => {
+		createTag('a', (aTag) => {
 			aTag.setAttribute(
 				'href',
 				'https://politicsandwar.com/nation/military/navy/',
@@ -431,9 +399,7 @@ createTag<HTMLFormElement>('form', (formTag) => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) =>
-		inputTag.toggleAttribute('disabled', true)
-	)
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) => inputTag.toggleAttribute('disabled', true))
 	Promise.all([data, sessionStorage.Token(() => undefined)])
 		.then(() =>
 			formTag.querySelectorAll<HTMLInputElement>('input').forEach(
@@ -443,45 +409,41 @@ createTag<HTMLFormElement>('form', (formTag) => {
 })
 
 // Spies
-createTag<HTMLFormElement>('form', (formTag) => {
+createTag('form', (formTag) => {
 	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
 	divTag.parentElement!.insertBefore(formTag, divTag)
 	divTag.remove()
 
 	formTag.classList.add('doc_military')
 	formTag.append(
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Spies Enlisted: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.spies.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.spies.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Spies Enlisted Today: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.spies_today.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.spies_today.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Enlist/Discharge: ',
 				divSpacer(),
-				createTag<HTMLInputElement>('input', (inputTag) => {
+				createTag('input', (inputTag) => {
 					inputTag.setAttribute('type', 'number')
 					inputTag.setAttribute('name', 'spies')
 					inputTag.setAttribute('value', '0')
@@ -497,12 +459,12 @@ createTag<HTMLFormElement>('form', (formTag) => {
 				}),
 			)
 		}),
-		createTag<HTMLInputElement>('input', (inputTag) => {
+		createTag('input', (inputTag) => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'train_spies')
 			inputTag.setAttribute('value', 'Enlist/Discharge Spies')
 		}),
-		createTag<HTMLAnchorElement>('a', (aTag) => {
+		createTag('a', (aTag) => {
 			aTag.setAttribute(
 				'href',
 				'https://politicsandwar.com/nation/military/spies/',
@@ -513,9 +475,7 @@ createTag<HTMLFormElement>('form', (formTag) => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) =>
-		inputTag.toggleAttribute('disabled', true)
-	)
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) => inputTag.toggleAttribute('disabled', true))
 	Promise.all([data, sessionStorage.Token(() => undefined)])
 		.then(() =>
 			formTag.querySelectorAll<HTMLInputElement>('input').forEach(
@@ -525,45 +485,41 @@ createTag<HTMLFormElement>('form', (formTag) => {
 })
 
 // Missiles
-createTag<HTMLFormElement>('form', (formTag) => {
+createTag('form', (formTag) => {
 	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
 	divTag.parentElement!.insertBefore(formTag, divTag)
 	divTag.remove()
 
 	formTag.classList.add('doc_military')
 	formTag.append(
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Missiles Stockpiled: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.missiles.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.missiles.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Missiles Manufactured Today: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.missiles_today.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.missiles_today.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Manufacture/Decommission: ',
 				divSpacer(),
-				createTag<HTMLInputElement>('input', (inputTag) => {
+				createTag('input', (inputTag) => {
 					inputTag.setAttribute('type', 'number')
 					inputTag.setAttribute(
 						'name',
@@ -577,12 +533,12 @@ createTag<HTMLFormElement>('form', (formTag) => {
 				}),
 			)
 		}),
-		createTag<HTMLInputElement>('input', (inputTag) => {
+		createTag('input', (inputTag) => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'missile_purchase_form_submit')
 			inputTag.setAttribute('value', 'Manufacture/Decommission Missiles')
 		}),
-		createTag<HTMLAnchorElement>('a', (aTag) => {
+		createTag('a', (aTag) => {
 			aTag.setAttribute(
 				'href',
 				'https://politicsandwar.com/nation/military/missiles/',
@@ -593,9 +549,7 @@ createTag<HTMLFormElement>('form', (formTag) => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) =>
-		inputTag.toggleAttribute('disabled', true)
-	)
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) => inputTag.toggleAttribute('disabled', true))
 	data.then(async (nation) => {
 		if (!nation.missile_launch_pad) {
 			return
@@ -608,55 +562,49 @@ createTag<HTMLFormElement>('form', (formTag) => {
 })
 
 // Nukes
-createTag<HTMLFormElement>('form', (formTag) => {
+createTag('form', (formTag) => {
 	const divTag = document.querySelector<HTMLDivElement>('#rightcolumn>.row')!
 	divTag.parentElement!.insertBefore(formTag, divTag)
 	divTag.remove()
 
 	formTag.classList.add('doc_military')
 	formTag.append(
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Nuclear Weapons Possessed: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.nukes.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.nukes.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Nuclear Weapons Manufactured Today: ',
 				divSpacer(),
-				createTag<HTMLSpanElement>('span', (spanTag) => {
+				createTag('span', (spanTag) => {
 					spanTag.append('?')
-					data.then((nation) =>
-						spanTag.textContent = nation.nukes_today.toString()
-					)
+					data.then((nation) => spanTag.textContent = nation.nukes_today.toString())
 				}),
 			)
 		}),
-		createTag<HTMLLabelElement>('label', (labelTag) => {
+		createTag('label', (labelTag) => {
 			labelTag.classList.add('spacer-row')
 			labelTag.append(
 				'Manufacture/Decommission: ',
 				divSpacer(),
-				createTag<HTMLInputElement>('input', (inputTag) => {
+				createTag('input', (inputTag) => {
 					inputTag.setAttribute('type', 'number')
 					inputTag.setAttribute('name', 'ships')
 					inputTag.setAttribute('value', '0')
-					data.then((nation) =>
-						inputTag.value = (1 - nation.nukes_today).toString()
-					)
+					data.then((nation) => inputTag.value = (1 - nation.nukes_today).toString())
 				}),
 			)
 		}),
-		createTag<HTMLInputElement>('input', (inputTag) => {
+		createTag('input', (inputTag) => {
 			inputTag.setAttribute('type', 'submit')
 			inputTag.setAttribute('name', 'buyships')
 			inputTag.setAttribute(
@@ -664,7 +612,7 @@ createTag<HTMLFormElement>('form', (formTag) => {
 				'Manufacture/Decommission Nuclear Weapons',
 			)
 		}),
-		createTag<HTMLAnchorElement>('a', (aTag) => {
+		createTag('a', (aTag) => {
 			aTag.setAttribute(
 				'href',
 				'https://politicsandwar.com/nation/military/nukes/',
@@ -675,9 +623,7 @@ createTag<HTMLFormElement>('form', (formTag) => {
 
 	formTag.addEventListener('submit', formSubmitEvent, { passive: false })
 
-	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) =>
-		inputTag.toggleAttribute('disabled', true)
-	)
+	formTag.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) => inputTag.toggleAttribute('disabled', true))
 	data.then(async (nation) => {
 		if (!nation.nuclear_research_facility) {
 			return
@@ -696,9 +642,7 @@ async function formSubmitEvent(
 	event: SubmitEvent,
 ): Promise<void> {
 	event.preventDefault()
-	this.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) =>
-		inputTag.toggleAttribute('disabled', true)
-	)
+	this.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) => inputTag.toggleAttribute('disabled', true))
 	await sessionStorage.Token(async (token) =>
 		new DOMParser().parseFromString(
 			await (await fetch(
@@ -728,7 +672,5 @@ async function formSubmitEvent(
 		).querySelector<HTMLInputElement>('input[name="token"]')?.value ?? null
 	)
 	this.querySelector<HTMLInputElement>('input[type="number"]')!.value = '0'
-	this.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) =>
-		inputTag.toggleAttribute('disabled', false)
-	)
+	this.querySelectorAll<HTMLInputElement>('input').forEach((inputTag) => inputTag.toggleAttribute('disabled', false))
 }

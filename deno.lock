@@ -198,9 +198,12 @@
       }
     }
   },
-  "remote": {},
+  "remote": {
+    "https://deno.land/x/basic_jsx@v3.0.1/mod.tsx": "a7a1b881d60531b04e51106e92d01a0ee3b0af73db14d5be08a96527b680ae68"
+  },
   "workspace": {
     "dependencies": [
+      "jsr:@doctor/create-tag@^0.1.2",
       "jsr:@luca/esbuild-deno-loader@^0.10.3",
       "jsr:@std/streams@^0.224.1",
       "npm:esbuild@^0.21.3"

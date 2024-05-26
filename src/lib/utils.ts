@@ -1,3 +1,4 @@
+import { createTag } from '@doctor/create-tag'
 import * as localStorage from './localStorage.ts'
 
 export type None = undefined | null
@@ -19,17 +20,6 @@ export async function lock<T>(key: string, func: () => Promise<T>): Promise<T> {
 	}
 }
 
-export function createTag<T extends HTMLElement>(
-	type: string,
-	func?: (tag: T) => void,
-): T {
-	const tag = document.createElement(type) as T
-	if (func) {
-		func(tag)
-	}
-	return tag
-}
-
 export enum GetLocalStorageKey {
 	Doc_APIKey = 'APIKey',
 }
@@ -45,7 +35,7 @@ export function sleep(ms: number): Promise<true> {
 }
 
 export function divSpacer(): HTMLDivElement {
-	return createTag<HTMLDivElement>(
+	return createTag(
 		'div',
 		(divTag) => divTag.classList.add('spacer'),
 	)
@@ -53,7 +43,7 @@ export function divSpacer(): HTMLDivElement {
 
 function userConfig() {
 	return document.querySelector<HTMLDivElement>('#Doc_Config') ??
-		createTag<HTMLDivElement>('div', (divTag) => {
+		createTag('div', (divTag) => {
 			document.querySelector('#leftcolumn')!.append(divTag)
 			divTag.setAttribute('id', 'Doc_Config')
 		})
@@ -62,13 +52,13 @@ function userConfig() {
 export function userConfig_Label(label: string) {
 	const divTag = userConfig()
 	divTag.append(document.createElement('hr'))
-	divTag.append(createTag<HTMLElement>('b', (bTag) => bTag.append(label)))
+	divTag.append(createTag('b', (bTag) => bTag.append(label)))
 }
 
 export function userConfig_APIKey() {
 	const divTag = userConfig()
 	divTag.append(document.createElement('br'))
-	divTag.append(createTag<HTMLButtonElement>('button', (buttonTag) => {
+	divTag.append(createTag('button', (buttonTag) => {
 		const apiKey = localStorage.APIKey()
 		buttonTag.append(apiKey ? 'Update API Key' : 'Insert API Key')
 		buttonTag.addEventListener('click', (_event) => {

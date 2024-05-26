@@ -224,7 +224,5 @@ export function formatNumber(number: number, digits = 2) {
 }
 
 export function formatBigInt(x: bigint) {
-	return `${
-		(x / 100n).toLocaleString('en-US', { maximumFractionDigits: 0 })
-	}.${(x % 100n).toString().padStart(2, '0')}`
+	return `${(x / 100n).toLocaleString('en-US', { maximumFractionDigits: 0 })}.${(x % 100n).toString().padStart(2, '0')}`
 }

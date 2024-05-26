@@ -4,7 +4,9 @@ import { denoPlugins } from '@luca/esbuild-deno-loader'
 
 async function esbuild(inPath: string, outPath: string) {
 	const { errors, warnings } = await build({
-		plugins: denoPlugins(),
+		plugins: denoPlugins({
+			configPath: await Deno.realPath('./deno.json'),
+		}),
 		entryPoints: [inPath],
 		outfile: outPath,
 		format: 'esm',
@@ -24,7 +26,9 @@ async function createScript(path: string) {
 		for await (
 			const line of (await Deno.open(path)).readable.pipeThrough(
 				new TextDecoderStream(),
-			).pipeThrough(new TextLineStream())
+			).pipeThrough(
+				new TextLineStream(),
+			)
 		) {
 			if (!copyLine) {
 				if (line.trim() === '// ==UserScript==') {
@@ -71,7 +75,5 @@ await Promise.allSettled(Deno.args.map((arg) => createScript(arg)))
 stop()
 
 console.log(
-	`${
-		performance.now().toLocaleString('en-US', { maximumFractionDigits: 2 })
-	}ms`,
+	`${performance.now().toLocaleString('en-US', { maximumFractionDigits: 2 })}ms`,
 )

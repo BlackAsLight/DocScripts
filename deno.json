@@ -10,20 +10,23 @@
 		"jsxFragmentFactory": "y"
 	},
 	"fmt": {
-		"indentWidth": 4,
-		"singleQuote": true,
 		"useTabs": true,
+		"indentWidth": 4,
+		"lineWidth": 128,
 		"semiColons": false,
+		"singleQuote": true,
 		"exclude": [
 			"**/*.js"
 		]
 	},
 	"tasks": {
+		"test": "deno run -A test.ts",
 		"build": "deno run -A bundle.ts",
 		"check": "deno cache --lock-write bundle.ts test.ts && deno check bundle.ts test.ts",
 		"ok": "deno fmt && deno task check && deno task build"
 	},
 	"imports": {
+		"@doctor/create-tag": "jsr:@doctor/create-tag@^0.1.2",
 		"@luca/esbuild-deno-loader": "jsr:@luca/esbuild-deno-loader@^0.10.3",
 		"@std/streams": "jsr:@std/streams@^0.224.1",
 		"esbuild": "npm:esbuild@^0.21.3"
