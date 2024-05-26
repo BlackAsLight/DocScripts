@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Military
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      10.0.0
+// @version      10.0.1
 // @description  Making it easier to militarise and demilitarise your army.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/military/
@@ -12,7 +12,6 @@
 import * as localStorage from './lib/localStorage.ts'
 import * as sessionStorage from './lib/sessionStorage.ts'
 import { divSpacer, userConfig_APIKey, userConfig_Label } from './lib/utils.ts'
-
 import { createTag } from '@doctor/create-tag'
 
 /* Double Injection Protection
@@ -20,10 +19,7 @@ import { createTag } from '@doctor/create-tag'
 if (document.querySelector('#Doc_Military')) {
 	throw Error('This script was already injected...')
 }
-document.body.append(createTag('div', (divTag) => {
-	divTag.setAttribute('id', 'Doc_Military')
-	divTag.style.setProperty('display', 'none')
-}))
+document.body.append(createTag('div', { id: 'Doc_Military' }, divTag => divTag.style.setProperty('display', 'none')))
 
 /* Global Variables
 -------------------------*/
