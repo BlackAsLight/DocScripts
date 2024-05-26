@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: Create Trade
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      10.0.0
+// @version      10.0.1
 // @description  Makes script, View Trades, Outbid and Match buttons work.
 // @author       BlackAsLight
 // @match        https://politicsandwar.com/nation/trade/create/*
@@ -18,7 +18,7 @@ import { createTag } from '@doctor/create-tag'
 if (document.querySelector('#Doc_CreateTrade')) {
 	throw Error('This script was already injected...')
 }
-document.body.append(createTag('div', { id: 'Doc_CreateTag' }, (divTag) => divTag.style.setProperty('display', 'none')))
+document.body.append(createTag('div', { id: 'Doc_CreateTrade' }, (divTag) => divTag.style.setProperty('display', 'none')))
 
 /* Global Variables
 -------------------------*/
