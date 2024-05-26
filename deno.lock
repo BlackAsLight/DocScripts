@@ -199,7 +199,7 @@
     }
   },
   "remote": {
-    "https://deno.land/x/basic_jsx@v3.0.1/mod.tsx": "a7a1b881d60531b04e51106e92d01a0ee3b0af73db14d5be08a96527b680ae68"
+    "https://deno.land/x/basic_jsx@v3.1.2/mod.tsx": "97261638ea3778fbbc85fce462b304183f065359ad135dbb535385b5d4a858a2"
   },
   "workspace": {
     "dependencies": [

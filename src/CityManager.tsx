@@ -23,8 +23,7 @@ document.body.append(
 
 /* Global Variables
 -------------------------*/
-let token =
-	(document.querySelector('input[name="token"]') as HTMLInputElement).value
+let token = (document.querySelector('input[name="token"]') as HTMLInputElement).value
 let submitting = false
 /* Main
 -------------------------*/
@@ -61,19 +60,15 @@ document.querySelectorAll('form[action*="#improvements"]')
 					'input[name="token"]',
 				) as HTMLInputElement).value
 				wrap(inputTag.parentElement as HTMLParagraphElement, (pTag) =>
-					(pTag.nextElementSibling
-						? pTag.nextElementSibling
-						: pTag.previousElementSibling) as HTMLParagraphElement)
+					(pTag.nextElementSibling ? pTag.nextElementSibling : pTag.previousElementSibling) as HTMLParagraphElement)
 					.textContent = wrap(
 						(dom.querySelector(
 							`input[name="${inputTag.name}"]`,
 						) as HTMLInputElement)
 							.parentElement as HTMLParagraphElement,
 						(pTag) =>
-							(pTag.nextElementSibling
-								? pTag.nextElementSibling
-								: pTag
-									.previousElementSibling) as HTMLParagraphElement,
+							(pTag.nextElementSibling ? pTag.nextElementSibling : pTag
+								.previousElementSibling) as HTMLParagraphElement,
 					).textContent
 				const spanTags = [
 					...document.querySelectorAll('.improvementQuantity'),

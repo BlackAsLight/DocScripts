@@ -58,32 +58,25 @@ if (document.querySelector('.alert-success')) {
 		q && q > 10_000_000 && localStorage.getItem(LocalStorageKeys.Recursive)
 	) {
 		const args = self.location.search.slice(1).split('&')
-		args[args.findIndex((arg) => arg.startsWith('q='))] = `q=${
-			q - 10_000_000
-		}`
+		args[args.findIndex((arg) => arg.startsWith('q='))] = `q=${q - 10_000_000}`
 		if (localStorage.getItem(LocalStorageKeys.Price)) {
-			args[args.findIndex((arg) => arg.startsWith('p='))] = `p=${
-				localStorage.getItem(LocalStorageKeys.Price)
-			}`
+			args[args.findIndex((arg) => arg.startsWith('p='))] = `p=${localStorage.getItem(LocalStorageKeys.Price)}`
 			localStorage.removeItem(LocalStorageKeys.Price)
 		}
 		self.location.href = self.location.origin + self.location.pathname +
 			'?' + args.join('&')
 	} else {
-		self.location.href =
-			`https://politicsandwar.com/index.php?id=26&display=world&resource1=${
-				resource ??
-					document.querySelector<HTMLAnchorElement>(
-						'.alert-success a[href^="https://politicsandwar.com/index.php"]',
-					)!.href.split('?')[1].split('&').find((arg) =>
-						arg.startsWith('resource1=')
-					)?.split('=')[1]
-			}&buysell=${
-				[
-					'buy',
-					'sell',
-				][parseInt(localStorage.getItem('Doc_MarketView')!)] ?? ''
-			}&ob=price&od=DEF&maximum=100&minimum=0&search=Go`
+		self.location.href = `https://politicsandwar.com/index.php?id=26&display=world&resource1=${
+			resource ??
+				document.querySelector<HTMLAnchorElement>(
+					'.alert-success a[href^="https://politicsandwar.com/index.php"]',
+				)!.href.split('?')[1].split('&').find((arg) => arg.startsWith('resource1='))?.split('=')[1]
+		}&buysell=${
+			[
+				'buy',
+				'sell',
+			][parseInt(localStorage.getItem('Doc_MarketView')!)] ?? ''
+		}&ob=price&od=DEF&maximum=100&minimum=0&search=Go`
 	}
 } else if (resource && document.querySelector('form#createTrade')) {
 	localStorage.removeItem(LocalStorageKeys.Recursive)
@@ -94,9 +87,8 @@ if (document.querySelector('.alert-success')) {
 	})
 	formTag.addEventListener('submit', (_event) => {
 		if (p) {
-			const price =
-				document.querySelector<HTMLInputElement>('input#priceper')!
-					.valueAsNumber
+			const price = document.querySelector<HTMLInputElement>('input#priceper')!
+				.valueAsNumber
 			if (price !== p) {
 				localStorage.setItem(LocalStorageKeys.Price, `${price}`)
 			}
@@ -133,8 +125,7 @@ if (document.querySelector('.alert-success')) {
 		buttonTag.setAttribute('name', 'submit')
 		buttonTag.setAttribute('value', t === 's' ? 'Sell' : 'Buy')
 		buttonTag.removeAttribute('data-target')
-		const ticks =
-			parseInt(localStorage.getItem(LocalStorageKeys.Ticks) ?? '0') -
+		const ticks = parseInt(localStorage.getItem(LocalStorageKeys.Ticks) ?? '0') -
 			new Date().getTime()
 		if (ticks > 0) {
 			buttonTag.toggleAttribute('disabled', true)

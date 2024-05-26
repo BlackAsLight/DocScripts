@@ -96,8 +96,7 @@ formTag.parentElement?.insertBefore(
 						localStorage.setItem(scoreKey, `${score}`)
 						updateIcons(score)
 						;((buttonTag.previousElementSibling as HTMLBRElement)
-							.previousElementSibling as HTMLInputElement).value =
-								`${score}`
+							.previousElementSibling as HTMLInputElement).value = `${score}`
 						buttonTag.toggleAttribute('disabled', false)
 					}),
 			)}
