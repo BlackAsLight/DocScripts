@@ -2,7 +2,7 @@
   "version": "3",
   "packages": {
     "specifiers": {
-      "jsr:@doctor/create-tag@^0.1.3": "jsr:@doctor/create-tag@0.1.3",
+      "jsr:@doctor/create-tag@^0.2.0": "jsr:@doctor/create-tag@0.2.0",
       "jsr:@luca/esbuild-deno-loader@^0.10.3": "jsr:@luca/esbuild-deno-loader@0.10.3",
       "jsr:@std/assert@^0.213.1": "jsr:@std/assert@0.213.1",
       "jsr:@std/assert@^0.224.0": "jsr:@std/assert@0.224.0",
@@ -14,12 +14,12 @@
       "jsr:@std/json@^0.213.1": "jsr:@std/json@0.213.1",
       "jsr:@std/jsonc@0.213": "jsr:@std/jsonc@0.213.1",
       "jsr:@std/path@0.213": "jsr:@std/path@0.213.1",
-      "jsr:@std/streams@^0.224.1": "jsr:@std/streams@0.224.1",
-      "npm:esbuild@^0.21.3": "npm:esbuild@0.21.4"
+      "jsr:@std/streams@^0.224.2": "jsr:@std/streams@0.224.2",
+      "npm:esbuild@^0.21.4": "npm:esbuild@0.21.4"
     },
     "jsr": {
-      "@doctor/create-tag@0.1.3": {
-        "integrity": "7a2e9d3065a286426de9492af9c857ef801a2b363884b3d05e44d3ef0fb17e67"
+      "@doctor/create-tag@0.2.0": {
+        "integrity": "26dfc0b23edb3eade94e6362f79c14e1a5fcd064e3d96b9a558f468bff237b60"
       },
       "@luca/esbuild-deno-loader@0.10.3": {
         "integrity": "32fc93f7e7f78060234fd5929a740668aab1c742b808c6048b57f9aaea514921",
@@ -70,8 +70,8 @@
           "jsr:@std/assert@^0.213.1"
         ]
       },
-      "@std/streams@0.224.1": {
-        "integrity": "e8565a376ae3888f60770cd09e480952ec7c349007aed81b8f7165424ce2195f",
+      "@std/streams@0.224.2": {
+        "integrity": "5d437af1423e4f616111b986ea783c15e0bc998b53e23e93b623de7ef0b14c2b",
         "dependencies": [
           "jsr:@std/assert@^0.225.3",
           "jsr:@std/bytes@^1.0.0-rc.3",
@@ -205,10 +205,10 @@
   "remote": {},
   "workspace": {
     "dependencies": [
-      "jsr:@doctor/create-tag@^0.1.3",
+      "jsr:@doctor/create-tag@^0.2.0",
       "jsr:@luca/esbuild-deno-loader@^0.10.3",
-      "jsr:@std/streams@^0.224.1",
-      "npm:esbuild@^0.21.3"
+      "jsr:@std/streams@^0.224.2",
+      "npm:esbuild@^0.21.4"
     ]
   }
 }
