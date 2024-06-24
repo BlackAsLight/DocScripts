@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      6.91
+// @version      6.92
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @include      https://politicsandwar.com/index.php?id=26*
@@ -133,9 +133,9 @@ document.querySelector('#leftcolumn').append(CreateElement('div', divTag => {
 			CreateElement('input', inputTag => {
 				inputTag.type = 'number'
 				inputTag.value = MaxAmount(currentResource)
-				inputTag.onchange = () => {
+				inputTag.addEventListener('change', function (_event) {
 					const currentMax = MaxAmount(currentResource)
-					const newMax = parseInt(prompt(`Set the maximum amount of ${currentResource} that you would like to offer when creating an offer:`, currentMax)).toString()
+					const newMax = (Math.round(this.valueAsNumber * 100) / 100).toString()
 					if (newMax !== 'NaN' && newMax !== currentMax) {
 						const key = `Doc_MaxResource_${currentResource}`
 						if (newMax > 0) {
@@ -146,7 +146,7 @@ document.querySelector('#leftcolumn').append(CreateElement('div', divTag => {
 						}
 						UpdateLinks()
 					}
-				}
+				})
 			})
 		)))
 	}
@@ -157,9 +157,9 @@ document.querySelector('#leftcolumn').append(CreateElement('div', divTag => {
 		CreateElement('input', inputTag => {
 			inputTag.type = 'number'
 			inputTag.value = MinAmount(currentResource)
-			inputTag.onchange = () => {
+			inputTag.addEventListener('change', function (_event) {
 				const currentMin = MinAmount(currentResource)
-				const newMin = (Math.round(parseFloat(prompt(`Set the minimum amount of ${currentResource} that you don't want to accidentally sell:`, currentMin)) * 100) / 100).toString()
+				const newMin = (Math.round(this.valueAsNumber * 100) / 100).toString()
 				if (newMin != 'NaN' && newMin != currentMin) {
 					const key = `Doc_MinResource_${currentResource}`
 					if (newMin > 0) {
@@ -171,7 +171,7 @@ document.querySelector('#leftcolumn').append(CreateElement('div', divTag => {
 					UpdateQuantities()
 					UpdateLinks()
 				}
-			}
+			})
 		})
 	)))
 
