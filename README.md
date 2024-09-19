@@ -6,6 +6,8 @@ This repo contains the source code for the scripts maintained by Doctor for a ga
 These scripts offer QoL things to the game in various specific areas. To find out more about how to use the scripts head to
 [DocScripts](https://docscripts.stagintin.com/)
 
+One of the scripts "Play Baseball" has a discord server that lets you find anothers to play with. It's called the [Orbital Baseball League](https://discord.gg/dfmnW2xt7B)
+
 ## DO NOT
 
 ...ask me how to do this or that unless you have read, followed, and _failed_ the
