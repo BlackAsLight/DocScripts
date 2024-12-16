@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"]
+  },
+  "imports": {
+    "@doctor/create-tag": "jsr:@doctor/create-tag@^0.2.0",
+    "@luca/esbuild-deno-loader": "jsr:@luca/esbuild-deno-loader@^0.11.1",
+    "@std/path": "jsr:@std/path@^1.0.8",
+    "esbuild": "npm:esbuild@^0.24.0"
+  },
+  "exclude": ["**/*.js"],
+  "tasks": {
+    "test": "deno run -A test.ts",
+    "build": "deno run -A build.ts",
+    "ok": "deno fmt && deno lint && deno task build"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "include": [
+        "camelcase",
+        "explicit-function-return-type",
+        "explicit-module-boundary-types",
+        "no-eval",
+        "no-inferrable-types",
+        "no-sparse-arrays",
+        "no-sync-fn-in-async-fn",
+        "no-throw-literal",
+        // "no-undef",
+        "prefer-ascii",
+        "single-var-declarator",
+        "verbatim-module-syntax"
+      ]
+    }
+  }
+}
