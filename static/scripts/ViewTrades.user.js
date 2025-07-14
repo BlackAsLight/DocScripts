@@ -448,6 +448,10 @@ function UpdateQuantities() {
 }
 
 function CreateRow(tdTags) {
+	const internalMarketTrade = tdTags[1].querySelector('span[title*="This trade from your shared alliance market"]')
+	if (internalMarketTrade) {
+		return
+	}
 	const sellerWanted = tdTags[1].textContent === 'SELLER WANTED'
 	const buyerWanted = tdTags[2].textContent === 'BUYER WANTED'
 	const offerType = (() => {
