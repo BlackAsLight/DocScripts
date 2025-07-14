@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      6.92
+// @version      6.93
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @include      https://politicsandwar.com/index.php?id=26*
@@ -448,6 +448,10 @@ function UpdateQuantities() {
 }
 
 function CreateRow(tdTags) {
+	const internalMarketTrade = tdTags[1].querySelector('span[title*="This trade from your shared alliance market"]')
+	if (internalMarketTrade) {
+		return
+	}
 	const sellerWanted = tdTags[1].textContent === 'SELLER WANTED'
 	const buyerWanted = tdTags[2].textContent === 'BUYER WANTED'
 	const offerType = (() => {
