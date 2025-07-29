@@ -523,7 +523,7 @@ function CreateRow(tdTags) {
 		divTag.append(CreateElement('div', divTag => {
 			divTag.classList.add('Create')
 			divTag.style.setProperty('grid-area', 'Create')
-			if (offerType.startsWith('Receive')) {
+			if (offerType.startsWith('Receive') || offerType === 'Embargo') {
 				// Outbid + Match
 				divTag.append(CreateElement('a', aTag => {
 					aTag.classList.add(`${sellUnits ? 's' : 'b'}Outbid_${resource}`)
