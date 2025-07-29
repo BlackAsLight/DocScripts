@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doc: View Trades
 // @namespace    https://politicsandwar.com/nation/id=19818
-// @version      6.94
+// @version      6.95
 // @description  Make Trading on the market Better!
 // @author       BlackAsLight
 // @include      https://politicsandwar.com/index.php?id=26*
@@ -523,7 +523,7 @@ function CreateRow(tdTags) {
 		divTag.append(CreateElement('div', divTag => {
 			divTag.classList.add('Create')
 			divTag.style.setProperty('grid-area', 'Create')
-			if (offerType.startsWith('Receive')) {
+			if (offerType.startsWith('Receive') || offerType === 'Embargo') {
 				// Outbid + Match
 				divTag.append(CreateElement('a', aTag => {
 					aTag.classList.add(`${sellUnits ? 's' : 'b'}Outbid_${resource}`)
